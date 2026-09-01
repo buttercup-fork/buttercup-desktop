@@ -1,8 +1,6 @@
 const path = require("path");
 const { execSync } = require("child_process");
 const fs = require("fs");
-const yaml = require("js-yaml");
-const { appBuilderPath } = require("app-builder-bin");
 const currentWorkingDirectory = process.cwd();
 const packageInfo = require(path.join(currentWorkingDirectory, "package.json"));
 
@@ -14,6 +12,10 @@ const APP_GENERATED_BINARY_PATH = path.join(APP_DIST_PATH, `${APP_NAME}-${APP_VE
 module.exports = (buildResults) => {
     const hasMacZip = buildResults.artifactPaths.some((artPath) => /mac*\.zip$/.test(artPath));
     if (!hasMacZip) return;
+    // macOS-only from here down (uses `ditto`); require these lazily so Windows
+    // and Linux builds don't need them installed.
+    const yaml = require("js-yaml");
+    const { appBuilderPath } = require("app-builder-bin");
     console.log("Zipping Started");
     execSync(
         `ditto -c -k --sequesterRsrc --keepParent --zlibCompressionLevel 9 "${APP_DIST_PATH}/mac/${APP_NAME}.app" "${APP_DIST_PATH}/${APP_NAME}-${APP_VERSION}-mac.zip"`

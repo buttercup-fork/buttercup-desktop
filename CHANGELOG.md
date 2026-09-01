@@ -29,6 +29,17 @@ Modernization work on the `rewrite/electron-modernize` branch.
 - The `buttercup` dependency now tracks the `ByteWurst-Labs/buttercup-core` fork.
 - Pointed `repository`, `bugs`, `homepage` and the electron-builder `publish`
   target at `bytewurst-labs/buttercup-desktop`.
+- Migrated the `build` config for electron-builder 26: `linux.desktop` entries
+  moved under `desktop.entry`; `win.sign` / `win.publisherName` moved under
+  `win.signtoolOptions`; `mac.notarize` is now a boolean (set to `false` — set it
+  to `true` with `APPLE_TEAM_ID=9D8F4J769D` and the other Apple env vars to
+  notarize).
+- `resources/scripts/windowsSign.js` now skips signing (unsigned build) when
+  `WIN_YUBIKEY_PIN` is unset instead of throwing, so `npm run package:win` works
+  without the signing key.
+- `resources/scripts/afterAllArtifactBuild.js` (macOS-only) now requires
+  `js-yaml` / `app-builder-bin` lazily; added both as devDependencies so Windows
+  and Linux packaging no longer fail on the missing module.
 
 ### Added
 

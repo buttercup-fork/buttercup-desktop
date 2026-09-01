@@ -9,7 +9,12 @@ exports.default = async (configuration) => {
     const { WIN_YUBIKEY_PIN } = process.env;
 
     if (!WIN_YUBIKEY_PIN) {
-        throw new Error("Yubikey PIN environment variable required");
+        console.log(
+            chalk.yellow(
+                ` · Skipping Windows code signing: WIN_YUBIKEY_PIN not set (unsigned build)`
+            )
+        );
+        return;
     }
 
     console.log(` ${chalk.greenBright("·")} ${basename(configuration.path)}`);
