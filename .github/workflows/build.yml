@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
+
+# Allow the release job to create a GitHub release from a tag build.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            package: package:win
+          - os: macos-latest
+            package: package:mac
+          - os: ubuntu-latest
+            package: package:linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Installs deps and builds the buttercup-core git dependency via its
+      # `prepare` script.
+      - run: npm ci
+
+      - run: npm run build
+
+      # Unsigned CI builds. electron-builder won't hunt for a signing identity
+      # (CSC_IDENTITY_AUTO_DISCOVERY), and the custom Windows sign hook skips
+      # itself when WIN_YUBIKEY_PIN is unset (resources/scripts/windowsSign.js).
+      - name: Package (${{ matrix.package }})
+        run: npm run ${{ matrix.package }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Collect installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: buttercup-${{ matrix.os }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.zip
+            dist/*.AppImage
+            dist/*.7z
+            dist/*.blockmap
+            dist/latest*.yml
+
+  release:
+    name: Draft GitHub release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          fail_on_unmatched_files: true
+          files: artifacts/**/*

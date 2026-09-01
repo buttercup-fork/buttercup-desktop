@@ -45,6 +45,7 @@ Modernization work on the `rewrite/electron-modernize` branch.
 
 - End-to-end UI tests with Playwright (`e2e/`, `playwright.config.ts`). Run with `npm run test:e2e` (or `npm run test:e2e:ui` for the interactive runner). See [`e2e/README.md`](e2e/README.md).
 - `npm run start:isolated` — runs a development build against a throwaway data directory so it can coexist with a personally-installed Buttercup without touching its config, vault list or logs.
+- CI: `.github/workflows/build.yml` builds unsigned installers for Windows, macOS and Linux on every push to `master` (and on `v*` tags, where it also drafts a GitHub release with the artifacts attached); can also be run manually. Rewrote `test.yml` (was pinned to deprecated actions and only ran on Ubuntu) into a 3-OS build/unit matrix plus a headless Playwright e2e job.
 - This `CHANGELOG.md`.
 
 [Unreleased]: https://github.com/ByteWurst-Labs/buttercup-desktop/compare/v2.28.1...HEAD
