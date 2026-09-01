@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/buttercup/buttercup-desktop.git"
+    "url": "git+https://github.com/bytewurst-labs/buttercup-desktop.git"
   },
   "engines": {
     "node": ">=16",
@@ -56,14 +56,14 @@
   "author": "Vault Garden",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/buttercup/desktop/issues"
+    "url": "https://github.com/bytewurst-labs/buttercup-desktop/issues"
   },
-  "homepage": "https://github.com/buttercup/desktop#readme",
+  "homepage": "https://github.com/bytewurst-labs/buttercup-desktop#readme",
   "build": {
     "publish": [
       {
         "provider": "github",
-        "owner": "buttercup",
+        "owner": "bytewurst-labs",
         "repo": "buttercup-desktop"
       }
     ],

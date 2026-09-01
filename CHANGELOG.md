@@ -27,6 +27,8 @@ Modernization work on the `rewrite/electron-modernize` branch.
   - `clipboard.readText()` is now awaited in the auto-clear-clipboard timer.
 - Replaced the Pug renderer template (`resources/renderer.pug`) with plain HTML (`resources/renderer.html`) and removed `pug` / `pug-loader`.
 - The `buttercup` dependency now tracks the `ByteWurst-Labs/buttercup-core` fork.
+- Pointed `repository`, `bugs`, `homepage` and the electron-builder `publish`
+  target at `bytewurst-labs/buttercup-desktop`.
 
 ### Added
 
