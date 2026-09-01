@@ -83,10 +83,6 @@ module.exports = [
                     exclude: /node_modules/
                 },
                 {
-                    test: /\.pug$/,
-                    use: "pug-loader"
-                },
-                {
                     test: /\.(png|jpe?g|gif)$/i,
                     use: "file-loader"
                 },
@@ -123,7 +119,7 @@ module.exports = [
             new HTMLWebpackPlugin({
                 filename: "index.html",
                 inject: "body",
-                template: path.resolve(__dirname, "./resources/renderer.pug")
+                template: path.resolve(__dirname, "./resources/renderer.html")
             }),
             new CopyWebpackPlugin({
                 patterns: [

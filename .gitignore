@@ -1,6 +1,33 @@
+# Logs
 *.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies
 node_modules
+
+# Build output
 /build
 /dist
+*.tsbuildinfo
+
+# Local runtime / config
 dev-app-update.yml
+.env
+.env.*
+!.env.example
+
+# Test output
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea
+*.swp
