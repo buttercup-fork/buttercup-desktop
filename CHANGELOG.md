@@ -4,13 +4,13 @@ All notable changes to this fork of Buttercup Desktop are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/bytewurst-labs/buttercup-desktop/tags) and the original project's GitHub Releases.
+Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/bytewerk-labs/buttercup-desktop/tags) and the original project's GitHub Releases.
 
 ## [Unreleased]
 
 ## [2.29.0] - 2026-09-01
 
-First release of the ByteWurst-Labs fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
+First release of the ByteWerk Labs fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
 
 ### Security
 
@@ -28,9 +28,9 @@ First release of the ByteWurst-Labs fork. A modernization pass over the archived
   - `LoginItemSettings.wasOpenedAsHidden` / `Settings.openAsHidden` are cast (no longer in Electron's type definitions; still present at runtime on macOS).
   - `clipboard.readText()` is now awaited in the auto-clear-clipboard timer.
 - Replaced the Pug renderer template (`resources/renderer.pug`) with plain HTML (`resources/renderer.html`) and removed `pug` / `pug-loader`.
-- The `buttercup` dependency now tracks the `ByteWurst-Labs/buttercup-core` fork.
+- The `buttercup` dependency now tracks the `bytewerk-labs/buttercup-core` fork.
 - Pointed `repository`, `bugs`, `homepage` and the electron-builder `publish`
-  target at `bytewurst-labs/buttercup-desktop`.
+  target at `bytewerk-labs/buttercup-desktop`.
 - Migrated the `build` config for electron-builder 26: `linux.desktop` entries moved under `desktop.entry`; `win.sign` / `win.publisherName` moved under `win.signtoolOptions`; `mac.notarize` is now a boolean (set to `false` — set it to `true` with `APPLE_TEAM_ID=9D8F4J769D` and the other Apple env vars to notarize).
 - Dropped the Linux `armv7l` (32-bit ARM) AppImage target — Electron 44 no longer ships that architecture. Linux builds are now x64 + arm64.
 - Removed the `afterAllArtifactBuild` hook (`resources/scripts/afterAllArtifactBuild.js`). It was a workaround for old electron-builder macOS zip/blockmap handling and broke under v26; v26 generates the mac `zip`, blockmap and `latest-mac.yml` natively.
@@ -44,5 +44,5 @@ First release of the ByteWurst-Labs fork. A modernization pass over the archived
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.29.0...HEAD
-[2.29.0]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.28.1...v2.29.0
+[Unreleased]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.29.0...HEAD
+[2.29.0]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.28.1...v2.29.0
