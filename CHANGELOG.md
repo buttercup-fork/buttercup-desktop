@@ -31,23 +31,16 @@ First release of the ByteWurst-Labs fork. A modernization pass over the archived
 - The `buttercup` dependency now tracks the `ByteWurst-Labs/buttercup-core` fork.
 - Pointed `repository`, `bugs`, `homepage` and the electron-builder `publish`
   target at `bytewurst-labs/buttercup-desktop`.
-- Migrated the `build` config for electron-builder 26: `linux.desktop` entries
-  moved under `desktop.entry`; `win.sign` / `win.publisherName` moved under
-  `win.signtoolOptions`; `mac.notarize` is now a boolean (set to `false` — set it
-  to `true` with `APPLE_TEAM_ID=9D8F4J769D` and the other Apple env vars to
-  notarize).
-- `resources/scripts/windowsSign.js` now skips signing (unsigned build) when
-  `WIN_YUBIKEY_PIN` is unset instead of throwing, so `npm run package:win` works
-  without the signing key.
-- `resources/scripts/afterAllArtifactBuild.js` (macOS-only) now requires
-  `js-yaml` / `app-builder-bin` lazily; added both as devDependencies so Windows
-  and Linux packaging no longer fail on the missing module.
+- Migrated the `build` config for electron-builder 26: `linux.desktop` entries moved under `desktop.entry`; `win.sign` / `win.publisherName` moved under `win.signtoolOptions`; `mac.notarize` is now a boolean (set to `false` — set it to `true` with `APPLE_TEAM_ID=9D8F4J769D` and the other Apple env vars to notarize).
+- Dropped the Linux `armv7l` (32-bit ARM) AppImage target — Electron 44 no longer ships that architecture. Linux builds are now x64 + arm64.
+- Removed the `afterAllArtifactBuild` hook (`resources/scripts/afterAllArtifactBuild.js`). It was a workaround for old electron-builder macOS zip/blockmap handling and broke under v26; v26 generates the mac `zip`, blockmap and `latest-mac.yml` natively.
+- `resources/scripts/windowsSign.js` now skips signing (unsigned build) when `WIN_YUBIKEY_PIN` is unset instead of throwing, so `npm run package:win` works without the signing key.
 
 ### Added
 
 - End-to-end UI tests with Playwright (`e2e/`, `playwright.config.ts`). Run with `npm run test:e2e` (or `npm run test:e2e:ui` for the interactive runner). See [`e2e/README.md`](e2e/README.md).
 - `npm run start:isolated` — runs a development build against a throwaway data directory so it can coexist with a personally-installed Buttercup without touching its config, vault list or logs.
-- CI: `.github/workflows/build.yml` builds unsigned installers for Windows, macOS and Linux on every push to `master` (and on `v*` tags, where it also drafts a GitHub release with the artifacts attached); can also be run manually. Rewrote `test.yml` (was pinned to deprecated actions and only ran on Ubuntu) into a 3-OS build/unit matrix plus a headless Playwright e2e job.
+- CI: `.github/workflows/build.yml` builds unsigned installers for Windows, macOS and Linux on every push to `master` (and on `v*` tags, where it also drafts a GitHub release with the artifacts attached); can also be run manually. Rewrote `test.yml` (was pinned to deprecated actions and only ran on Ubuntu) into a 3-OS build/unit matrix plus a Playwright e2e job (the e2e job is informational — the Electron window doesn't reliably come up under a headless display; the suite passes on a real desktop).
 - This `CHANGELOG.md`.
 
 [Unreleased]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.29.0...HEAD

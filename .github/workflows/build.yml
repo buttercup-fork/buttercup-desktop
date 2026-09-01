@@ -38,11 +38,13 @@ jobs:
 
       - run: npm run build
 
-      # Unsigned CI builds. electron-builder won't hunt for a signing identity
+      # Unsigned CI builds. `--publish never` stops electron-builder trying to
+      # talk to the GitHub releases API (the dedicated release job below handles
+      # publishing). electron-builder won't hunt for a signing identity
       # (CSC_IDENTITY_AUTO_DISCOVERY), and the custom Windows sign hook skips
       # itself when WIN_YUBIKEY_PIN is unset (resources/scripts/windowsSign.js).
       - name: Package (${{ matrix.package }})
-        run: npm run ${{ matrix.package }}
+        run: npm run ${{ matrix.package }} -- --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
