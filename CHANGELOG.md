@@ -41,6 +41,7 @@ First release of the ByteWurst-Labs fork. A modernization pass over the archived
 - End-to-end UI tests with Playwright (`e2e/`, `playwright.config.ts`). Run with `npm run test:e2e` (or `npm run test:e2e:ui` for the interactive runner). See [`e2e/README.md`](e2e/README.md).
 - `npm run start:isolated` — runs a development build against a throwaway data directory so it can coexist with a personally-installed Buttercup without touching its config, vault list or logs.
 - CI: `.github/workflows/build.yml` builds unsigned installers for Windows, macOS and Linux on every push to `master` (and on `v*` tags, where it also drafts a GitHub release with the artifacts attached); can also be run manually. Rewrote `test.yml` (was pinned to deprecated actions and only ran on Ubuntu) into a 3-OS build/unit matrix plus a Playwright e2e job (the e2e job is informational — the Electron window doesn't reliably come up under a headless display; the suite passes on a real desktop).
+- CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
 [Unreleased]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.29.0...HEAD

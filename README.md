@@ -48,7 +48,7 @@ _It is very important to note that no one associated with Buttercup will ever re
 
 The current stable version is **2**. We recommend upgrading if you're still on v1, as it is no longer being actively maintained. You can still browse the v1 source and documentation [here](https://github.com/buttercup/buttercup-desktop/tree/v1).
 
-Buttercup is built on Node 20 LTS - no other platform is officially supported.
+Buttercup is built on Node 22 LTS - no other platform is officially supported.
 
 ### Operating Systems
 

@@ -32,8 +32,8 @@
     "url": "git+https://github.com/bytewurst-labs/buttercup-desktop.git"
   },
   "engines": {
-    "node": ">=16",
-    "npm": ">=7"
+    "node": ">=20",
+    "npm": ">=9"
   },
   "lint-staged": {
     "{{resources,source,test}/**/*.{js,ts},webpack.config.js}": [
