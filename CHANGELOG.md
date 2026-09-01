@@ -19,7 +19,9 @@ Modernization work on the `rewrite/electron-modernize` branch.
 
 ### Changed
 
-- Upgraded to Electron 44. Adjusted `source/main` code for API/type changes:
+- Upgraded to Electron 44, and `@electron/remote` 2.0 → 2.1 (2.0.x crashed the
+  renderer on Electron 44 with `isDesktopCapturerEnabled is not a function`,
+  leaving a blank window). Adjusted `source/main` code for API/type changes:
   - `window-all-closed` handler no longer receives an `event` argument.
   - `LoginItemSettings.wasOpenedAsHidden` / `Settings.openAsHidden` are cast (no longer in Electron's type definitions; still present at runtime on macOS).
   - `clipboard.readText()` is now awaited in the auto-clear-clipboard timer.
