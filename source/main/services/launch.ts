@@ -44,15 +44,16 @@ async function setStartWithSessionNative(enable: boolean): Promise<void> {
     const isEnabled = app.getLoginItemSettings().openAtLogin;
     if (enable && !isEnabled) {
         app.setLoginItemSettings({
+            // `openAsHidden` is macOS-only and dropped from Electron's types.
             openAsHidden: true,
             openAtLogin: true,
             args: ["--autostart"]
-        });
+        } as Electron.Settings & { openAsHidden?: boolean });
     } else if (!enable && isEnabled) {
         app.setLoginItemSettings({
             openAsHidden: false,
             openAtLogin: false,
             args: []
-        });
+        } as Electron.Settings & { openAsHidden?: boolean });
     }
 }

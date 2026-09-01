@@ -14,6 +14,14 @@ The Buttercup project has come to an end, and these repositories are in transiti
 
 ---
 
+ℹ️ **About this fork**
+
+This is a [**ByteWurst-Labs**](https://github.com/ByteWurst-Labs) fork of the archived upstream project, maintained independently to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). It is not affiliated with or endorsed by the original Buttercup maintainers. See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
+
+It depends on the companion fork [`ByteWurst-Labs/buttercup-core`](https://github.com/ByteWurst-Labs/buttercup-core).
+
+---
+
 ## About
 
 Buttercup is a free, open-source and cross-platform **password manager**, built on NodeJS with Typescript. It uses strong industry-standard encryption to protect your passwords and credentials (among other data you store in Buttercup vaults) at rest, within vault files (`.bcup`). Vaults can be loaded from and saved to a number of sources, such as the **local filesystem**, **Dropbox**, **Google Drive** or any **WebDAV**-enabled service (like _ownCloud_ or _Nextcloud_ ¹).
@@ -152,9 +160,65 @@ We won't be supporting formats like Snapcraft, deb or rpm images as they do not 
 
 ## Development
 
-To begin developing features or bug-fixes for Buttercup Desktop, make sure that you first have Node v16 or greater installed with NPM v7 or greater.
+You need **Node 20 or greater** with **npm 9 or greater**. No IDE is required — any editor works (VS Code is convenient; see [`e2e/README.md`](e2e/README.md) for its optional Playwright extension).
 
-Once cloned, make sure to install all dependencies: `npm install`. After that, open 2 terminals and run `npm run start:build` on one, and then `npm run start:main` in the other.
+Once cloned, install dependencies with `npm install`. This also builds the `buttercup-core` fork (pulled straight from git), so the first install takes a little longer.
+
+Then, in two terminals:
+
+```bash
+npm run start:build     # webpack, development mode, watches for changes
+npm run start:main      # launches Electron once build/ exists (Ctrl+R reloads the UI)
+```
+
+### Running alongside an installed Buttercup
+
+If you use Buttercup on the same machine, run the dev build isolated so it never reads or writes your real config, vault list or logs:
+
+```bash
+npm run start:isolated  # uses a throwaway data dir under your temp folder
+```
+
+### Tests
+
+```bash
+npm run test:specs      # Jest unit tests (source/**/*.test.ts)
+npm run test:e2e         # Playwright end-to-end UI tests — builds first, then runs
+npm run test:e2e:ui      # ...same, in Playwright's interactive runner
+npm test                 # build + unit specs + prettier check (what CI runs)
+```
+
+The e2e tests launch the real app in an isolated data directory. See [`e2e/README.md`](e2e/README.md).
+
+### Dependency security
+
+`npm audit` is expected to report **0 vulnerabilities**. Transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
+
+## Building & Releasing
+
+There is **no automated release pipeline** in this repo — the only GitHub Actions workflow (`.github/workflows/test.yml`) just runs `npm test` on every push. Producing installers and cutting a release is a **manual** process.
+
+### Local, unsigned builds
+
+To produce installers for the platform you are on:
+
+```bash
+npm run package:win     # dist/*.exe, *.7z, portable  (run on Windows)
+npm run package:mac     # dist/*.dmg, *.zip           (run on macOS)
+npm run package:linux   # dist/*.AppImage             (run on Linux)
+```
+
+Each platform's installers must be built on that platform (macOS builds in particular cannot be produced or signed elsewhere). Output lands in `dist/`. These builds are **not code-signed**, so Windows SmartScreen and macOS Gatekeeper will warn on first run.
+
+### Publishing a release
+
+`npm run publish` (see `resources/scripts/publish.js`) builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set.
+
+Before this fork can publish, update the `build.publish` block in `package.json` — it still points at `owner: "buttercup"` and must target `owner: "ByteWurst-Labs"`.
+
+electron-builder creates the GitHub release as a **draft**; review it and publish it by hand. Version comes from `package.json` (`npm run set-version` writes it into `source/main/library/build.ts`); tag releases `v<version>` to match the existing history.
+
+> If you want CI to build and attach installers automatically on `git tag`, a matrix workflow across `windows-latest` / `macos-latest` / `ubuntu-latest` running `electron-builder --publish always` is the usual approach. It is not set up yet.
 
 ### Contributing
 
@@ -174,37 +238,6 @@ To add support for a language, make sure to add the translations for our [**vaul
  * Edit the `source/shared/i18n/translations/index.ts` file and:
    * Import the new JSON file: `import fi from "./fi.json";`.
    * Export the imported constant inside the default export already in that file.
-
-#### Contributions
-
-This project exists thanks to all the people who contribute. [[Contribute]](CONTRIBUTING.md).
-<a href="https://github.com/buttercup/buttercup-desktop/graphs/contributors"><img src="https://opencollective.com/buttercup/contributors.svg?width=890" /></a>
-
-We'd also like to thank:
-
-- Mohammad Amiri (Brand & Identity) ([@pixelvisualize](https://twitter.com/pixelvisualize))
-- Arash Asghari (Brand & Identity) ([@\_arashasghari](https://twitter.com/_arashasghari))
-
-#### Backers
-
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/buttercup#backer)]
-
-<a href="https://opencollective.com/buttercup#backers" target="_blank"><img src="https://opencollective.com/buttercup/backers.svg?width=890"></a>
-
-#### Sponsors
-
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/buttercup#sponsor)]
-
-<a href="https://opencollective.com/buttercup/sponsor/0/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/0/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/1/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/1/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/2/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/2/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/3/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/3/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/4/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/4/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/5/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/5/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/6/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/6/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/7/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/7/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/8/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/8/avatar.svg"></a>
-<a href="https://opencollective.com/buttercup/sponsor/9/website" target="_blank"><img src="https://opencollective.com/buttercup/sponsor/9/avatar.svg"></a>
 
 ## Notes and Caveats
 

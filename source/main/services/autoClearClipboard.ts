@@ -15,8 +15,8 @@ export async function restartAutoClearClipboardTimer(text: string) {
     if (autoClipboardClearTimeout) {
         clearTimeout(autoClipboardClearTimeout);
     }
-    autoClipboardClearTimeout = setTimeout(() => {
-        if (clipboard.readText() === lastCopiedText) {
+    autoClipboardClearTimeout = setTimeout(async () => {
+        if ((await clipboard.readText()) === lastCopiedText) {
             logInfo("Timer elapsed. Auto clear clipboard");
             clipboard.clear();
         }

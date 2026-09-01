@@ -14,10 +14,13 @@ export function processLaunchConfiguration() {
     if (cl.hasSwitch("hidden")) {
         __showMainWindow = false;
     }
-    if (isOSX() && app.getLoginItemSettings().wasOpenedAtLogin) {
+    const loginItemSettings = app.getLoginItemSettings();
+    if (isOSX() && loginItemSettings.wasOpenedAtLogin) {
         __autostarted = true;
     }
-    if (isOSX() && app.getLoginItemSettings().wasOpenedAsHidden) {
+    // `wasOpenedAsHidden` is macOS-only and no longer in Electron's type
+    // definitions, but is still provided at runtime.
+    if (isOSX() && (loginItemSettings as { wasOpenedAsHidden?: boolean }).wasOpenedAsHidden) {
         __showMainWindow = false;
     }
     if (cl.hasSwitch("autostart")) {

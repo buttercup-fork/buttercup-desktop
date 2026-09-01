@@ -23,8 +23,9 @@ if (!lock) {
 //   }
 // });
 
-app.on("window-all-closed", (event: Event) => {
-    event.preventDefault();
+app.on("window-all-closed", () => {
+    // Intentionally left blank: Buttercup keeps running in the system tray when
+    // all windows are closed, so we don't call app.quit() here.
 });
 
 app.on("activate", () => {
