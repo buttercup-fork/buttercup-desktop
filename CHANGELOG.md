@@ -4,11 +4,13 @@ All notable changes to this fork of Buttercup Desktop are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/ByteWurst-Labs/buttercup-desktop/tags) and the original project's GitHub Releases.
+Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/bytewurst-labs/buttercup-desktop/tags) and the original project's GitHub Releases.
 
 ## [Unreleased]
 
-Modernization work on the `rewrite/electron-modernize` branch.
+## [2.29.0] - 2026-09-01
+
+First release of the ByteWurst-Labs fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
 
 ### Security
 
@@ -48,4 +50,5 @@ Modernization work on the `rewrite/electron-modernize` branch.
 - CI: `.github/workflows/build.yml` builds unsigned installers for Windows, macOS and Linux on every push to `master` (and on `v*` tags, where it also drafts a GitHub release with the artifacts attached); can also be run manually. Rewrote `test.yml` (was pinned to deprecated actions and only ran on Ubuntu) into a 3-OS build/unit matrix plus a headless Playwright e2e job.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/ByteWurst-Labs/buttercup-desktop/compare/v2.28.1...HEAD
+[Unreleased]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.29.0...HEAD
+[2.29.0]: https://github.com/bytewurst-labs/buttercup-desktop/compare/v2.28.1...v2.29.0
