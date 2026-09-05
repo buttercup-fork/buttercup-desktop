@@ -8,6 +8,19 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [Unreleased]
 
+## [2.30.0] - 2026-09-05
+
+### Changed
+
+- **Breaking:** renamed the custom URL protocol scheme from `buttercup://` to `bytewerklabs-buttercup://` (`build.protocols` / `linux.mimeTypes` in `package.json`, `BUTTERCUP_PROTOCOL` in `source/main/symbols.ts`), to avoid colliding with the original upstream Buttercup app's protocol handler if both are installed on the same machine. Anything that links to the app via the old scheme needs updating.
+- Fixed the `buttercup-core` git dependency's org casing to `github:ByteWerk-Labs/buttercup-core#master`.
+- Expanded the README fork disclaimer with a note that this fork has not yet undergone an independent security audit.
+
+### Fixed
+
+- Resolved 3 moderate `npm audit` findings via `overrides`: `qs` (flat) and a nested `iocane` override for `@buttercup/secure-file-host`.
+- Pinned `electron` back to `44.1.0` after a dependency reinstall let its `^44.1.0` range float to `44.2.0` unintentionally, and reformatted `source/main/ipc.ts` to match the `prettier` version that same reinstall pulled in.
+
 ## [2.29.0] - 2026-09-01
 
 First release of the ByteWerk Labs fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
@@ -44,5 +57,6 @@ First release of the ByteWerk Labs fork. A modernization pass over the archived 
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.29.0...HEAD
+[Unreleased]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.30.0...HEAD
+[2.30.0]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.29.0...v2.30.0
 [2.29.0]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.28.1...v2.29.0
