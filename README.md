@@ -16,7 +16,9 @@ The Buttercup project has come to an end, and these repositories are in transiti
 
 ℹ️ **About this fork**
 
-This is a [**ByteWerk Labs**](https://github.com/bytewerk-labs) fork of the archived upstream project, maintained independently to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). It is not affiliated with or endorsed by the original Buttercup maintainers. See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
+This is an independent fork of the original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop), archived by its maintainers, now maintained by **ByteWerk Labs** to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
+
+This fork is not affiliated with, endorsed by, or supported by the original Buttercup maintainers. It has not yet undergone an independent security audit (this line will be removed once/if one happens).
 
 It depends on the companion fork [`bytewerk-labs/buttercup-core`](https://github.com/bytewerk-labs/buttercup-core).
 

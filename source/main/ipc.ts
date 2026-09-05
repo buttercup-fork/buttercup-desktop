@@ -219,12 +219,9 @@ ipcMain.handle("copied-into-clipboard", (_, text: string) => {
     restartAutoClearClipboardTimer(text);
 });
 
-ipcMain.handle(
-    "get-app-environment",
-    async (): Promise<AppEnvironmentFlags> => ({
-        portable: isPortable()
-    })
-);
+ipcMain.handle("get-app-environment", async (): Promise<AppEnvironmentFlags> => ({
+    portable: isPortable()
+}));
 
 ipcMain.handle("get-biometric-source-password", async (_, sourceID: VaultSourceID) => {
     return getSourcePasswordViaBiometrics(sourceID);
