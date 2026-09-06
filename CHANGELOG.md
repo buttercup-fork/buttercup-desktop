@@ -4,16 +4,20 @@ All notable changes to this fork of Buttercup Desktop are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/bytewerk-labs/buttercup-desktop/tags) and the original project's GitHub Releases.
+Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/codekunde/buttercup-desktop/tags) and the original project's GitHub Releases.
 
 ## [Unreleased]
+
+### Changed
+
+- Renamed the GitHub organisation from `bytewerk-labs` to `codekunde` and updated all repository, issue, homepage and electron-builder `publish` metadata (and the `buttercup-core` git dependency) accordingly.
 
 ## [2.30.0] - 2026-09-05
 
 ### Changed
 
 - **Breaking:** renamed the custom URL protocol scheme from `buttercup://` to `bytewerklabs-buttercup://` (`build.protocols` / `linux.mimeTypes` in `package.json`, `BUTTERCUP_PROTOCOL` in `source/main/symbols.ts`), to avoid colliding with the original upstream Buttercup app's protocol handler if both are installed on the same machine. Anything that links to the app via the old scheme needs updating.
-- Fixed the `buttercup-core` git dependency's org casing to `github:ByteWerk-Labs/buttercup-core#master`.
+- Fixed the `buttercup-core` git dependency's org casing to `github:codekunde/buttercup-core#master`.
 - Expanded the README fork disclaimer with a note that this fork has not yet undergone an independent security audit.
 
 ### Fixed
@@ -23,7 +27,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [2.29.0] - 2026-09-01
 
-First release of the ByteWerk Labs fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
+First release of the Codekunde fork. A modernization pass over the archived upstream 2.28.1: dependency security, Electron 44, and testing/CI tooling. No user-facing feature or behaviour changes.
 
 ### Security
 
@@ -41,9 +45,9 @@ First release of the ByteWerk Labs fork. A modernization pass over the archived 
   - `LoginItemSettings.wasOpenedAsHidden` / `Settings.openAsHidden` are cast (no longer in Electron's type definitions; still present at runtime on macOS).
   - `clipboard.readText()` is now awaited in the auto-clear-clipboard timer.
 - Replaced the Pug renderer template (`resources/renderer.pug`) with plain HTML (`resources/renderer.html`) and removed `pug` / `pug-loader`.
-- The `buttercup` dependency now tracks the `bytewerk-labs/buttercup-core` fork.
+- The `buttercup` dependency now tracks the `codekunde/buttercup-core` fork.
 - Pointed `repository`, `bugs`, `homepage` and the electron-builder `publish`
-  target at `bytewerk-labs/buttercup-desktop`.
+  target at `codekunde/buttercup-desktop`.
 - Migrated the `build` config for electron-builder 26: `linux.desktop` entries moved under `desktop.entry`; `win.sign` / `win.publisherName` moved under `win.signtoolOptions`; `mac.notarize` is now a boolean (set to `false` — set it to `true` with `APPLE_TEAM_ID=9D8F4J769D` and the other Apple env vars to notarize).
 - Dropped the Linux `armv7l` (32-bit ARM) AppImage target — Electron 44 no longer ships that architecture. Linux builds are now x64 + arm64.
 - Removed the `afterAllArtifactBuild` hook (`resources/scripts/afterAllArtifactBuild.js`). It was a workaround for old electron-builder macOS zip/blockmap handling and broke under v26; v26 generates the mac `zip`, blockmap and `latest-mac.yml` natively.
@@ -57,6 +61,6 @@ First release of the ByteWerk Labs fork. A modernization pass over the archived 
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.30.0...HEAD
-[2.30.0]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.29.0...v2.30.0
-[2.29.0]: https://github.com/bytewerk-labs/buttercup-desktop/compare/v2.28.1...v2.29.0
+[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...HEAD
+[2.30.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.29.0...v2.30.0
+[2.29.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.28.1...v2.29.0

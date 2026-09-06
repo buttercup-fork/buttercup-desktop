@@ -16,11 +16,11 @@ The Buttercup project has come to an end, and these repositories are in transiti
 
 ℹ️ **About this fork**
 
-This is an independent fork of the original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop), archived by its maintainers, now maintained by **ByteWerk Labs** to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
+This is an independent fork of the original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop), archived by its maintainers, now maintained by **Codekunde** to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
 
 This fork is not affiliated with, endorsed by, or supported by the original Buttercup maintainers. It has not yet undergone an independent security audit (this line will be removed once/if one happens).
 
-It depends on the companion fork [`bytewerk-labs/buttercup-core`](https://github.com/bytewerk-labs/buttercup-core).
+It depends on the companion fork [`codekunde/buttercup-core`](https://github.com/codekunde/buttercup-core).
 
 ---
 
@@ -214,7 +214,7 @@ Each platform's installers must be built on that platform (macOS builds in parti
 
 ### Publishing a release
 
-The simplest path is the **`Build` GitHub Actions workflow**: pushing a `v*` tag builds unsigned installers for all three platforms and drafts a GitHub release with them attached (review the draft and publish it by hand). `build.publish` in `package.json` targets `bytewerk-labs/buttercup-desktop`.
+The simplest path is the **`Build` GitHub Actions workflow**: pushing a `v*` tag builds unsigned installers for all three platforms and drafts a GitHub release with them attached (review the draft and publish it by hand). `build.publish` in `package.json` targets `codekunde/buttercup-desktop`.
 
 For **signed** releases there is `npm run publish` (see `resources/scripts/publish.js`): it builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set.
 
