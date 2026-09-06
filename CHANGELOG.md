@@ -8,9 +8,12 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [Unreleased]
 
+## [2.30.1] - 2026-09-06
+
 ### Changed
 
 - Renamed the GitHub organisation from `bytewerk-labs` to `codekunde` and updated all repository, issue, homepage and electron-builder `publish` metadata (and the `buttercup-core` git dependency) accordingly.
+- **Breaking:** renamed the custom URL protocol scheme from `bytewerklabs-buttercup://` to `codekunde-buttercup://` (`build.protocols` / `linux.mimeTypes` in `package.json`, `BUTTERCUP_PROTOCOL` in `source/main/symbols.ts`), following the organisation rename. Reinstall the app to re-register the handler; anything that links to the app via the old scheme needs updating.
 
 ## [2.30.0] - 2026-09-05
 
@@ -61,6 +64,7 @@ First release of the Codekunde fork. A modernization pass over the archived upst
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...HEAD
+[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.1...HEAD
+[2.30.1]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...v2.30.1
 [2.30.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.29.0...v2.30.0
 [2.29.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.28.1...v2.29.0

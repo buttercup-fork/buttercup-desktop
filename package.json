@@ -1,6 +1,6 @@
 {
   "name": "Buttercup",
-  "version": "2.30.0",
+  "version": "2.30.1",
   "description": "Buttercup Password Manager",
   "main": "build/main/index.js",
   "scripts": {
@@ -97,7 +97,7 @@
       "synopsis": "Free and Open Source Password Vault",
       "artifactName": "${productName}-${os}-${arch}.${ext}",
       "mimeTypes": [
-        "x-scheme-handler/bytewerklabs-buttercup"
+        "x-scheme-handler/codekunde-buttercup"
       ],
       "executableArgs": [
         "%u"
@@ -158,9 +158,9 @@
     },
     "protocols": [
       {
-        "name": "bytewerklabs-buttercup",
+        "name": "codekunde-buttercup",
         "schemes": [
-          "bytewerklabs-buttercup"
+          "codekunde-buttercup"
         ]
       }
     ],
