@@ -139,6 +139,19 @@ export function AddVaultMenu() {
         setAuthenticatingGoogleDrive(false);
         setVaultFilenameOverride(null);
     }, []);
+    // The dialog's built-in Escape-to-close only fires when focus sits inside its
+    // React subtree; the vault-type page has nothing focusable, so Escape was
+    // dropped. A document-level listener while the dialog is open covers it.
+    useEffect(() => {
+        if (!showAddVault.get()) return undefined;
+        const handleEscape = (evt: KeyboardEvent) => {
+            if (evt.key === "Escape") {
+                close();
+            }
+        };
+        document.addEventListener("keydown", handleEscape);
+        return () => document.removeEventListener("keydown", handleEscape);
+    }, [showAddVault.get(), close]);
     const handleVaultTypeClick = useCallback(async type => {
         setSelectedType(type);
         if (type === SourceType.File) {
@@ -351,6 +364,11 @@ export function AddVaultMenu() {
                                 ...webdavCredentials,
                                 url: evt.target.value
                             })}
+                            onKeyDown={evt => {
+                                if (evt.key === "Enter" && webdavCredentials.url) {
+                                    handleAuthSubmit();
+                                }
+                            }}
                             value={webdavCredentials.url}
                             autoFocus
                         />
@@ -378,6 +396,11 @@ export function AddVaultMenu() {
                                 ...webdavCredentials,
                                 password: evt.target.value
                             })}
+                            onKeyDown={evt => {
+                                if (evt.key === "Enter" && webdavCredentials.url) {
+                                    handleAuthSubmit();
+                                }
+                            }}
                             type="password"
                             value={webdavCredentials.password}
                         />
@@ -406,6 +429,11 @@ export function AddVaultMenu() {
                 type="password"
                 value={vaultPassword}
                 onChange={evt => setVaultPassword(evt.target.value)}
+                onKeyDown={evt => {
+                    if (evt.key === "Enter" && vaultPassword.length > 0) {
+                        handleFinalConfirm();
+                    }
+                }}
                 autoFocus
             />
         </>

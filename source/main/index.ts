@@ -4,6 +4,7 @@ import "./ipc";
 import { initialise } from "./services/init";
 import { openMainWindow } from "./services/windows";
 import { handleProtocolCall } from "./services/protocol";
+import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
 import { logErr, logInfo } from "./library/log";
@@ -16,6 +17,10 @@ const lock = app.requestSingleInstanceLock();
 if (!lock) {
     app.quit();
 }
+
+// Protocol URL passed on the command line when the app is cold-started by a link
+// (Linux/Windows). A running instance instead receives it via "second-instance".
+const initialProtocolURL = process.argv.find((arg) => arg.startsWith(BUTTERCUP_PROTOCOL)) ?? null;
 
 // app.on("window-all-closed", () => {
 //   if (process.platform !== PLATFORM_MACOS) {
@@ -61,8 +66,9 @@ app.whenReady()
         initialiseElectronRemote();
     })
     .then(() => initialise())
-    .then(() => {
+    .then(async () => {
         const protocol = BUTTERCUP_PROTOCOL.replace("://", "");
+        await ensureLinuxProtocolHandler();
         if (!app.isDefaultProtocolClient(protocol)) {
             logInfo(`Registering protocol: ${protocol}`);
             const protoReg = app.setAsDefaultProtocolClient(protocol);
@@ -76,14 +82,27 @@ app.whenReady()
     .then(async () => {
         const preferences = await getConfigValue("preferences");
         const autostarted = wasAutostarted();
-        if (!shouldShowMainWindow() || preferences.startMode === AppStartMode.HiddenAlways) {
+        // A launch-time protocol URL (e.g. an auth callback) needs a window to
+        // receive it, so force the window open even for otherwise-hidden starts.
+        if (
+            !initialProtocolURL &&
+            (!shouldShowMainWindow() || preferences.startMode === AppStartMode.HiddenAlways)
+        ) {
             logInfo("Not opening initial window: disabled by CL or preferences");
             return;
-        } else if (autostarted && preferences.startMode === AppStartMode.HiddenOnBoot) {
+        } else if (
+            !initialProtocolURL &&
+            autostarted &&
+            preferences.startMode === AppStartMode.HiddenOnBoot
+        ) {
             logInfo("Not opening initial window: disabled for autostart");
             return;
         }
-        openMainWindow();
+        await openMainWindow();
+        if (initialProtocolURL) {
+            logInfo("Handling protocol URL from launch arguments");
+            handleProtocolCall(initialProtocolURL);
+        }
     })
     .catch((err) => {
         logErr(err);

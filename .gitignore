@@ -25,6 +25,10 @@ dev-app-update.yml
 /blob-report
 /playwright/.cache
 
+# Local working notes (not for upstream)
+TODO.md
+UPSTREAM-ISSUES.md
+
 # Editor / OS
 .DS_Store
 Thumbs.db

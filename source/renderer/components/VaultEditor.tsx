@@ -117,6 +117,12 @@ export function VaultEditor(props: VaultEditorProps) {
                         intent={Intent.PRIMARY}
                         large
                         onClick={() => onUnlockRequest()}
+                        onKeyDown={event => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                onUnlockRequest();
+                            }
+                        }}
                         round
                     >
                         {vaultItem.name}

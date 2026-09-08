@@ -8,6 +8,17 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [Unreleased]
 
+### Fixed
+
+- Linux: the custom URL scheme (`codekunde-buttercup://`) is now registered at runtime when running from a bare AppImage, so Google Drive and other protocol auth callbacks are delivered back to the app without requiring AppImageLauncher (upstream [#987](https://github.com/buttercup/buttercup-desktop/issues/987)). A `~/.local/share/applications/codekunde-buttercup.desktop` entry is written/refreshed on start and registered via `xdg-mime`.
+- A protocol URL passed on the command line at cold start (Linux/Windows) is now handled once the window is ready, instead of only being handled when an instance is already running.
+- The entries-list copy shortcuts (Ctrl/Cmd+C for password, Ctrl/Cmd+B for username) now always act on the currently selected entry rather than the previously selected one (upstream [#1384](https://github.com/buttercup/buttercup-desktop/issues/1384)). The handlers now read live selection state through a ref, working around `react-hotkeys` caching stale handler closures, and look the field up by property (`username` / `password`) instead of by its display title.
+- The entries-list copy shortcuts now write to the clipboard via the native clipboard API instead of a hidden-`textarea` `execCommand` hack. The hack stole and then dropped keyboard focus, which left the list unfocused so the next shortcut press was silently ignored (and beeped). Copying via shortcut now also arms the auto-clear-clipboard timer, matching the field copy buttons.
+- Keyboard navigation of the entries list is now consistent: arrow keys move the highlight and keep DOM focus on the highlighted row (previously focus lagged one row behind), and Enter acts on the highlighted entry instead of clicking whatever element happened to hold focus - which had been snapping the selection back to a previously focused entry.
+- Enter now activates the primary action from the keyboard where it previously did nothing (upstream [#1349](https://github.com/buttercup/buttercup-desktop/issues/1349)): the "unlock" button on a locked vault (Enter or Space), the password field when adding or creating a vault, and the WebDAV URL / password fields in the add-vault dialog.
+- Escape now closes the add-vault dialog from every page. Previously the built-in handler only fired when focus was inside an input, so Escape did nothing on the vault-type selection page.
+- Deleting a custom field now sticks, and renaming a custom field no longer leaves a duplicate behind (upstream [#1342](https://github.com/buttercup/buttercup-desktop/issues/1342)). The fix is in `buttercup-core`: the Format B vault merge (run on every save) was discarding each property's deletion tombstone, so the next save resurrected any field that had been removed. Requires `codekunde/buttercup-core` at the commit carrying this change.
+
 ## [2.30.1] - 2026-09-06
 
 ### Changed
