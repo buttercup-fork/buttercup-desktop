@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useMemo, useRef, useState } from "react";
+import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import cx from "classnames";
 import TextArea from "react-textarea-autosize";
@@ -822,6 +822,17 @@ const EntryDetailsContent = () => {
 
     const editing = isEditing && !readOnly;
 
+    // Focus the first field (Title) when starting to edit a brand-new entry, so
+    // the user can type straight away instead of hunting for the input.
+    const primaryFormRef = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+        if (!editing || !entry?.isNew) return;
+        const timer = setTimeout(() => {
+            primaryFormRef.current?.querySelector<HTMLInputElement>("input")?.focus();
+        }, 60);
+        return () => clearTimeout(timer);
+    }, [editing, entry?.isNew, entry?.id]);
+
     const editableFields = useMemo(() => {
         if (!entry) return [];
         return editing
@@ -843,7 +854,7 @@ const EntryDetailsContent = () => {
                 {entry?.type === EntryType.CreditCard && (
                     <CreditCard entry={entry} />
                 )}
-                <FormContainer primary>
+                <FormContainer primary ref={primaryFormRef}>
                     {mainFields.map(field => (
                         <FieldRow
                             key={field.id}

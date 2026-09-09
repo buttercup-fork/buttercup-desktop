@@ -3,12 +3,12 @@ import { initialize as initialiseElectronRemote } from "@electron/remote/main";
 import "./ipc";
 import { initialise } from "./services/init";
 import { openMainWindow } from "./services/windows";
-import { handleProtocolCall } from "./services/protocol";
+import { handleProtocolCall, matchProtocolURL } from "./services/protocol";
 import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
 import { logErr, logInfo } from "./library/log";
-import { BUTTERCUP_PROTOCOL } from "./symbols";
+import { ACCEPTED_PROTOCOLS } from "./symbols";
 import { AppStartMode } from "./types";
 
 logInfo("Application starting");
@@ -20,7 +20,7 @@ if (!lock) {
 
 // Protocol URL passed on the command line when the app is cold-started by a link
 // (Linux/Windows). A running instance instead receives it via "second-instance".
-const initialProtocolURL = process.argv.find((arg) => arg.startsWith(BUTTERCUP_PROTOCOL)) ?? null;
+const initialProtocolURL = process.argv.map(matchProtocolURL).find(Boolean) ?? null;
 
 // app.on("window-all-closed", () => {
 //   if (process.platform !== PLATFORM_MACOS) {
@@ -44,14 +44,14 @@ app.on("activate", () => {
 app.on("second-instance", async (event, args) => {
     await openMainWindow();
     // Protocol URL for Linux/Windows
-    const protocolURL = args.find((arg) => arg.startsWith(BUTTERCUP_PROTOCOL));
+    const protocolURL = args.map(matchProtocolURL).find(Boolean);
     if (protocolURL) {
         handleProtocolCall(protocolURL);
     }
 });
 app.on("open-url", (e, url) => {
     // Protocol URL for MacOS
-    if (url.startsWith(BUTTERCUP_PROTOCOL)) {
+    if (matchProtocolURL(url)) {
         handleProtocolCall(url);
     }
 });
@@ -67,16 +67,17 @@ app.whenReady()
     })
     .then(() => initialise())
     .then(async () => {
-        const protocol = BUTTERCUP_PROTOCOL.replace("://", "");
         await ensureLinuxProtocolHandler();
-        if (!app.isDefaultProtocolClient(protocol)) {
-            logInfo(`Registering protocol: ${protocol}`);
-            const protoReg = app.setAsDefaultProtocolClient(protocol);
-            if (!protoReg) {
-                logErr(`Failed registering protocol: ${protocol}`);
+        for (const scheme of ACCEPTED_PROTOCOLS) {
+            const protocol = scheme.replace("://", "");
+            if (!app.isDefaultProtocolClient(protocol)) {
+                logInfo(`Registering protocol: ${protocol}`);
+                if (!app.setAsDefaultProtocolClient(protocol)) {
+                    logErr(`Failed registering protocol: ${protocol}`);
+                }
+            } else {
+                logInfo(`Protocol already registered: ${protocol}`);
             }
-        } else {
-            logInfo(`Protocol already registered: ${protocol}`);
         }
     })
     .then(async () => {

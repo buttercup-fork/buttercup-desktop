@@ -97,7 +97,8 @@
       "synopsis": "Free and Open Source Password Vault",
       "artifactName": "${productName}-${os}-${arch}.${ext}",
       "mimeTypes": [
-        "x-scheme-handler/codekunde-buttercup"
+        "x-scheme-handler/codekunde-buttercup",
+        "x-scheme-handler/buttercup"
       ],
       "executableArgs": [
         "%u"
@@ -160,7 +161,8 @@
       {
         "name": "codekunde-buttercup",
         "schemes": [
-          "codekunde-buttercup"
+          "codekunde-buttercup",
+          "buttercup"
         ]
       }
     ],

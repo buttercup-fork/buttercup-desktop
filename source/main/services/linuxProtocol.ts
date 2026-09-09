@@ -4,11 +4,13 @@ import os from "os";
 import path from "path";
 import { app } from "electron";
 import { logErr, logInfo, logWarn } from "../library/log";
-import { BUTTERCUP_PROTOCOL } from "../symbols";
+import { ACCEPTED_PROTOCOLS, BUTTERCUP_PROTOCOL } from "../symbols";
 
 const SCHEME = BUTTERCUP_PROTOCOL.replace("://", "");
 const DESKTOP_FILE_NAME = `${SCHEME}.desktop`;
-const MIME_TYPE = `x-scheme-handler/${SCHEME}`;
+const MIME_TYPES = ACCEPTED_PROTOCOLS.map(
+    (scheme) => `x-scheme-handler/${scheme.replace("://", "")}`
+);
 
 function runQuiet(command: string, args: Array<string>): Promise<void> {
     return new Promise((resolve) => {
@@ -35,7 +37,7 @@ function buildDesktopEntry(execPath: string): string {
             "Icon=buttercup",
             "Terminal=false",
             "Categories=Utility;Security;",
-            `MimeType=${MIME_TYPE};`,
+            `MimeType=${MIME_TYPES.map((mime) => `${mime};`).join("")}`,
             "StartupWMClass=Buttercup",
             "X-Buttercup-Generated=true"
         ].join("\n") + "\n"
@@ -46,9 +48,9 @@ function buildDesktopEntry(execPath: string): string {
  * Register the custom URL scheme handler on Linux when running as an AppImage.
  *
  * When Buttercup runs from a bare AppImage (no AppImageLauncher), nothing
- * installs a .desktop file, so the desktop environment has no handler for
- * `codekunde-buttercup://` URLs and Google Drive / protocol auth callbacks are
- * silently dropped (buttercup/buttercup-desktop#987). Electron's
+ * installs a .desktop file, so the desktop environment has no handler for the
+ * `codekunde-buttercup://` / `buttercup://` URLs and Google Drive / protocol auth
+ * callbacks are silently dropped (buttercup/buttercup-desktop#987). Electron's
  * `setAsDefaultProtocolClient` only shells out to `xdg-settings`, which needs an
  * existing .desktop file, so it can't fix this on its own. Here we write a
  * minimal .desktop file pointing back at the running AppImage and register it as
@@ -81,7 +83,9 @@ export async function ensureLinuxProtocolHandler(): Promise<void> {
         } else {
             logInfo("URL scheme handler desktop entry already up to date");
         }
-        await runQuiet("xdg-mime", ["default", DESKTOP_FILE_NAME, MIME_TYPE]);
+        for (const mime of MIME_TYPES) {
+            await runQuiet("xdg-mime", ["default", DESKTOP_FILE_NAME, mime]);
+        }
     } catch (err) {
         logErr("Failed registering Linux URL scheme handler", err);
     }

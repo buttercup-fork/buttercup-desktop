@@ -18,6 +18,10 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - Enter now activates the primary action from the keyboard where it previously did nothing (upstream [#1349](https://github.com/buttercup/buttercup-desktop/issues/1349)): the "unlock" button on a locked vault (Enter or Space), the password field when adding or creating a vault, and the WebDAV URL / password fields in the add-vault dialog.
 - Escape now closes the add-vault dialog from every page. Previously the built-in handler only fired when focus was inside an input, so Escape did nothing on the vault-type selection page.
 - Deleting a custom field now sticks, and renaming a custom field no longer leaves a duplicate behind (upstream [#1342](https://github.com/buttercup/buttercup-desktop/issues/1342)). The fix is in `buttercup-core`: the Format B vault merge (run on every save) was discarding each property's deletion tombstone, so the next save resurrected any field that had been removed. Requires `codekunde/buttercup-core` at the commit carrying this change.
+- The create/rename group dialog now focuses (and selects) the group-name field when it opens; the old focus effect keyed off a ref value and never re-ran once the dialog existed.
+- Adding a new entry now focuses the Title field so you can type immediately, instead of leaving the form with nothing focused.
+- Google Drive authentication works again. The rename to `codekunde-buttercup://` broke it because the OAuth redirect page (`buttercup.pw`) still bounces back to the original `buttercup://` scheme; the app now also registers and handles `buttercup://` for inbound auth callbacks (all platforms). If the upstream Buttercup app is also installed, whichever registered its handler last wins for `buttercup://` links.
+- The vault's three-pane split (groups / entries / details) now remembers its column widths across restarts instead of resetting to the default every launch (upstream [#1367](https://github.com/buttercup/buttercup-desktop/issues/1367)). Sizes are stored per machine and applied proportionally, so the ratio holds at any window size.
 
 ## [2.30.1] - 2026-09-06
 

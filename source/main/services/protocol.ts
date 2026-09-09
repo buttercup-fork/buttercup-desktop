@@ -1,7 +1,15 @@
 import { BrowserWindow } from "electron";
 import EventEmitter from "eventemitter3";
 import { logErr, logInfo, logWarn } from "../library/log";
-import { BUTTERCUP_PROTOCOL } from "../symbols";
+import { ACCEPTED_PROTOCOLS } from "../symbols";
+
+/**
+ * Return the value if it starts with one of the schemes we handle, else null.
+ */
+export function matchProtocolURL(value: string): string | null {
+    if (typeof value !== "string") return null;
+    return ACCEPTED_PROTOCOLS.some((scheme) => value.startsWith(scheme)) ? value : null;
+}
 
 let __protocolEmitter: EventEmitter = null;
 
@@ -32,7 +40,12 @@ function handleAuthCall(args) {
 }
 
 export function handleProtocolCall(protocolURL: string) {
-    const path = protocolURL.replace(BUTTERCUP_PROTOCOL, "");
+    const scheme = ACCEPTED_PROTOCOLS.find((s) => protocolURL.startsWith(s));
+    if (!scheme) {
+        logWarn(`Ignoring unrecognised protocol URL: ${protocolURL}`);
+        return;
+    }
+    const path = protocolURL.slice(scheme.length);
     logInfo(`Protocol URL call: ${path}`);
     const [action, ...args] = path.split("/");
     switch (action) {

@@ -79,10 +79,17 @@ export const GroupsList = () => {
     const { readOnly } = useContext(VaultContext);
 
     useEffect(() => {
-        if (groupTitleInputRef && groupTitleInputRef.current) {
-            groupTitleInputRef.current.focus();
-        }
-    }, [groupTitleInputRef.current]);
+        // A ref's `.current` is not a reactive dependency, so the old effect only
+        // ran on mount (before the dialog - and its input - existed) and never
+        // focused anything. Key off the dialog-open state instead, and defer past
+        // the Blueprint dialog transition / its own focus handling.
+        if (groupEditID === null) return;
+        const timer = setTimeout(() => {
+            groupTitleInputRef.current?.focus();
+            groupTitleInputRef.current?.select();
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [groupEditID]);
 
     const closeEditDialog = () => {
         setGroupEditID(null);
