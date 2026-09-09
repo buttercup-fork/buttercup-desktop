@@ -1,11 +1,13 @@
-import { logInfo } from "../library/log";
+import { logErr, logInfo } from "../library/log";
 import { applyCurrentTheme } from "../services/theme";
 import { getOSLocale } from "../services/locale";
-import { changeLanguage } from "../../shared/i18n/trans";
+import { changeLanguage, t } from "../../shared/i18n/trans";
 import { getLanguage } from "../../shared/library/i18n";
 import { startFileHost, stopFileHost } from "../services/fileHost";
 import { setStartWithSession } from "../services/launch";
 import { start as startBrowserAPI, stop as stopBrowserAPI } from "../services/browser/index";
+import { setConfigValue } from "../services/config";
+import { getMainWindow } from "../services/windows";
 import { Preferences } from "../types";
 
 export async function handleConfigUpdate(preferences: Preferences) {
@@ -33,8 +35,29 @@ export async function handleConfigUpdate(preferences: Preferences) {
     await setStartWithSession(preferences.startWithSession);
     logInfo(` - File host: ${preferences.fileHostEnabled ? "Enabled" : "Disabled"}`);
     if (preferences.fileHostEnabled) {
-        await startBrowserAPI();
-        await startFileHost();
+        try {
+            await startBrowserAPI();
+            await startFileHost();
+        } catch (err) {
+            logErr("Failed enabling browser access / file host", err);
+            // Roll the preference back so the UI doesn't show it as enabled while
+            // nothing is listening (e.g. the port is already in use).
+            await stopBrowserAPI().catch(() => {});
+            await stopFileHost().catch(() => {});
+            preferences.fileHostEnabled = false;
+            await setConfigValue("preferences", preferences);
+            const window = getMainWindow();
+            if (window) {
+                const detail =
+                    (err as NodeJS.ErrnoException)?.code === "EADDRINUSE"
+                        ? t("notification.error.browser-access-port-in-use")
+                        : (err as Error)?.message || t("notification.error.unknown-error");
+                window.webContents.send(
+                    "notify-error",
+                    `${t("notification.error.browser-access-failed")}: ${detail}`
+                );
+            }
+        }
     } else {
         await stopBrowserAPI();
         await stopFileHost();

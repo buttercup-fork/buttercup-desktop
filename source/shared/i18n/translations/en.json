@@ -239,6 +239,8 @@
             "preferences-load": "Failed loading preferences",
             "preferences-save": "Failed saving preferences",
             "unknown-error": "Unknown error",
+      "browser-access-failed": "Failed enabling browser access",
+      "browser-access-port-in-use": "The port is already in use - another Buttercup instance may be running",
             "vault-format-upgrade-failed": "Vault format upgrade failed",
             "vault-lock-failed": "Vault lock failed",
             "vault-save-failed": "Vault failed to save",
