@@ -16,9 +16,11 @@
         "./source/renderer/**/*",
         "./source/shared/**/*"
     ],
-    "exclude":[
+    "exclude": [
         "build",
         "dist",
-        "node_modules"
+        "node_modules",
+        "./source/**/*.test.ts",
+        "./source/**/*.test.tsx"
     ]
 }

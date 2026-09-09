@@ -61,6 +61,20 @@ export function showSuccess(message: string) {
     showNotification(message, Intent.SUCCESS);
 }
 
+export function notifyCopied(message: string = t("notification.copied")) {
+    const toaster = getToaster();
+    if (!toaster) return;
+    // Reuse a fixed key so rapid successive copies replace the toast instead of
+    // stacking up.
+    toaster.show({
+        className: "bcup-toast-compact",
+        icon: "clipboard",
+        message,
+        intent: Intent.SUCCESS,
+        timeout: 2500
+    }, "clipboard-copied");
+}
+
 export function showUpdateAvailable(version: string, onUpdate: () => void, onCancel: () => void) {
     const toaster = getUpdateToaster();
     let closed = false;

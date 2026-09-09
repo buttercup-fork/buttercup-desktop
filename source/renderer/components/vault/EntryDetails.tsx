@@ -34,7 +34,8 @@ import { PaneContainer, PaneContent, PaneHeader, PaneFooter } from "./Pane";
 import { VaultContext } from "./VaultContext";
 import { ConfirmButton } from "./ConfirmButton";
 import CreditCard from "./CreditCard";
-import { copyToClipboard } from "../../library/clipboard";
+import { copyText } from "../../actions/clipboard";
+import { notifyCopied } from "../../services/notifications";
 import { OTPDigits } from "../OTPDigits";
 import { t } from "../../../shared/i18n/trans";
 import { getThemeProp } from "./utils/theme";
@@ -488,6 +489,16 @@ const Attachments = ({
     );
 };
 
+function copiedFieldMessage(field): string {
+    if (field.valueType === EntryPropertyValueType.OTP) return t("notification.copied-otp");
+    if (field.property === "password" || field.valueType === EntryPropertyValueType.Password) {
+        return t("notification.copied-password");
+    }
+    if (field.property === "username") return t("notification.copied-username");
+    const label = field.title || field.property;
+    return label ? t("notification.copied-field", { field: label }) : t("notification.copied");
+}
+
 const FieldText = ({ entryFacade, field }) => {
     const { onUserCopy } = useContext(VaultContext);
     const [visible, toggleVisibility] = useState(false);
@@ -548,7 +559,8 @@ const FieldText = ({ entryFacade, field }) => {
                     icon="clipboard"
                     small
                     onClick={() => {
-                        copyToClipboard(otpRef.current);
+                        copyText(otpRef.current);
+                        notifyCopied(copiedFieldMessage(field));
                         if (onUserCopy) onUserCopy(otpRef.current);
                     }}
                 />
@@ -599,7 +611,10 @@ const FieldText = ({ entryFacade, field }) => {
                                             <ButtonGroup>
                                                 <Button
                                                     icon="clipboard"
-                                                    onClick={() => copyToClipboard(change.value)}
+                                                    onClick={() => {
+                                                        copyText(change.value);
+                                                        notifyCopied();
+                                                    }}
                                                 />
                                                 <Button
                                                     icon="redo"

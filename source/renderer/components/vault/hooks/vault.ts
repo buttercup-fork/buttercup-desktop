@@ -166,7 +166,11 @@ export function useGroups(): GroupsResult {
             }
             onMoveEntryToGroup(entryID, trashID);
         },
-        [trashID]
+        // `onMoveEntryToGroup` is a fresh closure every render and carries the
+        // current editing state - it's what stops the editor when the entry
+        // being edited is trashed. Omitting it here froze that closure at mount,
+        // so trashing an entry mid-edit left the editor open on a stale copy.
+        [trashID, onMoveEntryToGroup]
     );
     const emptyTrash = useCallback(() => {
         if (!trashID) return;

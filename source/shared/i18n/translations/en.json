@@ -232,6 +232,11 @@
     "notification": {
         "attachment-downloaded": "Attachment saved successfully",
         "biometrics-disabled": "Biometrics disabled for vault",
+        "copied": "Copied!",
+        "copied-field": "{{field}} copied!",
+        "copied-otp": "OTP copied!",
+        "copied-password": "Password copied!",
+        "copied-username": "Username copied!",
         "error": {
             "biometrics-disable-failed": "Failed disabling biometrics for vault: {{error}}",
             "import-failed": "Failed importing: {{error}}",
@@ -239,11 +244,12 @@
             "preferences-load": "Failed loading preferences",
             "preferences-save": "Failed saving preferences",
             "unknown-error": "Unknown error",
-      "browser-access-failed": "Failed enabling browser access",
-      "browser-access-port-in-use": "The port is already in use - another Buttercup instance may be running",
+            "browser-access-failed": "Failed enabling browser access",
+            "browser-access-port-in-use": "The port is already in use - another Buttercup instance may be running",
             "vault-format-upgrade-failed": "Vault format upgrade failed",
             "vault-lock-failed": "Vault lock failed",
             "vault-save-failed": "Vault failed to save",
+            "vault-save-timeout": "Timed out - the remote did not respond",
             "vault-settings-load": "Failed loading vault settings",
             "vault-settings-save": "Failed saving vault settings",
             "vault-unlock-failed": "Vault unlock failed"

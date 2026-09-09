@@ -10,6 +10,7 @@ import { VaultContext } from "./VaultContext";
 import { getFacadeField } from "./utils/ui";
 import { t } from "../../../shared/i18n/trans";
 import { copyText } from "../../actions/clipboard";
+import { notifyCopied } from "../../services/notifications";
 
 interface EntriesListProps {
     className?: string;
@@ -91,6 +92,11 @@ export const EntriesList = ({ className }: EntriesListProps) => {
         // hack, which steals and then drops DOM focus - that left the entries
         // list unfocused so the *next* shortcut press was ignored (and beeped).
         copyText(value);
+        notifyCopied(
+            property === "username"
+                ? t("notification.copied-username")
+                : t("notification.copied-password")
+        );
         if (onUserCopy) {
             onUserCopy(value);
         }

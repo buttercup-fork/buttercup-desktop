@@ -149,7 +149,7 @@ export const PaneHeader = ({
     return (
         <ListHeader>
             <ListHeadingContent>
-                {(filterInputVisible && showFilter) || (filter && filter.term !== "") && (
+                {showFilter && (filterInputVisible || (filter && filter.term !== "")) ? (
                     <InputGroup
                         small
                         className={Classes.FILL}
@@ -161,7 +161,7 @@ export const PaneHeader = ({
                         onKeyDown={handleInputKeyPress}
                         inputRef={ref => (inputRef.current = ref)}
                     />
-                ) || (
+                ) : (
                     <Fragment>
                         <ListHeading>{title}</ListHeading>
                         {typeof count === "number" && (

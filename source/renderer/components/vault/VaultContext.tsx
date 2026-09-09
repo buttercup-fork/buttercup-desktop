@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, useState } from "react";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 import { useReducer } from "use-reducer-state";
 import { EntryFacade, EntryFacadeField, EntryID, EntryPropertyValueType, EntryType, GroupFacade, GroupID, VaultFacade, createEntryFacade, createGroupFacade } from "buttercup";
 import { EntryActionType, entryReducer, getInitialEntryState } from "./reducers/entry";
@@ -141,6 +141,15 @@ export const VaultProvider = ({
 
     const selectedEntry = vaultState.entries.find(entry => entry.id === selectedEntryID) ?? null;
     const currentEntries = vaultState.entries.filter(entry => entry.parentID === selectedGroupID);
+
+    useEffect(() => {
+        // In controlled mode (VaultEditor) the selection starts empty, which
+        // leaves the entries pane blank and "New Entry" disabled until the user
+        // clicks a group (buttercup/buttercup-desktop#1045). Seed it with the
+        // first group, matching the uncontrolled default above.
+        if (!onSelectGroup || extSelectedGroup || vaultState.groups.length === 0) return;
+        onSelectGroup(vaultState.groups[0].id as GroupID);
+    }, [onSelectGroup, extSelectedGroup, vaultState.groups]);
 
     useDeepEffect(() => {
         if (vaultFacadeTag !== lastVaultFacadeTag) {

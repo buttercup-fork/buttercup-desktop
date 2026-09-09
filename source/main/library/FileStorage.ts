@@ -4,10 +4,12 @@ import { StorageInterface } from "buttercup";
 import { ChannelQueue } from "@buttercup/channel-queue";
 import pify from "pify";
 import { naiveClone } from "../../shared/library/clone";
+import { logErr, logWarn } from "./log";
 
 const mkdir = pify(fs.mkdir);
 const readFile = pify(fs.readFile);
 const writeFile = pify(fs.writeFile);
+const rename = pify(fs.rename);
 
 export class FileStorage extends StorageInterface {
     _queue: ChannelQueue = null;
@@ -73,9 +75,9 @@ export class FileStorage extends StorageInterface {
     async _getContents(): Promise<Object> {
         return this._queue.channel("io").enqueue(
             async () => {
+                let data: Buffer;
                 try {
-                    const data = await readFile(this._path);
-                    return JSON.parse(data);
+                    data = await readFile(this._path);
                 } catch (err) {
                     if (err.code === "ENOENT") {
                         // No file
@@ -83,6 +85,21 @@ export class FileStorage extends StorageInterface {
                     }
                     // Other error
                     throw err;
+                }
+                try {
+                    return JSON.parse(data.toString("utf8"));
+                } catch (err) {
+                    // The file exists but isn't valid JSON - typically an empty
+                    // or truncated file left behind by a crash mid-write. Rather
+                    // than re-throwing (which bricks the whole app on boot), move
+                    // the bad file aside and start from an empty store.
+                    logErr(`Corrupt storage file, resetting: ${this._path}`, err);
+                    try {
+                        await rename(this._path, `${this._path}.corrupt-${Date.now()}`);
+                    } catch (renameErr) {
+                        logWarn(`Failed to back up corrupt storage file: ${this._path}`, renameErr);
+                    }
+                    return {};
                 }
             },
             undefined,
@@ -93,7 +110,11 @@ export class FileStorage extends StorageInterface {
     async _putContents(data: Object): Promise<void> {
         return this._queue.channel("io").enqueue(async () => {
             await mkdir(path.dirname(this._path), { recursive: true });
-            await writeFile(this._path, JSON.stringify(data));
+            // Write to a temp file and rename into place so a crash mid-write
+            // can't leave a truncated (unparseable) file behind.
+            const tempPath = `${this._path}.tmp-${process.pid}`;
+            await writeFile(tempPath, JSON.stringify(data));
+            await rename(tempPath, this._path);
         });
     }
 }

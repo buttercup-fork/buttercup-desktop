@@ -113,6 +113,7 @@
       }
     },
     "mac": {
+      "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
       "category": "public.app-category.productivity",
       "darkModeSupport": true,
       "entitlements": "./resources/build/entitlements.plist",
@@ -125,19 +126,21 @@
         {
           "target": "dmg",
           "arch": [
-            "x64"
+            "x64",
+            "arm64"
           ]
         },
         {
           "target": "zip",
           "arch": [
-            "x64"
+            "x64",
+            "arm64"
           ]
         }
       ]
     },
     "dmg": {
-      "artifactName": "${productName}-${os}-x64-${version}.${ext}",
+      "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
       "background": "./resources/build/background@2x.png",
       "contents": [
         {
