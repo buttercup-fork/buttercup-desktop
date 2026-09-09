@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/codekunde/buttercup-desktop/tags) and the original project's GitHub Releases.
 
-## [Unreleased]
+## [2.31.0] - 2026-09-10
+
+A pass over the open upstream issue tracker: 17 issues fixed or confirmed resolved, plus keyboard and preferences polish. The macOS build now ships separate Intel and Apple Silicon artifacts, and the in-app updater points at this fork.
 
 ### Added
 
@@ -15,6 +17,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
+- The in-app auto-updater now checks this fork's releases (`codekunde/buttercup-desktop`) instead of the archived upstream repo. It had still been pointing at `buttercup/buttercup-desktop`, so it would never have found a fork release - and could have tried to "update" an installed fork build back to an upstream one.
 - The "Clear clipboard after" and "Lock vaults after" settings (Preferences → Security) are now dropdowns with sensible presets (Off, 30 seconds, 1 minute, … up to 1 day) instead of continuous sliders. The lock-vaults slider spanned 0-24h with a tick label every hour, so the labels were an unreadable smear and small values were almost impossible to select with the mouse. A previously-saved value that isn't a preset stays selectable.
 - macOS builds are now produced for both Intel (`x64`) and Apple Silicon (`arm64`), as separate `.dmg` / `.zip` artifacts named with the architecture (upstream [#1276](https://github.com/buttercup/buttercup-desktop/issues/1276)). The previous build was Intel-only, so on Apple Silicon it ran under Rosetta 2 - which is slow (the likely cause of the "everything lags ~1 second" reports) and which recent macOS flags with a "will not open in a future release of macOS" warning. Apple Silicon users should now install the `arm64` build.
 
@@ -30,6 +33,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - A vault save that stalls indefinitely (e.g. a WebDAV or cloud server that accepts the connection but never responds) no longer leaves every button disabled until the app is restarted (upstream [#1077](https://github.com/buttercup/buttercup-desktop/issues/1077)). The save now times out after 90 seconds, clears the saving state and shows a "Vault failed to save: timed out" error instead of hanging forever. If the underlying request does eventually complete after the timeout, that outcome is logged rather than surfaced.
 - Linux: the custom URL scheme (`codekunde-buttercup://`) is now registered at runtime when running from a bare AppImage, so Google Drive and other protocol auth callbacks are delivered back to the app without requiring AppImageLauncher (upstream [#987](https://github.com/buttercup/buttercup-desktop/issues/987)). A `~/.local/share/applications/codekunde-buttercup.desktop` entry is written/refreshed on start and registered via `xdg-mime`.
 - A protocol URL passed on the command line at cold start (Linux/Windows) is now handled once the window is ready, instead of only being handled when an instance is already running.
+- Confirmed already resolved in this fork's V2 codebase / Electron 44 base, and closed off: exporting a vault as CSV no longer shows an endless list of disabled menu items (upstream [#670](https://github.com/buttercup/buttercup-desktop/issues/670) - export is now a single menu item; verified by code inspection, not yet re-tested on macOS), emptying the trash no longer throws (upstream [#668](https://github.com/buttercup/buttercup-desktop/issues/668)), and the app launches with Windows Defender "Mandatory ASLR" forced on (upstream [#502](https://github.com/buttercup/buttercup-desktop/issues/502)).
 - The entries-list copy shortcuts (Ctrl/Cmd+C for password, Ctrl/Cmd+B for username) now always act on the currently selected entry rather than the previously selected one (upstream [#1384](https://github.com/buttercup/buttercup-desktop/issues/1384)). The handlers now read live selection state through a ref, working around `react-hotkeys` caching stale handler closures, and look the field up by property (`username` / `password`) instead of by its display title.
 - The entries-list copy shortcuts now write to the clipboard via the native clipboard API instead of a hidden-`textarea` `execCommand` hack. The hack stole and then dropped keyboard focus, which left the list unfocused so the next shortcut press was silently ignored (and beeped). Copying via shortcut now also arms the auto-clear-clipboard timer, matching the field copy buttons.
 - Keyboard navigation of the entries list is now consistent: arrow keys move the highlight and keep DOM focus on the highlighted row (previously focus lagged one row behind), and Enter acts on the highlighted entry instead of clicking whatever element happened to hold focus - which had been snapping the selection back to a previously focused entry.
@@ -99,7 +103,7 @@ First release of the Codekunde fork. A modernization pass over the archived upst
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.1...HEAD
+[2.31.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.1...v2.31.0
 [2.30.1]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...v2.30.1
 [2.30.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.29.0...v2.30.0
 [2.29.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.28.1...v2.29.0

@@ -91,7 +91,7 @@ async function checkForUpdateInternal() {
     autoUpdater.autoDownload = false;
     autoUpdater.setFeedURL({
         provider: "github",
-        owner: "buttercup",
+        owner: "codekunde",
         repo: "buttercup-desktop"
     });
     if (isDev) {
