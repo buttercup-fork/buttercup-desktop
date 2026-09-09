@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import cn from "classnames";
 import styled from "styled-components";
@@ -67,6 +67,38 @@ export function VaultManagement() {
         history.push(`/source/${sourceID}`);
         setCurrentVault(sourceID);
     }, [history, id, setCurrentVault]);
+    // Keep the active vault in sync with the route, so arriving here from the
+    // tray / app menu (which navigate without going through a tab click) still
+    // points the rest of the app - password prompt, facade updates - at the
+    // right vault.
+    useEffect(() => {
+        if (id) {
+            setCurrentVault(id);
+        }
+    }, [id, setCurrentVault]);
+    // Ctrl/Cmd+Tab (and Ctrl/Cmd+PageDown / +PageUp) cycle through the vault tabs.
+    useEffect(() => {
+        const handler = (event: KeyboardEvent) => {
+            if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+            let delta = 0;
+            if (event.key === "Tab") {
+                delta = event.shiftKey ? -1 : 1;
+            } else if (event.key === "PageDown") {
+                delta = 1;
+            } else if (event.key === "PageUp") {
+                delta = -1;
+            } else {
+                return;
+            }
+            if (vaults.length < 2) return;
+            event.preventDefault();
+            const currentIndex = Math.max(vaults.findIndex(vault => vault.id === id), 0);
+            const nextIndex = (currentIndex + delta + vaults.length) % vaults.length;
+            handleSourceSelect(vaults[nextIndex].id);
+        };
+        document.addEventListener("keydown", handler);
+        return () => document.removeEventListener("keydown", handler);
+    }, [vaults, id, handleSourceSelect]);
     const handleSourcesReoder = useCallback((newTabsOrder: Array<Tab>) => {
         setVaultSourcesOrder(newTabsOrder.map(tab => tab.id)).catch(err => {
             logErr("Failed reordering vaults", err);

@@ -25,7 +25,7 @@ import { clearFacadeCache } from "./facades";
 import { notifyWindowsOfSourceUpdate } from "./windows";
 import { getVaultCacheStorage, getVaultStorage } from "./storage";
 import { updateSearchCaches } from "./search";
-import { setAutoLockEnabled } from "./autoLock";
+import { setAutoLockSuspended, startAutoVaultLockTimer } from "./autoLock";
 import { logErr, logInfo } from "../library/log";
 import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
@@ -68,6 +68,7 @@ export async function addVault(
         await source.unlock(passCredentials, { initialiseRemote: createNew });
         await vaultManager.dehydrateSource(source);
     });
+    void startAutoVaultLockTimer();
     return source.id;
 }
 
@@ -341,7 +342,8 @@ export async function testSourceMasterPassword(
 }
 
 export async function toggleAutoUpdate(autoUpdateEnabled: boolean = true) {
-    setAutoLockEnabled(autoUpdateEnabled);
+    // Editing an entry (auto-update disabled) also suspends auto-lock.
+    setAutoLockSuspended(!autoUpdateEnabled);
     const vaultManager = getVaultManager();
     await vaultManager.enqueueStateChange(() => {});
     vaultManager.toggleAutoUpdating(autoUpdateEnabled);
@@ -351,6 +353,8 @@ export async function unlockSource(sourceID: VaultSourceID, password: string) {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
     await source.unlock(Credentials.fromPassword(password));
+    // Arm auto-lock now rather than waiting for the next user-activity ping.
+    void startAutoVaultLockTimer();
 }
 
 export async function updateExistingEntry(

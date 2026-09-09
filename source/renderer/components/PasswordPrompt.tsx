@@ -46,7 +46,11 @@ export function PasswordPrompt() {
     const [showPrompt, setShowPrompt] = useSingleState(PASSWORD_STATE, "showPrompt");
     const [currentPassword, setCurrentPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [sourceID] = useSingleState(VAULTS_STATE, "currentVault");
+    const [promptSourceID] = useSingleState(PASSWORD_STATE, "promptSourceID");
+    const [currentVault] = useSingleState(VAULTS_STATE, "currentVault");
+    // Prefer the source the unlock was explicitly requested for; fall back to the
+    // active vault for in-app unlock paths that don't set `promptSourceID`.
+    const sourceID = promptSourceID ?? currentVault;
     const [sourceDetails] = useSourceDetails(sourceID);
     const [settings, setSettings] = useState<VaultSettingsLocal | null>(null);
     const [promptedBiometrics, setPromptedBiometrics] = useState<boolean>(false);

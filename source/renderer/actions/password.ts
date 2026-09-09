@@ -7,6 +7,11 @@ export async function getPrimaryPassword(
     sourceID?: VaultSourceID
 ): Promise<[password: string | null, biometricsEnabled: boolean, usedBiometrics: boolean]> {
     let biometricsEnabled: boolean = false;
+    // The prompt reads the vault being unlocked from here rather than from
+    // `VAULTS_STATE.currentVault`, which isn't set when unlocking is triggered
+    // from the tray or app menu (buttercup/buttercup-desktop#1280) - the prompt
+    // would then render blank.
+    PASSWORD_STATE.promptSourceID = sourceID ?? null;
     if (sourceID) {
         const supportsBiometrics = await sourceHasBiometricAvailability(sourceID);
         if (supportsBiometrics) {
@@ -24,5 +29,6 @@ export async function getPrimaryPassword(
         emitter.once("password", callback);
     });
     PASSWORD_STATE.passwordViaBiometricSource = null;
+    PASSWORD_STATE.promptSourceID = null;
     return [password, biometricsEnabled, usedBiometrics];
 }

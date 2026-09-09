@@ -1,9 +1,8 @@
 import * as React from "react";
 import styled from "styled-components";
 import { useState as useHookState } from "@hookstate/core";
-import { Alignment, Button, ButtonGroup, Callout, Classes, Dialog, FormGroup, Intent, MenuItem, Radio, RadioGroup, Slider, Switch } from "@blueprintjs/core";
+import { Alignment, Button, ButtonGroup, Callout, Classes, Dialog, FormGroup, HTMLSelect, Intent, MenuItem, Radio, RadioGroup, Switch } from "@blueprintjs/core";
 import { Select } from "@blueprintjs/select";
-import ms from "ms";
 import prettyMS from "pretty-ms";
 import { naiveClone } from "../../shared/library/clone";
 import { SHOW_PREFERENCES, showPreferences as setShowPreferences } from "../state/preferences";
@@ -20,9 +19,18 @@ const { useCallback, useEffect, useMemo, useState } = React;
 const LanguageSelect = Select.ofType<Language>();
 const ThemeSelect = Select.ofType<ThemeSource>();
 
-const AUTO_CLEAR_CP_MAX = ms("30m") / 1000;
 const LANG_AUTO_NAME = "Auto (OS)";
-const LOCK_VAULTS_TIME_MAX = ms("1d") / 1000;
+// Durations in seconds; 0 means "Off". Presented as a plain dropdown - a
+// continuous 0-to-24h slider crammed its hourly tick labels into an unreadable
+// smear and made small values (a minute, or less) impossible to land on.
+const CLIPBOARD_CLEAR_OPTIONS = [0, 15, 30, 60, 120, 300, 600, 900, 1800];
+const LOCK_VAULTS_OPTIONS = [0, 30, 60, 300, 600, 900, 1800, 3600, 7200, 14400, 28800, 86400];
+const durationLabel = (seconds: number): string =>
+    seconds === 0 ? "Off" : prettyMS(seconds * 1000, { verbose: true });
+// Keep a previously-saved value that isn't one of the presets (e.g. set with the
+// old slider) selectable rather than silently snapping it.
+const withCurrentValue = (options: Array<number>, current: number): Array<number> =>
+    options.includes(current) ? options : [...options, current].sort((a, b) => a - b);
 const PAGE_CONNECTIVITY = "connectivity";
 const PAGE_GENERAL = "general";
 const PAGE_SECURITY = "security";
@@ -196,32 +204,46 @@ export function PreferencesDialog() {
     const pageSecurity = () => (
         <>
             <FormGroup label={t("preferences.item.clear-clipboard")}>
-                <Slider
-                    labelRenderer={value => value > 0 ? prettyMS(value * 1000) : "Off"}
-                    labelStepSize={60 * 5}
-                    max={AUTO_CLEAR_CP_MAX}
-                    min={0}
-                    onChange={value => setPreferences({
-                        ...naiveClone(preferences),
-                        autoClearClipboard: value === 0 ? false : value
-                    })}
-                    stepSize={30}
+                <HTMLSelect
                     value={preferences.autoClearClipboard === false ? 0 : preferences.autoClearClipboard}
-                />
+                    onChange={evt => {
+                        const value = Number(evt.currentTarget.value);
+                        setPreferences({
+                            ...naiveClone(preferences),
+                            autoClearClipboard: value === 0 ? false : value
+                        });
+                    }}
+                >
+                    {withCurrentValue(
+                        CLIPBOARD_CLEAR_OPTIONS,
+                        preferences.autoClearClipboard === false ? 0 : preferences.autoClearClipboard
+                    ).map(seconds => (
+                        <option key={seconds} value={seconds}>
+                            {durationLabel(seconds)}
+                        </option>
+                    ))}
+                </HTMLSelect>
             </FormGroup>
             <FormGroup label={t("preferences.item.lock-vaults-after-time")}>
-                <Slider
-                    labelRenderer={value => value > 0 ? prettyMS(value * 1000) : "Off"}
-                    labelStepSize={ms("1h") / 1000}
-                    max={LOCK_VAULTS_TIME_MAX}
-                    min={0}
-                    onChange={value => setPreferences({
-                        ...naiveClone(preferences),
-                        lockVaultsAfterTime: value === 0 ? false : value
-                    })}
-                    stepSize={60}
+                <HTMLSelect
                     value={preferences.lockVaultsAfterTime === false ? 0 : preferences.lockVaultsAfterTime}
-                />
+                    onChange={evt => {
+                        const value = Number(evt.currentTarget.value);
+                        setPreferences({
+                            ...naiveClone(preferences),
+                            lockVaultsAfterTime: value === 0 ? false : value
+                        });
+                    }}
+                >
+                    {withCurrentValue(
+                        LOCK_VAULTS_OPTIONS,
+                        preferences.lockVaultsAfterTime === false ? 0 : preferences.lockVaultsAfterTime
+                    ).map(seconds => (
+                        <option key={seconds} value={seconds}>
+                            {durationLabel(seconds)}
+                        </option>
+                    ))}
+                </HTMLSelect>
                 <p>{t("preferences.item.lock-vaults-after-time-desc")}</p>
             </FormGroup>
             <FormGroup label={t("preferences.item.lock-vaults-window-closed")}>

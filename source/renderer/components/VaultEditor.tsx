@@ -76,6 +76,13 @@ export function VaultEditor(props: VaultEditorProps) {
         });
     }, [currentlyEditing]);
     useEffect(() => {
+        // Leaving the editor (e.g. locking the vault mid-edit) must not leave
+        // auto-update / auto-lock stuck in the "editing" suspended state.
+        return () => {
+            toggleAutoUpdate(true).catch(() => {});
+        };
+    }, []);
+    useEffect(() => {
         setSelectedSource(sourceID);
     }, [sourceID]);
     // Search

@@ -7,6 +7,7 @@ import { startFileHost, stopFileHost } from "../services/fileHost";
 import { setStartWithSession } from "../services/launch";
 import { start as startBrowserAPI, stop as stopBrowserAPI } from "../services/browser/index";
 import { setConfigValue } from "../services/config";
+import { startAutoVaultLockTimer } from "../services/autoLock";
 import { getMainWindow } from "../services/windows";
 import { Preferences } from "../types";
 
@@ -33,6 +34,8 @@ export async function handleConfigUpdate(preferences: Preferences) {
         ` - Start with session launch: ${preferences.startWithSession ? "Enabled" : "Disabled"}`
     );
     await setStartWithSession(preferences.startWithSession);
+    // Pick up a changed `lockVaultsAfterTime` immediately.
+    await startAutoVaultLockTimer();
     logInfo(` - File host: ${preferences.fileHostEnabled ? "Enabled" : "Disabled"}`);
     if (preferences.fileHostEnabled) {
         try {
