@@ -13,6 +13,15 @@ import { AppStartMode } from "./types";
 
 logInfo("Application starting");
 
+// Windows-only GPU-compositor workaround: on some Windows GPU driver / Chromium
+// combinations, the window leaves stale pixels between repaints - most visibly a
+// line between the menu bar and the vault-tab strip that only clears wherever the
+// cursor hovers. Confirmed fixed by disabling GPU compositing (see UPSTREAM-ISSUES.md,
+// "Fork-discovered" table). Must run before the app is ready.
+if (process.platform === "win32") {
+    app.commandLine.appendSwitch("disable-gpu-compositing");
+}
+
 const lock = app.requestSingleInstanceLock();
 if (!lock) {
     app.quit();
