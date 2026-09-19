@@ -1,22 +1,15 @@
 # Buttercup Desktop
 > Buttercup for Desktop - Mac, Linux and Windows
 
-[![Buttercup](https://cdn.rawgit.com/buttercup-pw/buttercup-assets/6582a033/badge/buttercup-slim.svg)](https://buttercup.pw) ![Latest version](https://img.shields.io/github/tag/buttercup/buttercup-desktop.svg?label=latest) [![Chat securely on Keybase](https://img.shields.io/badge/keybase-bcup-blueviolet)](https://keybase.io/team/bcup)
+[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/codekunde/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/codekunde/buttercup-desktop?label=latest)](https://github.com/codekunde/buttercup-desktop/releases/latest)
 
 <img width="1406" alt="Buttercup Desktop screenshot" src="https://github.com/buttercup/buttercup-desktop/assets/3869469/1320b163-3e5c-4423-a4fd-8de7ffad2a0e">
-²
-
----
-
-⚠️ **Project Closure** ⚠️
-
-The Buttercup project has come to an end, and these repositories are in transition to becoming public archives. No public-facing resources will be removed, wherever possible. Please do not create issues or PRs - they will unfortunately be ignored. Discussion can be found [here](https://github.com/buttercup/buttercup-desktop/discussions/1395), and explanation [here](https://gist.github.com/perry-mitchell/43ebfcec4d874b77a704be1d4f2262e6).
 
 ---
 
 ℹ️ **About this fork**
 
-This is an independent fork of the original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop), archived by its maintainers, now maintained by **Codekunde** to rebuild, modernize and keep the app secure (dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed.
+The original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop) was closed by its maintainers and its repositories archived. This is an independent fork, maintained by **Codekunde** to keep the app working and secure (bug fixes, dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed. In-app update checks read this repository's releases.
 
 This fork is not affiliated with, endorsed by, or supported by the original Buttercup maintainers. It has not yet undergone an independent security audit (this line will be removed once/if one happens).
 
@@ -27,6 +20,8 @@ It depends on the companion fork [`codekunde/buttercup-core`](https://github.com
 ## About
 
 Buttercup is a free, open-source and cross-platform **password manager**, built on NodeJS with Typescript. It uses strong industry-standard encryption to protect your passwords and credentials (among other data you store in Buttercup vaults) at rest, within vault files (`.bcup`). Vaults can be loaded from and saved to a number of sources, such as the **local filesystem**, **Dropbox**, **Google Drive** or any **WebDAV**-enabled service (like _ownCloud_ or _Nextcloud_ ¹).
+
+> **Known issue:** signing in to **Google Drive** currently does not complete. It relied on a redirect service run by the original project (`buttercup.pw`), which is offline. A replacement sign-in flow is planned. Local files, Dropbox and WebDAV are unaffected.
 
 ### Why you need a password manager
 
@@ -48,59 +43,55 @@ _It is very important to note that no one associated with Buttercup will ever re
 
 ### Versions
 
-The current stable version is **2**. We recommend upgrading if you're still on v1, as it is no longer being actively maintained. You can still browse the v1 source and documentation [here](https://github.com/buttercup/buttercup-desktop/tree/v1).
+The current stable version is **2**. If you're still on v1, upgrade: it is no longer maintained. You can still browse the v1 source and documentation [here](https://github.com/buttercup/buttercup-desktop/tree/v1).
 
-Buttercup is built on Node 22 LTS - no other platform is officially supported.
+The app is built on [Electron](https://www.electronjs.org/) (see `package.json` for the current version) and is built in CI with Node 22 LTS.
 
 ### Operating Systems
 
-Buttercup Desktop is officially supported on:
+Builds are provided for:
 
- * Most linux distributions (x64), such as Ubuntu
- * MacOS (x64, Apple Silicon¹)
+ * Linux: x64 and arm64, as an AppImage (runs on most distributions, such as Ubuntu)
+ * macOS: Intel (x64) and Apple Silicon (arm64)¹
  * Windows 10 / 11 (x64)
 
- ¹ No builds yet
+ ¹ Apple Silicon builds first shipped in 2.31.0 and have not yet been tested on real Apple Silicon hardware.
 
-#### Arch Linux
-
-Buttercup is also available for [Arch via the AUR](https://aur.archlinux.org/packages/buttercup-desktop/). This release channel is maintained by our community.
-
-Some Arch users have reported the occasional segfault - if you experience this please try [this solution](https://github.com/buttercup/buttercup-desktop/issues/643#issuecomment-413852760) before creating an issue.
+All builds are **unsigned** - see [Published Applications](#published-applications).
 
 #### 32bit builds (x86)
 
-Buttercup no longer provides 32bit builds, due to the complexity of supporting them in the build pipeline.
+This fork does not provide 32bit builds.
 
 ## Portability
 
-Buttercup provides a portable **Windows** version. Look for the release with the name `Buttercup-win-x64-2.0.0-portable.exe` where `2.0.0` is the version and `x64` is the architecture.
+Buttercup provides a portable **Windows** version. Look for the release asset named like `Buttercup-win-x64-2.31.0-portable.exe`, where `2.31.0` is the version and `x64` is the architecture.
 
 Although not explicitly portable, both the Mac **zip** and Linux **AppImage** formats are more or less standalone. They still write to the standard config/log destinations, however.
 
-To make the most of the portable version, some enviroment variables are required:
+**On its own, the Windows portable build is not fully portable:** it still keeps its configuration and vault list in the standard OS locations (see [Configuration](#configuration)); only the log file is written next to the executable. To keep everything alongside the executable, set some environment variables:
 
-| Enviroment Variables   | Description |
+| Environment Variable   | Description |
 |------------------------|-------------|
-| `BUTTERCUP_HOME_DIR`   | If provided buttercup will use this path for saving __configrations__ , __user settings__ or even __temprorary files__ |
-| `BUTTERCUP_CONFIG_DIR` | Stores __user settings__, not allways needed but can be used to change config location or will default to BUTTERCUP_HOME_DIR `Optional: Only activates if BUTTERCUP_HOME_DIR is provided` |
-| `BUTTERCUP_TEMP_DIR`   | Same as BUTTERCUP_CONFIG_DIR but stores __temprory files__ `Optional: Only activates if BUTTERCUP_HOME_DIR is provided` |
+| `BUTTERCUP_HOME_DIR`   | If provided, Buttercup keeps its data, configuration, cache, log and temporary files under this path (in `data`, `config`, `cache`, `log` and `temp` sub-folders). |
+| `BUTTERCUP_CONFIG_DIR` | Optional. Stores user settings (in a `config` sub-folder) here instead of under `BUTTERCUP_HOME_DIR`. Only takes effect if `BUTTERCUP_HOME_DIR` is provided. |
+| `BUTTERCUP_TEMP_DIR`   | Optional. Stores temporary files (in a `temp` sub-folder) here instead of under `BUTTERCUP_HOME_DIR`. Only takes effect if `BUTTERCUP_HOME_DIR` is provided. |
 
 ### Sample `ButtercupLauncher.bat` for Windows portable executable
 
-> This example stores user settings and cache on the portable folder, but stores temprory files on the host PC.
+> This example stores user settings and cache in a folder next to the launcher, but stores temporary files on the host PC. Change the executable's file name to match the version you downloaded.
 
 ```bat
 @ECHO OFF
 if not exist "%~dp0Buttercup" mkdir "%~dp0Buttercup"
 set "BUTTERCUP_HOME_DIR=%~dp0Buttercup"
 set "BUTTERCUP_TEMP_DIR=%temp%"
-start %~dp0Buttercup.exe %*
+start "" "%~dp0Buttercup-win-x64-2.31.0-portable.exe" %*
 ```
 
 ## Configuration
 
-Configuration files are stored in OS-specific locations.
+Configuration files are stored in OS-specific locations (unless `BUTTERCUP_HOME_DIR` is set - see [Portability](#portability)). Note the `Buttercup-nodejs` folder name.
 
 ### Command-Line arguments
 
@@ -116,29 +107,29 @@ The following arguments can be provided to Buttercup, but are all optional.
 
 Application configuration.
 
- * Linux: `$XDG_CONFIG_HOME/Buttercup/desktop.config.json`
- * Mac: `~/Library/Preferences/Buttercup/desktop.config.json`
- * Windows: `$APPDATA/Buttercup/Config/desktop.config.json`
+ * Linux: `$XDG_CONFIG_HOME/Buttercup-nodejs/desktop.config.json` (`~/.config` if `XDG_CONFIG_HOME` is unset)
+ * Mac: `~/Library/Preferences/Buttercup-nodejs/desktop.config.json`
+ * Windows: `%APPDATA%\Buttercup-nodejs\Config\desktop.config.json`
 
 ### Vault storage
 
 Storage of connected vaults (not actual vault contents).
 
- * Linux: `$XDG_DATA_HOME/Buttercup/vaults.json`
- * Mac: `~/Library/Application\ Support/Buttercup/vaults.json`
- * Windows: `$LOCALAPPDATA/Buttercup/Data/vaults.json`
+ * Linux: `$XDG_DATA_HOME/Buttercup-nodejs/vaults.json` (`~/.local/share` if `XDG_DATA_HOME` is unset)
+ * Mac: `~/Library/Application Support/Buttercup-nodejs/vaults.json`
+ * Windows: `%LOCALAPPDATA%\Buttercup-nodejs\Data\vaults.json`
 
 ### Offline vault cache
 
-Stored copies of vaults for offline use.
+Stored copies of vaults for offline use, in your OS's temporary directory (`os.tmpdir()`).
 
- * Linux: `$(node -e "console.log(os.tmpdir())")/$(whoami)/Buttercup/vaults-offline.cache.json`
- * Mac: `$(node -e "console.log(os.tmpdir())")/Buttercup/vaults-offline.cache.json`
- * Windows: `$(node -e "console.log(os.tmpdir())")/Buttercup/vaults-offline.cache.json`
+ * Linux: `<tmpdir>/<username>/Buttercup-nodejs/vaults-offline.cache.json`
+ * Mac: `<tmpdir>/Buttercup-nodejs/vaults-offline.cache.json`
+ * Windows: `<tmpdir>\Buttercup-nodejs\vaults-offline.cache.json`
 
 ### Logs
 
-Logs are written for all app sessions.
+Logs are written for all app sessions, to `buttercup-desktop.log` in:
 
  * Linux: `~/.local/state/Buttercup-nodejs` or `$XDG_STATE_HOME/Buttercup-nodejs`
  * Mac: `~/Library/Logs/Buttercup-nodejs`
@@ -148,17 +139,26 @@ _Note that logs for portable Windows applications will be written to the same di
 
 ## Published Applications
 
-You can view the current releases on the [Buttercup Desktop releases page](https://github.com/buttercup/buttercup-desktop/releases). Under each release are some assets - the various binaries and installers for each platform Buttercup supports. When installing or downloading, make sure to pick the right operating system and architecture for your machine.
+You can view the current releases on the [releases page](https://github.com/codekunde/buttercup-desktop/releases). Under each release are the binaries and installers for each supported platform. Make sure to pick the right operating system and architecture for your machine:
 
-_Note that at this time, Buttercup only supports x64 (64 bit) machines._
+| Platform | Assets |
+|----------|--------|
+| Windows (x64) | `Buttercup-win-x64-<version>-installer.exe` (installer), `Buttercup-win-x64-<version>-portable.exe` (portable), `Buttercup-win-x64-<version>.7z` (archive) |
+| macOS, Intel | `Buttercup-mac-x64-<version>.dmg` / `.zip` |
+| macOS, Apple Silicon | `Buttercup-mac-arm64-<version>.dmg` / `.zip` |
+| Linux, x64 | `Buttercup-linux-x86_64.AppImage` |
+| Linux, arm64 | `Buttercup-linux-arm64.AppImage` |
+
+**These builds are not code-signed**, so your OS will warn you the first time you run them:
+
+ * **Windows** SmartScreen: choose _More info_, then _Run anyway_.
+ * **macOS** Gatekeeper: right-click the app and choose _Open_ (or run `xattr -cr /Applications/Buttercup.app` once).
 
 ### Linux
 
-We provide an **AppImage** build for Linux, because it is the most desirable format for us to release. AppImages support auto-updating, a crucial feature (we feel) for a security application. The other build types do not.
+We provide an **AppImage** build for Linux, because it supports auto-updating, a crucial feature (we feel) for a security application. Other package formats (deb, rpm, Snap) are not provided at this time.
 
-**Important:** Buttercup uses Electron to build its desktop application, which relies on [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) for correct integration of AppImages into the host OS. Features like **Google Drive** authentication and correct `.desktop` icon use is only performed when integrating via AppImageLauncher. We highly recommend that you install it.
-
-We won't be supporting formats like Snapcraft, deb or rpm images as they do not align with our requirements. Issues requesting these formats will be closed immediately. Discussion on topics like this should be started on other social channels.
+Buttercup registers its own `.desktop` entry and URL-scheme handler when run as an AppImage, so no extra tooling is required. Installing [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) is still a good way to integrate AppImages into your desktop (menu entries, icons, updates) if you'd like that.
 
 ## Development
 
@@ -194,11 +194,14 @@ The e2e tests launch the real app in an isolated data directory. See [`e2e/READM
 
 ### Dependency security
 
-`npm audit` is expected to report **0 vulnerabilities**. Transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
+`npm audit` currently reports **2 moderate** findings, both the same issue: `csv-parse` pulled in by `@buttercup/importer` (used for importing from other password managers and CSV files). The only automatic fix is a breaking downgrade of that package, so it is not applied. Other transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
 
 ## Building & Releasing
 
-There is **no automated release pipeline** in this repo — the only GitHub Actions workflow (`.github/workflows/test.yml`) just runs `npm test` on every push. Producing installers and cutting a release is a **manual** process.
+Two GitHub Actions workflows live in `.github/workflows/`:
+
+ * **`test.yml`** runs on every push and on pull requests to `master`: a build plus the unit tests and prettier check on Ubuntu, macOS and Windows, and an informational Playwright end-to-end run.
+ * **`build.yml`** runs on pushes to `master`, on `v*` tags, and on demand: it builds **unsigned** installers on Windows, macOS and Linux. On a `v*` tag it also **drafts a GitHub release** with all of the artifacts (including the `latest*.yml` auto-update metadata) attached.
 
 ### Local, unsigned builds
 
@@ -210,17 +213,17 @@ npm run package:mac     # dist/*.dmg, *.zip           (run on macOS)
 npm run package:linux   # dist/*.AppImage             (run on Linux)
 ```
 
-Each platform's installers must be built on that platform (macOS builds in particular cannot be produced or signed elsewhere). Output lands in `dist/`. These builds are **not code-signed**, so Windows SmartScreen and macOS Gatekeeper will warn on first run.
+Each platform's installers must be built on that platform (macOS builds in particular cannot be produced or signed elsewhere). Run `npm run build` first if `build/` is stale. Output lands in `dist/`. These builds are **not code-signed**, so Windows SmartScreen and macOS Gatekeeper will warn on first run.
 
 ### Publishing a release
 
-The simplest path is the **`Build` GitHub Actions workflow**: pushing a `v*` tag builds unsigned installers for all three platforms and drafts a GitHub release with them attached (review the draft and publish it by hand). `build.publish` in `package.json` targets `codekunde/buttercup-desktop`.
+ 1. Bump `version` in `package.json` (and the two version fields in `package-lock.json`), run `npm run set-version` (it writes the version into `source/main/library/build.ts`), and add the release to `CHANGELOG.md`.
+ 2. Merge that to `master`, then tag it `v<version>` and push the tag (`git tag v2.31.0 && git push origin v2.31.0`).
+ 3. The `Build` workflow builds everything and drafts the release. Review the draft and publish it by hand.
 
-For **signed** releases there is `npm run publish` (see `resources/scripts/publish.js`): it builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set.
+`build.publish` in `package.json` targets `codekunde/buttercup-desktop`, which is also where the in-app updater looks for new versions.
 
-electron-builder creates the GitHub release as a **draft**; review it and publish it by hand. Version comes from `package.json` (`npm run set-version` writes it into `source/main/library/build.ts`); tag releases `v<version>` to match the existing history.
-
-> If you want CI to build and attach installers automatically on `git tag`, a matrix workflow across `windows-latest` / `macos-latest` / `ubuntu-latest` running `electron-builder --publish always` is the usual approach. It is not set up yet.
+For **signed** releases there is `npm run publish` (see `resources/scripts/publish.js`): it builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set. The secrets are not currently configured, so releases are unsigned.
 
 ### Contributing
 
@@ -228,11 +231,11 @@ There are a number of ways you can contribute to Buttercup!
 
 #### Features & Bug fixes
 
-We welcome pull-requests and issues that serve to better Buttercup as a platform. Please remain respecful (this is free & open source after all) with your ideas and observations, and always consider opening an issue before starting on a substantial pull request.
+Pull requests and issues that make Buttercup better are welcome on this repository (issues and PRs on the original, archived project will not be seen). Please be respectful with your ideas and observations, and consider opening an issue before starting on a substantial pull request.
 
 #### Translations
 
-Buttercup relies on the community for translating its interfaces into languages besides English. We use British English (en_GB) as the base language, and translate into all others that our contributors are kind enough to provide.
+Buttercup relies on the community for translating its interfaces into languages besides English. English (`en.json`) is the base language, and all others are contributed translations.
 
 To add support for a language, make sure to add the translations for our [**vault UI**](https://github.com/buttercup/ui#translations--i18n) first. After that, you can follow these instructions to add another language to the desktop application:
 

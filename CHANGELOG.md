@@ -11,6 +11,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Changed
 
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
+- Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
 
 ### Fixed
 
