@@ -8,6 +8,10 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [Unreleased]
 
+### Changed
+
+- New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
+
 ### Fixed
 
 - The "Copied!" confirmation toast sometimes stayed on screen until its "X" was clicked. This happened when a second copy arrived just as the previous toast was fading out; each copy now gets its own toast.
