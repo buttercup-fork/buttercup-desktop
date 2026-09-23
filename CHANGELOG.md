@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/codekunde/buttercup-desktop/tags) and the original project's GitHub Releases.
 
+## [Unreleased]
+
+### Changed
+
+- New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
+- Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
+
+### Fixed
+
+- The "Copied!" confirmation toast sometimes stayed on screen until its "X" was clicked. This happened when a second copy arrived just as the previous toast was fading out; each copy now gets its own toast.
+
 ## [2.31.0] - 2026-09-10
 
 A pass over the open upstream issue tracker: 17 issues fixed or confirmed resolved, plus keyboard and preferences polish. The macOS build now ships separate Intel and Apple Silicon artifacts, and the in-app updater points at this fork.
@@ -103,6 +114,7 @@ First release of the Codekunde fork. A modernization pass over the archived upst
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
+[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.31.0...HEAD
 [2.31.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.1...v2.31.0
 [2.30.1]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...v2.30.1
 [2.30.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.29.0...v2.30.0

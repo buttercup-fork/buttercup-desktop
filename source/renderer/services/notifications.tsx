@@ -61,18 +61,28 @@ export function showSuccess(message: string) {
     showNotification(message, Intent.SUCCESS);
 }
 
+let __copiedToastKey: string | null = null;
+let __copiedToastCount = 0;
+
 export function notifyCopied(message: string = t("notification.copied")) {
     const toaster = getToaster();
     if (!toaster) return;
-    // Reuse a fixed key so rapid successive copies replace the toast instead of
-    // stacking up.
+    // Each copy gets its own key, with the previous copy toast dismissed, so rapid
+    // successive copies replace rather than stack. Reusing one fixed key is not safe:
+    // Blueprint only restarts a toast's timeout when its `timeout` prop changes, so
+    // re-showing under the same key while the previous toast is still animating out
+    // revives it with no timer left - and it then stays until "X" is clicked.
+    if (__copiedToastKey) {
+        toaster.dismiss(__copiedToastKey);
+    }
+    __copiedToastKey = `clipboard-copied-${++__copiedToastCount}`;
     toaster.show({
         className: "bcup-toast-compact",
         icon: "clipboard",
         message,
         intent: Intent.SUCCESS,
         timeout: 2500
-    }, "clipboard-copied");
+    }, __copiedToastKey);
 }
 
 export function showUpdateAvailable(version: string, onUpdate: () => void, onCancel: () => void) {
