@@ -49,7 +49,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Collect installers
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v3
         with:
           name: buttercup-${{ matrix.os }}
           if-no-files-found: error
@@ -59,6 +59,7 @@ jobs:
             dist/*.dmg
             dist/*.zip
             dist/*.AppImage
+            dist/*.deb
             dist/*.7z
             dist/*.blockmap
             dist/latest*.yml
@@ -70,10 +71,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
-          merge-multiple: true
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2

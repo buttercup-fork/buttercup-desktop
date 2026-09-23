@@ -56,6 +56,7 @@ import { log as logRaw, logInfo, logErr } from "./library/log";
 import { isPortable } from "./library/portability";
 import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
+import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
 import {
     AppEnvironmentFlags,
     AddVaultPayload,
@@ -375,3 +376,7 @@ ipcMain.handle("unlock-source", async (evt, sourceID: VaultSourceID, password: s
 ipcMain.handle("write-clipboard", (_, text: string) => {
     clipboard.writeText(text);
 });
+
+ipcMain.handle("read-clipboard-qr-image", () => readClipboardQRImage());
+
+ipcMain.handle("choose-qr-image-file", () => chooseQRImageFile());

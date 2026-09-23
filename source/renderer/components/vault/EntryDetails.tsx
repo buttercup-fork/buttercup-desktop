@@ -41,6 +41,7 @@ import { t } from "../../../shared/i18n/trans";
 import { getThemeProp } from "./utils/theme";
 import { ErrorBoundary } from "../ErrorBoundary";
 import { PasswordGenerator } from "../standalone/PasswordGenerator";
+import { ScanOTPButton } from "./ScanOTPButton";
 
 interface AttachmentItem extends AttachmentDetails {
     sizeEncFriendly: string;
@@ -761,6 +762,9 @@ const FieldRow = ({
                                         : undefined
                                 }
                             />
+                        )}
+                        {field.valueType === EntryPropertyValueType.OTP && (
+                            <ScanOTPButton onScan={otpURI => onFieldUpdate(field, otpURI)} />
                         )}
                         {field.valueType === "password" && (
                             <Fragment>

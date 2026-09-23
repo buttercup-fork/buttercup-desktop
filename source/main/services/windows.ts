@@ -4,7 +4,7 @@ import { enable as enableWebContents } from "@electron/remote/main";
 import { VaultSourceID } from "buttercup";
 import debounce from "debounce";
 import { getConfigValue, setConfigValue } from "./config";
-import { getIconPath } from "../library/tray";
+import { getWindowIconPath } from "../library/tray";
 import { lockAllSources } from "./buttercup";
 import { setLastSourceID } from "./lastVault";
 import { logErr, logInfo } from "../library/log";
@@ -34,7 +34,7 @@ async function createVaultWindow() {
     const config: BrowserWindowConstructorOptions = {
         width,
         height,
-        icon: getIconPath(),
+        icon: getWindowIconPath(),
         webPreferences: {
             contextIsolation: false,
             nodeIntegration: true,

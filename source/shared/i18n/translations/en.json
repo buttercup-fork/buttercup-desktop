@@ -171,6 +171,11 @@
             "submit-button": "Import",
             "title": "Import from {{importer}} vault"
         },
+        "otp-qr-chooser": {
+            "filter-name": "QR code image",
+            "submit-button": "Scan",
+            "title": "Choose a QR code image"
+        },
         "new-file-prompt": {
             "button-cancel": {
                 "text": "Close",
@@ -436,6 +441,14 @@
                 "note": "Note",
                 "password": "Password",
                 "otp": "OTP"
+            },
+            "otp-scan": {
+                "button-title": "Scan a QR code (from the clipboard or a file) to fill this OTP",
+                "error": "Something went wrong while scanning the QR code.",
+                "invalid": "That QR code isn't a valid OTP code.",
+                "no-image": "No image found on the clipboard, and no file was chosen.",
+                "not-found": "No QR code could be found in that image.",
+                "success": "OTP added from QR code"
             }
         },
         "entries-list": {
