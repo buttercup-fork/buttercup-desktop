@@ -3,6 +3,7 @@ import { Classes, Intent, IToastProps, ProgressBar } from "@blueprintjs/core";
 import { getToaster, getUpdateToaster } from "../components/Notifications";
 import { logWarn } from "../library/log";
 import { t } from "../../shared/i18n/trans";
+import { setUpdateErrorDetails } from "../state/updateError";
 
 export interface ProgressNotification {
     clear: (message: any, intent: Intent, timeout?: number) => void;
@@ -129,12 +130,28 @@ export function showUpdateDownloaded(version: string, onUpdate: () => void, onCa
     }, "update-downloaded");
 }
 
+// electron-updater errors are raw network/HTTP messages (e.g. GitHub feed
+// URLs, status codes, stack-ish text) - not fit for a toast. Showing the
+// full text in the toast made it grow to take over the corner of the
+// screen. Instead we classify it into a short, human summary and let the
+// user expand a dialog with the original message when they want it.
+function summariseUpdateError(message: string): string {
+    if (/\b404\b/.test(message) || /ENOTFOUND|ECONNREFUSED/.test(message)) {
+        return t("update.error.github-unavailable");
+    }
+    return t("update.error.generic");
+}
+
 export function showUpdateError(message: string) {
     const toaster = getUpdateToaster();
     toaster.show({
-        message: `Update failed: ${message}`,
+        message: summariseUpdateError(message),
         intent: Intent.DANGER,
-        timeout: 15000
+        timeout: 15000,
+        action: {
+            text: t("update.error.details-button"),
+            onClick: () => setUpdateErrorDetails(message)
+        }
     });
 }
 
