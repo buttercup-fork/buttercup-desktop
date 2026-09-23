@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import cn from "classnames";
 import styled from "styled-components";
-import { Intent } from "@blueprintjs/core";
+import { Colors, Intent } from "@blueprintjs/core";
 import { VaultSourceID, VaultSourceStatus } from "buttercup";
 import { useSingleState } from "react-obstate";
 import { VaultEditor } from "./VaultEditor";
@@ -36,6 +36,17 @@ const ContentContainer = styled.div`
     margin-top: 1px;
     flex: 10 10 auto;
     height: 100%;
+`;
+// @buttercup/ui's <Tabs> only paints a background behind the tabs/add-button
+// themselves, not the full width of its (flex-stretched) container - leaving
+// a strip of unpainted background visible to the right of the last tab.
+// Matching that background here removes the seam regardless of tab count.
+const TabBarBackground = styled.div`
+    background-color: ${Colors.LIGHT_GRAY4};
+
+    &.bp4-dark {
+        background-color: ${Colors.DARK_GRAY1};
+    }
 `;
 
 export function VaultManagement() {
@@ -124,15 +135,19 @@ export function VaultManagement() {
     return (
         <PrimaryContainer>
             <SearchProvider>
-                <VaultTabs
-                    onAddVault={handleSourceAdd}
-                    onLockVault={handleSourceLock}
-                    onRemoveVault={handleSourceRemove}
-                    onReorder={handleSourcesReoder}
-                    onSelectVault={handleSourceSelect}
-                    onUnlockVault={handleSourceUnlockRequest}
-                    sourceID={id}
-                />
+                <TabBarBackground className={cn({
+                    "bp4-dark": themeType === Theme.Dark
+                })}>
+                    <VaultTabs
+                        onAddVault={handleSourceAdd}
+                        onLockVault={handleSourceLock}
+                        onRemoveVault={handleSourceRemove}
+                        onReorder={handleSourcesReoder}
+                        onSelectVault={handleSourceSelect}
+                        onUnlockVault={handleSourceUnlockRequest}
+                        sourceID={id}
+                    />
+                </TabBarBackground>
                 <ContentContainer className={cn({
                     "bp4-dark": themeType === Theme.Dark
                 })}>
