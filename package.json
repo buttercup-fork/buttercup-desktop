@@ -91,9 +91,17 @@
             "x64",
             "arm64"
           ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "category": "Utility",
+      "maintainer": "Codekunde <buttercup@codekunde.net>",
       "synopsis": "Free and Open Source Password Vault",
       "artifactName": "${productName}-${os}-${arch}.${ext}",
       "mimeTypes": [

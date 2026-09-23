@@ -59,6 +59,7 @@ jobs:
             dist/*.dmg
             dist/*.zip
             dist/*.AppImage
+            dist/*.deb
             dist/*.7z
             dist/*.blockmap
             dist/latest*.yml
