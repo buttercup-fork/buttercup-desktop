@@ -7,3 +7,9 @@ export function getIconPath(): string {
     const root = getRootProjectPath();
     return path.join(root, "resources/icons", trayPath);
 }
+
+export function getWindowIconPath(): string {
+    const iconFile = isWindows() ? "icon.ico" : isLinux() ? "icons/256x256.png" : "icon.icns";
+    const root = getRootProjectPath();
+    return path.join(root, "resources/build", iconFile);
+}
