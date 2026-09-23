@@ -8,6 +8,10 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ## [Unreleased]
 
+### Added
+
+- A "Scan QR code" button next to an entry's OTP field, for sites that only offer a QR code during 2FA setup with no manual-entry fallback. It reads an image from the clipboard (screenshot the QR, then click scan) or, if the clipboard has no image, opens a file picker. Resolves upstream [#1042](https://github.com/buttercup/buttercup-desktop/issues/1042).
+
 ### Changed
 
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
