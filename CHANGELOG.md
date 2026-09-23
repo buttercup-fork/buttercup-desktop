@@ -16,6 +16,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Fixed
 
 - The "Copied!" confirmation toast sometimes stayed on screen until its "X" was clicked. This happened when a second copy arrived just as the previous toast was fading out; each copy now gets its own toast.
+- The updater's error toast showed the raw network/HTTP error text (e.g. a full GitHub 404 message), which could grow large enough to dominate the screen. It now shows a short summary ("GitHub is currently unavailable", or a generic message otherwise) with a "Details" button that opens a dialog with the full error, for anyone who wants it.
 
 ## [2.31.0] - 2026-09-10
 
