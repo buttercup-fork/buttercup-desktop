@@ -26,10 +26,6 @@ jobs:
   e2e:
     name: Playwright e2e
     runs-on: ubuntu-latest
-    # Known limitation: the Electron window does not always come up under a
-    # headless (xvfb) display, so this job is informational for now. The suite
-    # passes on a real desktop (`npm run test:e2e`).
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -37,7 +33,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: sudo apt-get update && sudo apt-get install -y xvfb
+      # Electron needs Chromium's system libraries (libnss3, libnspr4, ...) and GTK 3.
+      # GitHub's Ubuntu image has them; minimal runner images such as Forgejo's don't.
+      - run: sudo apt-get update && sudo apt-get install -y xvfb libgtk-3-0
+      - run: npx playwright install-deps chromium
       - name: Run e2e tests
         run: xvfb-run -a --server-args="-screen 0 1280x1024x24" npm run test:e2e
         env:
