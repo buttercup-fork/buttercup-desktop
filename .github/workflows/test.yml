@@ -41,6 +41,8 @@ jobs:
         run: xvfb-run -a --server-args="-screen 0 1280x1024x24" npm run test:e2e
         env:
           ELECTRON_ENABLE_LOGGING: "1"
+          # Print the app's own stdout/stderr, so a window that never opens shows why
+          DEBUG: "pw:browser"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
