@@ -252,7 +252,7 @@
     "@buttercup/exporter": "^1.1.0",
     "@buttercup/file-interface": "^3.0.1",
     "@buttercup/google-oauth2-client": "^2.2.0",
-    "@buttercup/googledrive-client": "^2.3.0",
+    "@buttercup/googledrive-client": "git+http://192.168.168.6:3050/buttercup.codekunde/googledrive-client.git#master",
     "@buttercup/importer": "^3.1.0",
     "@buttercup/secure-file-host": "^0.3.0",
     "@electron/remote": "^2.1.3",
@@ -347,6 +347,7 @@
     "xbytes": "^1.9.1"
   },
   "overrides": {
+    "@buttercup/googledrive-client": "$@buttercup/googledrive-client",
     "xml2js": "^0.6.2",
     "yaml": "^2.9.0",
     "minimatch": "^9.0.5",

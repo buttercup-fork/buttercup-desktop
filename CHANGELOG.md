@@ -21,6 +21,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 - The "Copied!" confirmation toast sometimes stayed on screen until its "X" was clicked. This happened when a second copy arrived just as the previous toast was fading out; each copy now gets its own toast.
 - The updater's error toast showed the raw network/HTTP error text (e.g. a full GitHub 404 message), which could grow large enough to dominate the screen. It now shows a short summary ("GitHub is currently unavailable", or a generic message otherwise) with a "Details" button that opens a dialog with the full error, for anyone who wants it.
+- Saving to Google Drive could fail or corrupt the upload when a vault or attachment name contained non-ASCII characters (e.g. `café.bcup`, `日記.bcup`): the upload's `Content-Length` counted characters instead of bytes. Fixed in the `googledrive-client` fork, which the app now installs from instead of npm.
 
 ## [2.31.0] - 2026-09-10
 
