@@ -27,6 +27,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Security
 
 - Updated to the current core library fork: its dependency and security updates, and all storage requests (Dropbox, Google Drive, OneDrive, WebDAV) through the built-in `fetch` instead of `node-fetch`. The app's own Dropbox client and `@buttercup/fetch` now also come from the CodeKunde forks, and the Google Drive client is on the fork's current version, so `node-fetch` is no longer used anywhere (it stays installed only because `webdav` and `@buttercup/google-oauth2-client` still list it).
+- The vault importer now comes from the CodeKunde `buttercup-importer` fork, which fixes two prototype-pollution advisories in how it reads imported files: `csv-parse` (GHSA-8cw4-87c7-c6xx; CSV, Buttercup CSV and LastPass imports) and `xml2js` (GHSA-776f-qx25-q3cc; KeePass XML imports). `npm audit` is now clean.
 
 ## [2.31.0] - 2026-09-10
 
