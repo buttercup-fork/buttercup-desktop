@@ -5,14 +5,19 @@ on:
   pull_request:
     branches: [master]
 
+# A pull request from a branch in this repo already gets a run from its push,
+# so each job's `if` only runs it again for pull requests from forks.
 jobs:
   unit:
     name: Build & unit (${{ matrix.os }})
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # macOS and Windows need runners on those systems: GitHub has them,
+        # the Forgejo instance only has a Linux runner
+        os: ${{ fromJSON(github.server_url == 'https://github.com' && '["ubuntu-latest", "macos-latest", "windows-latest"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -25,6 +30,7 @@ jobs:
 
   e2e:
     name: Playwright e2e
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
