@@ -32,7 +32,7 @@
     "url": "git+https://github.com/codekunde/buttercup-desktop.git"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=9"
   },
   "lint-staged": {
@@ -248,7 +248,7 @@
   },
   "dependencies": {
     "@buttercup/channel-queue": "^1.2.0",
-    "@buttercup/dropbox-client": "^2.2.0",
+    "@buttercup/dropbox-client": "git+http://192.168.168.6:3050/buttercup.codekunde/dropbox-client.git#master",
     "@buttercup/exporter": "^1.1.0",
     "@buttercup/file-interface": "^3.0.1",
     "@buttercup/google-oauth2-client": "^2.2.0",
@@ -348,6 +348,8 @@
   },
   "overrides": {
     "@buttercup/googledrive-client": "$@buttercup/googledrive-client",
+    "@buttercup/dropbox-client": "$@buttercup/dropbox-client",
+    "@buttercup/fetch": "git+http://192.168.168.6:3050/buttercup.codekunde/fetch.git#main",
     "xml2js": "^0.6.2",
     "yaml": "^2.9.0",
     "minimatch": "^9.0.5",
