@@ -1,7 +1,8 @@
 import * as React from "react";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
-import { DndProvider, HTML5Backend, themes } from "@buttercup/ui";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { THEME_DARK, THEME_LIGHT } from "./styles/themes";
 import { getThemeProp } from "./styles/theme";
 import { VaultManagement } from "./components/VaultManagement";
@@ -38,7 +39,6 @@ export function App() {
         <ThemeProvider
             theme={themeType === Theme.Dark ? THEME_DARK: THEME_LIGHT}
         >
-            <ThemeProvider theme={themeType === Theme.Dark ? themes.dark : themes.light}>
                 <DndProvider backend={HTML5Backend}>
                     <BaseContainer className={`theme-${themeType}`} onCopy={() => userCopiedText(document.getSelection()?.toString() ?? "")}>
                         <Router>
@@ -72,7 +72,6 @@ export function App() {
                         </Router>
                     </BaseContainer>
                 </DndProvider>
-            </ThemeProvider>
         </ThemeProvider>
     );
 }

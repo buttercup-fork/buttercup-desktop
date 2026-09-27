@@ -16,6 +16,8 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
 - Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
+- Building from source now requires Node.js 22 or newer (was 20), matching the core library. CI already built on 22.
+- The app no longer depends on the deprecated `@buttercup/ui` library, which upstream archived in 2024. Its components were already copied into the app; the last four imports (vault tabs, the search result icon, drag-and-drop and the vault theme) now use the app's own copies. Packages the vault UI had only been getting through `@buttercup/ui` (`otpauth`, `react-textarea-autosize`, `react-popover`, `@buttercup/react-formatted-input`, the Inter font and others) are now direct dependencies, at the versions already in use.
 
 ### Fixed
 
@@ -23,6 +25,13 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - The updater's error toast showed the raw network/HTTP error text (e.g. a full GitHub 404 message), which could grow large enough to dominate the screen. It now shows a short summary ("GitHub is currently unavailable", or a generic message otherwise) with a "Details" button that opens a dialog with the full error, for anyone who wants it.
 - Vault saves weren't debounced: every single edit (effectively every keystroke) fired its own save immediately, so fast edits could send overlapping saves racing each other. Saves are now double-edged debounced per vault - the first save still starts immediately, but further edits made while it's in flight are coalesced into one trailing save with the latest state, instead of firing one save per edit (buttercup/buttercup-core#182).
 - Saving to Google Drive could fail or corrupt the upload when a vault or attachment name contained non-ASCII characters (e.g. `café.bcup`, `日記.bcup`): the upload's `Content-Length` counted characters instead of bytes. Fixed in the `googledrive-client` fork, which the app now installs from instead of npm.
+- Switching vault tabs briefly flashed a bright line under the tab being left. The selected tab dropped its bottom border, and the tab animation then grew it back from the browser's default (3px, in the text colour). The selected tab now keeps a transparent border, so only the colour fades.
+- Adding a vault while other vaults were open left you on the previously active tab, or on the first tab if you had just removed the active vault. The app now switches to the vault you just added.
+
+### Security
+
+- Updated to the current core library fork: its dependency and security updates, and all storage requests (Dropbox, Google Drive, OneDrive, WebDAV) through the built-in `fetch` instead of `node-fetch`. The app's own Dropbox client and `@buttercup/fetch` now also come from the CodeKunde forks, and the Google Drive client is on the fork's current version, so `node-fetch` is no longer used anywhere (it stays installed only because `webdav` and `@buttercup/google-oauth2-client` still list it).
+- The vault importer now comes from the CodeKunde `buttercup-importer` fork, which fixes two prototype-pollution advisories in how it reads imported files: `csv-parse` (GHSA-8cw4-87c7-c6xx; CSV, Buttercup CSV and LastPass imports) and `xml2js` (GHSA-776f-qx25-q3cc; KeePass XML imports). `npm audit` is now clean.
 
 ## [2.31.0] - 2026-09-10
 

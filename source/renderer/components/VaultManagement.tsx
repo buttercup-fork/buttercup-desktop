@@ -10,6 +10,7 @@ import { VaultSearchManager } from "./search/VaultSearchManager";
 import { SearchProvider } from "./search/SearchContext";
 import { ConfirmDialog } from "./prompt/ConfirmDialog";
 import { VAULTS_STATE } from "../state/vaults";
+import { getVaultAdditionEmitter } from "../services/addVault";
 import { showAddVaultMenu } from "../state/addVault";
 import { handleError } from "../actions/error";
 import { useTheme } from "../hooks/theme";
@@ -37,7 +38,7 @@ const ContentContainer = styled.div`
     flex: 10 10 auto;
     height: 100%;
 `;
-// @buttercup/ui's <Tabs> only paints a background behind the tabs/add-button
+// The vault <Tabs> (vault/tabs/Tabs.tsx) only paints a background behind the tabs/add-button
 // themselves, not the full width of its (flex-stretched) container - leaving
 // a strip of unpainted background visible to the right of the last tab.
 // Matching that background here removes the seam regardless of tab count.
@@ -78,6 +79,15 @@ export function VaultManagement() {
         history.push(`/source/${sourceID}`);
         setCurrentVault(sourceID);
     }, [history, id, setCurrentVault]);
+    // Switch to a vault as soon as it's added, rather than staying on (or
+    // falling back to) whichever tab was active before.
+    useEffect(() => {
+        const emitter = getVaultAdditionEmitter();
+        emitter.on("vault-added", handleSourceSelect);
+        return () => {
+            emitter.off("vault-added", handleSourceSelect);
+        };
+    }, [handleSourceSelect]);
     // Keep the active vault in sync with the route, so arriving here from the
     // tray / app menu (which navigate without going through a tab click) still
     // points the rest of the app - password prompt, facade updates - at the
