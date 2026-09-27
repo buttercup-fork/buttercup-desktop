@@ -3,9 +3,8 @@ import { useHistory } from "react-router-dom";
 import { useState as useHookState } from "@hookstate/core";
 import { useSingleState } from "react-obstate";
 import { Intent, NonIdealState, Tag } from "@blueprintjs/core";
-import { themes } from "@buttercup/ui";
 import { VaultFacade, VaultSourceStatus } from "buttercup";
-import styled, { ThemeProvider } from "styled-components";
+import styled from "styled-components";
 import { SearchContext } from "./search/SearchContext";
 import { VaultProvider } from "./vault/VaultContext";
 import { VaultUI } from "./vault/VaultUI";
@@ -17,13 +16,11 @@ import { toggleAutoUpdate } from "../actions/autoUpdate";
 import { userCopiedText } from "../actions/clipboard";
 import { setSelectedSource } from "../services/config";
 import { useCurrentFacade } from "../hooks/facade";
-import { useTheme } from "../hooks/theme";
 import { useAttachments } from "../hooks/attachments";
 import { logErr, logInfo } from "../library/log";
 import { getThemeProp } from "../styles/theme";
 import { t } from "../../shared/i18n/trans";
 import { ATTACHMENTS_MAX_SIZE } from "../../shared/symbols";
-import { Theme } from "../types";
 
 const BENCH_IMAGE = require("../../../resources/images/bench.png").default;
 
@@ -62,7 +59,6 @@ export function VaultEditor(props: VaultEditorProps) {
     const vaultItem = useMemo(() => {
         return vaultList.find(item => item.id === sourceID) || null;
     }, [sourceID, vaultList]);
-    const themeType = useTheme();
     const [currentlyEditing, setCurrentlyEditing] = useState(false);
     useEffect(() => {
         if (vaultItem && vaultItem.state === VaultSourceStatus.Unlocked) {
@@ -142,31 +138,29 @@ export function VaultEditor(props: VaultEditorProps) {
     return (
         <>
             {currentFacade && (
-                <ThemeProvider theme={themeType === Theme.Dark ? themes.dark : themes.light}>
-                    <VaultProvider
-                        attachments={currentSupportsAttachments}
-                        attachmentsMaxSize={ATTACHMENTS_MAX_SIZE}
-                        attachmentPreviews={attachmentPreviews}
-                        icons
-                        onAddAttachments={addAttachments}
-                        onDeleteAttachment={deleteAttachment}
-                        onDownloadAttachment={downloadAttachment}
-                        onEditing={setCurrentlyEditing}
-                        onPreviewAttachment={previewAttachment}
-                        onSelectEntry={setSelectedEntryID}
-                        onSelectGroup={setSelectedGroupID}
-                        onUserCopy={userCopiedText}
-                        onUpdate={(vaultFacade: VaultFacade) => {
-                            saveVaultFacade(vaultItem.id, vaultFacade);
-                        }}
-                        readOnly={savingState.get()}
-                        selectedEntry={selectedEntryID}
-                        selectedGroup={selectedGroupID}
-                        vault={currentFacade}
-                    >
-                        <VaultUI />
-                    </VaultProvider>
-                </ThemeProvider>
+                <VaultProvider
+                    attachments={currentSupportsAttachments}
+                    attachmentsMaxSize={ATTACHMENTS_MAX_SIZE}
+                    attachmentPreviews={attachmentPreviews}
+                    icons
+                    onAddAttachments={addAttachments}
+                    onDeleteAttachment={deleteAttachment}
+                    onDownloadAttachment={downloadAttachment}
+                    onEditing={setCurrentlyEditing}
+                    onPreviewAttachment={previewAttachment}
+                    onSelectEntry={setSelectedEntryID}
+                    onSelectGroup={setSelectedGroupID}
+                    onUserCopy={userCopiedText}
+                    onUpdate={(vaultFacade: VaultFacade) => {
+                        saveVaultFacade(vaultItem.id, vaultFacade);
+                    }}
+                    readOnly={savingState.get()}
+                    selectedEntry={selectedEntryID}
+                    selectedGroup={selectedGroupID}
+                    vault={currentFacade}
+                >
+                    <VaultUI />
+                </VaultProvider>
             )}
         </>
     );

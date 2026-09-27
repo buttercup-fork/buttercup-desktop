@@ -237,7 +237,7 @@ Pull requests and issues that make Buttercup better are welcome on this reposito
 
 Buttercup relies on the community for translating its interfaces into languages besides English. English (`en.json`) is the base language, and all others are contributed translations.
 
-To add support for a language, make sure to add the translations for our [**vault UI**](https://github.com/buttercup/ui#translations--i18n) first. After that, you can follow these instructions to add another language to the desktop application:
+To add support for a language, follow these instructions to add another language to the desktop application:
 
  * Copy the `source/shared/i18n/translations/en.json` file to the language code you're providing (eg. `fi.json` for Finnish).
  * Edit the `source/shared/i18n/translations/index.ts` file and:

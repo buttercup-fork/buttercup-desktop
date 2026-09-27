@@ -37,7 +37,7 @@ const ContentContainer = styled.div`
     flex: 10 10 auto;
     height: 100%;
 `;
-// @buttercup/ui's <Tabs> only paints a background behind the tabs/add-button
+// The vault <Tabs> (vault/tabs/Tabs.tsx) only paints a background behind the tabs/add-button
 // themselves, not the full width of its (flex-stretched) container - leaving
 // a strip of unpainted background visible to the right of the last tab.
 // Matching that background here removes the seam regardless of tab count.

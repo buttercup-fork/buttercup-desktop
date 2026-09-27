@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { IInputGroupProps2, Intent, MenuItem, Tag } from "@blueprintjs/core";
 import { Omnibar } from "@blueprintjs/select";
-import { SiteIcon } from "@buttercup/ui";
+import { SiteIcon } from "../vault/SiteIcon";
 import { EntryType } from "buttercup";
 import styled from "styled-components";
 import { extractSSHPubKeyName } from "../../library/entryType";

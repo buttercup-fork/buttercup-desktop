@@ -17,6 +17,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
 - Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
 - Building from source now requires Node.js 22 or newer (was 20), matching the core library. CI already built on 22.
+- The app no longer depends on the deprecated `@buttercup/ui` library, which upstream archived in 2024. Its components were already copied into the app; the last four imports (vault tabs, the search result icon, drag-and-drop and the vault theme) now use the app's own copies. Packages the vault UI had only been getting through `@buttercup/ui` (`otpauth`, `react-textarea-autosize`, `react-popover`, `@buttercup/react-formatted-input`, the Inter font and others) are now direct dependencies, at the versions already in use.
 
 ### Fixed
 
