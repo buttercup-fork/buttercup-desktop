@@ -4,6 +4,7 @@ import { VaultFacade, VaultSourceID } from "buttercup";
 import { Layerr } from "layerr";
 import { setSaving } from "../state/app";
 import { createProgressNotification } from "../services/notifications";
+import { createDoubleEdgedSaver } from "../library/doubleEdgedSave";
 import { logInfo, logWarn } from "../library/log";
 import { withTimeout } from "../library/timeout";
 import { t } from "../../shared/i18n/trans";
@@ -15,7 +16,13 @@ import { ICON_UPLOAD } from "../../shared/symbols";
 // (buttercup/buttercup-desktop#1077). Cap the wait and surface an error instead.
 export const SAVE_TIMEOUT = 90 * 1000;
 
-export async function saveVaultFacade(sourceID: VaultSourceID, vaultFacade: VaultFacade) {
+// The VaultProvider (vault/VaultContext) fires `onUpdate` on every single internal
+// vault mutation (effectively every field edit), which VaultEditor wires
+// straight into this save action - with no debounce, rapid edits fired
+// overlapping IPC saves that could race each other (buttercup/buttercup-core#182).
+export const saveVaultFacade = createDoubleEdgedSaver<VaultSourceID, VaultFacade>(performSave);
+
+async function performSave(sourceID: VaultSourceID, vaultFacade: VaultFacade): Promise<void> {
     const progNotification = createProgressNotification(ICON_UPLOAD, 100);
     setSaving(true);
     logInfo(`Saving vault facade: ${sourceID}`);
