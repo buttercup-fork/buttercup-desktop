@@ -1,9 +1,7 @@
 const path = require("path");
 const { DefinePlugin } = require("webpack");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const BCUPUI_ICONS_PATH = path.join(path.dirname(require.resolve("@buttercup/ui")), "icons");
 const BCUP_PACKAGE_PATH = path.join(__dirname, "node_modules/buttercup/package.json");
 
 const pkgInfo = require("./package.json");
@@ -120,14 +118,6 @@ module.exports = [
                 filename: "index.html",
                 inject: "body",
                 template: path.resolve(__dirname, "./resources/renderer.html")
-            }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: BCUPUI_ICONS_PATH,
-                        to: "icons"
-                    }
-                ]
             }),
             new DefinePlugin({
                 __CORE_VERSION__: JSON.stringify(bcupCoreInfo.version),

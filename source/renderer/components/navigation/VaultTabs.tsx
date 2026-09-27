@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import { VaultSourceID, VaultSourceStatus } from "buttercup";
 import { useSingleState } from "react-obstate";
-import { Tabs } from "@buttercup/ui";
+import { Tabs } from "../vault/tabs/Tabs";
 import { Intent, Menu, MenuDivider, MenuItem } from "@blueprintjs/core";
 import { sortVaults } from "../../library/vault";
 import { getIconForProvider } from "../../library/icons";
@@ -28,7 +28,7 @@ interface VaultTabsProps {
     onAddVault: () => void;
     onLockVault: (sourceID: VaultSourceID) => void;
     onRemoveVault: (sourceID: VaultSourceID) => void;
-    onReorder: (tabs: Array<Tabs>) => void;
+    onReorder: (tabs: Array<Tab>) => void;
     onSelectVault: (sourceID: VaultSourceID) => void;
     onUnlockVault: (sourceID: VaultSourceID) => void;
     sourceID: VaultSourceID;
