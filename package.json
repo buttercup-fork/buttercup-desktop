@@ -249,7 +249,7 @@
   "dependencies": {
     "@buttercup/channel-queue": "^1.2.0",
     "@buttercup/dropbox-client": "git+http://192.168.168.6:3050/buttercup.codekunde/dropbox-client.git#master",
-    "@buttercup/exporter": "^1.1.0",
+    "@buttercup/exporter": "git+http://192.168.168.6:3050/buttercup.codekunde/buttercup-exporter.git#master",
     "@buttercup/file-interface": "^3.0.1",
     "@buttercup/google-oauth2-client": "^2.2.0",
     "@buttercup/googledrive-client": "git+http://192.168.168.6:3050/buttercup.codekunde/googledrive-client.git#master",
