@@ -69,7 +69,7 @@ const TabInner = styled.div<{
     cursor: pointer;
     ${p => p.selected ? `
         height: ${TAB_HEIGHT_SELECTED}px;
-        border-bottom: none;
+        border-bottom-color: transparent;
     ` : ""}
 
     &:hover {
