@@ -10,6 +10,7 @@ import { VaultSearchManager } from "./search/VaultSearchManager";
 import { SearchProvider } from "./search/SearchContext";
 import { ConfirmDialog } from "./prompt/ConfirmDialog";
 import { VAULTS_STATE } from "../state/vaults";
+import { getVaultAdditionEmitter } from "../services/addVault";
 import { showAddVaultMenu } from "../state/addVault";
 import { handleError } from "../actions/error";
 import { useTheme } from "../hooks/theme";
@@ -78,6 +79,15 @@ export function VaultManagement() {
         history.push(`/source/${sourceID}`);
         setCurrentVault(sourceID);
     }, [history, id, setCurrentVault]);
+    // Switch to a vault as soon as it's added, rather than staying on (or
+    // falling back to) whichever tab was active before.
+    useEffect(() => {
+        const emitter = getVaultAdditionEmitter();
+        emitter.on("vault-added", handleSourceSelect);
+        return () => {
+            emitter.off("vault-added", handleSourceSelect);
+        };
+    }, [handleSourceSelect]);
     // Keep the active vault in sync with the route, so arriving here from the
     // tray / app menu (which navigate without going through a tab click) still
     // points the rest of the app - password prompt, facade updates - at the
