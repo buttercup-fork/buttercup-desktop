@@ -16,12 +16,18 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
 - Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
+- Building from source now requires Node.js 22 or newer (was 20), matching the core library. CI already built on 22.
 
 ### Fixed
 
 - The "Copied!" confirmation toast sometimes stayed on screen until its "X" was clicked. This happened when a second copy arrived just as the previous toast was fading out; each copy now gets its own toast.
 - The updater's error toast showed the raw network/HTTP error text (e.g. a full GitHub 404 message), which could grow large enough to dominate the screen. It now shows a short summary ("GitHub is currently unavailable", or a generic message otherwise) with a "Details" button that opens a dialog with the full error, for anyone who wants it.
 - Saving to Google Drive could fail or corrupt the upload when a vault or attachment name contained non-ASCII characters (e.g. `café.bcup`, `日記.bcup`): the upload's `Content-Length` counted characters instead of bytes. Fixed in the `googledrive-client` fork, which the app now installs from instead of npm.
+
+### Security
+
+- Updated to the current core library fork: its dependency and security updates, and all storage requests (Dropbox, Google Drive, OneDrive, WebDAV) through the built-in `fetch` instead of `node-fetch`. The app's own Dropbox client and `@buttercup/fetch` now also come from the CodeKunde forks, and the Google Drive client is on the fork's current version, so `node-fetch` is no longer used anywhere (it stays installed only because `webdav` and `@buttercup/google-oauth2-client` still list it).
+- The vault importer now comes from the CodeKunde `buttercup-importer` fork, which fixes two prototype-pollution advisories in how it reads imported files: `csv-parse` (GHSA-8cw4-87c7-c6xx; CSV, Buttercup CSV and LastPass imports) and `xml2js` (GHSA-776f-qx25-q3cc; KeePass XML imports). `npm audit` is now clean.
 
 ## [2.31.0] - 2026-09-10
 
