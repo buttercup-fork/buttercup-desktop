@@ -16,7 +16,7 @@ import { ICON_UPLOAD } from "../../shared/symbols";
 // (buttercup/buttercup-desktop#1077). Cap the wait and surface an error instead.
 export const SAVE_TIMEOUT = 90 * 1000;
 
-// @buttercup/ui's VaultProvider fires `onUpdate` on every single internal
+// The VaultProvider (vault/VaultContext) fires `onUpdate` on every single internal
 // vault mutation (effectively every field edit), which VaultEditor wires
 // straight into this save action - with no debounce, rapid edits fired
 // overlapping IPC saves that could race each other (buttercup/buttercup-core#182).
