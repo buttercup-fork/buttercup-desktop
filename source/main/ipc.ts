@@ -35,7 +35,7 @@ import {
 } from "./services/config";
 import { getOSLocale } from "./services/locale";
 import { searchSingleVault } from "./services/search";
-import { addGoogleTokens } from "./services/googleDrive";
+import { addGoogleTokens, beginGoogleAuth, completeGoogleAuth } from "./services/googleDrive";
 import {
     getCurrentUpdate,
     getReadyUpdate,
@@ -274,6 +274,10 @@ ipcMain.handle("get-vault-settings", async (evt, sourceID: VaultSourceID) => {
     const settings = await getVaultSettings(sourceID);
     return settings;
 });
+
+ipcMain.handle("google-auth-begin", async () => beginGoogleAuth());
+
+ipcMain.handle("google-auth-complete", async () => completeGoogleAuth());
 
 ipcMain.handle("install-update", installUpdate);
 

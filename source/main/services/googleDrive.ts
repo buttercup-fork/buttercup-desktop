@@ -2,11 +2,10 @@ import { shell } from "electron";
 import { DatasourceAuthManager, GoogleDriveDatasource, VaultSourceID } from "buttercup";
 import { ERR_REFRESH_FAILED, GoogleToken, OAuth2Client } from "@buttercup/google-oauth2-client";
 import { Layerr } from "layerr";
-import { getProtocolEmitter } from "./protocol";
 import { getMainWindow } from "./windows";
+import { LoopbackAuthSession, startLoopbackAuth } from "../library/googleLoopback";
 import { logInfo, logWarn } from "../library/log";
 import {
-    GOOGLE_AUTH_REDIRECT,
     GOOGLE_AUTH_TIMEOUT,
     GOOGLE_DRIVE_SCOPES_STANDARD,
     GOOGLE_CLIENT_ID,
@@ -16,6 +15,7 @@ import {
 const __googleDriveTokens: Record<VaultSourceID, { accessToken: string; refreshToken: string }> =
     {};
 let __googleDriveOAuthClient: OAuth2Client = null;
+let __pendingAuth: { client: OAuth2Client; session: LoopbackAuthSession } | null = null;
 
 export function addGoogleTokens(
     sourceID: VaultSourceID,
@@ -24,26 +24,61 @@ export function addGoogleTokens(
     __googleDriveTokens[sourceID] = tokens;
 }
 
-async function authenticateGoogleDrive(): Promise<{ accessToken: string; refreshToken: string }> {
-    logInfo("Authenticating Google Drive");
-    const scopes = GOOGLE_DRIVE_SCOPES_STANDARD;
-    const oauth2Client = getGoogleDriveOAuthClient();
-    const url = oauth2Client.generateAuthUrl({
+/**
+ * Start a sign-in: open a loopback listener and return the Google URL to visit.
+ * Any sign-in still pending is cancelled, so only one listener exists at a time.
+ */
+export async function beginGoogleAuth(): Promise<string> {
+    __pendingAuth?.session.close();
+    __pendingAuth = null;
+    const session = await startLoopbackAuth(GOOGLE_AUTH_TIMEOUT);
+    // The redirect URI must match exactly between the auth URL and the code
+    // exchange, and it carries this session's port, so each sign-in gets its
+    // own client.
+    const client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, session.redirectURI);
+    __pendingAuth = { client, session };
+    const url = client.generateAuthUrl({
         access_type: "offline",
-        scope: [...scopes],
+        scope: [...GOOGLE_DRIVE_SCOPES_STANDARD],
         prompt: "consent select_account"
     });
-    logInfo(`Google Drive: Opening authentication URL: ${url}`);
+    return `${url}&state=${session.state}`;
+}
+
+/**
+ * Wait for the pending sign-in to redirect back, then exchange the code for tokens.
+ */
+export async function completeGoogleAuth(): Promise<{ accessToken: string; refreshToken: string }> {
+    const pending = __pendingAuth;
+    if (!pending) {
+        throw new Error("No Google authentication in progress");
+    }
+    try {
+        const authCode = await pending.session.waitForCode();
+        logInfo("Google Drive: Received auth code - exchanging for tokens");
+        // The client decodes the code before sending it; encode it so a code
+        // containing "%" survives that round trip unchanged.
+        const response = await pending.client.exchangeAuthCodeForToken(
+            encodeURIComponent(authCode)
+        );
+        const { access_token: accessToken, refresh_token: refreshToken } = response.tokens;
+        logInfo("Google Drive: tokens received");
+        return {
+            accessToken,
+            refreshToken
+        };
+    } finally {
+        if (__pendingAuth === pending) {
+            __pendingAuth = null;
+        }
+    }
+}
+
+async function authenticateGoogleDrive(): Promise<{ accessToken: string; refreshToken: string }> {
+    logInfo("Authenticating Google Drive");
+    const url = await beginGoogleAuth();
     shell.openExternal(url);
-    const authCode = await listenForGoogleAuthCode();
-    logInfo("Google Drive:  Received auth code - exchanging for tokens");
-    const response = await oauth2Client.exchangeAuthCodeForToken(authCode);
-    const { access_token: accessToken, refresh_token: refreshToken } = response.tokens;
-    logInfo("Google Drive: tokens received");
-    return {
-        accessToken,
-        refreshToken
-    };
+    return completeGoogleAuth();
 }
 
 async function authenticateGoogleDriveWithRefreshToken(
@@ -69,36 +104,16 @@ async function authenticateGoogleDriveWithRefreshToken(
     };
 }
 
+// Only used to refresh tokens, which doesn't involve a redirect.
 function getGoogleDriveOAuthClient(): OAuth2Client {
     if (!__googleDriveOAuthClient) {
         __googleDriveOAuthClient = new OAuth2Client(
             GOOGLE_CLIENT_ID,
             GOOGLE_CLIENT_SECRET,
-            GOOGLE_AUTH_REDIRECT
+            "http://127.0.0.1"
         );
     }
     return __googleDriveOAuthClient;
-}
-
-async function listenForGoogleAuthCode(): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-        const emitter = getProtocolEmitter();
-        const onAuth = (args: Array<string>) => {
-            const path = args.join("/");
-            const match = path.match(/\?googledesktopauth&code=([^&#?]+)/);
-            if (match !== null && match.length > 0) {
-                resolve(match[1]);
-            } else {
-                reject(new Error("Authentication failed"));
-            }
-            clearTimeout(timeout);
-        };
-        const timeout = setTimeout(() => {
-            reject(new Error("Timed-out waiting for Google authentication"));
-            emitter.off("authGoogle", onAuth);
-        }, GOOGLE_AUTH_TIMEOUT);
-        emitter.once("authGoogle", onAuth);
-    });
 }
 
 export function registerGoogleDriveAuthHandlers() {

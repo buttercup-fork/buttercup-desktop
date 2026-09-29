@@ -250,12 +250,12 @@ export function AddVaultMenu() {
     }, [selectedType, datasourcePayload, webdavCredentials]);
     const handleAuthURLCopy = useCallback(async () => {
         if (selectedType === SourceType.GoogleDrive) {
-            const url = getGoogleDriveAuthURL();
             try {
-                await copyText(url);
+                await copyText(await getGoogleDriveAuthURL());
                 showSuccess(t("add-vault-menu.copy-auth-link.url-copied"));
             } catch (err) {
                 showError(err.message);
+                return;
             }
             try {
                 const { accessToken, refreshToken } = await waitForGoogleAuthCode();
