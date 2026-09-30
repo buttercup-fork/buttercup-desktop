@@ -8,12 +8,11 @@ export function countChildGroups(facade: VaultFacade, parentGroupID: GroupID) {
 }
 
 export function countChildGroupsAndEntries(facade: VaultFacade, parentGroupID: GroupID) {
-    const groups = getAllGroupsInGroup(facade, parentGroupID);
-    let count = groups.length;
-    groups.forEach((group) => {
-        count += getAllEntriesInGroup(facade, group.id as string).length;
-    });
-    return count;
+    // getAllEntriesInGroup already includes the entries of every subgroup
+    return (
+        getAllGroupsInGroup(facade, parentGroupID).length +
+        getAllEntriesInGroup(facade, parentGroupID).length
+    );
 }
 
 export function filterNestedGroups(
