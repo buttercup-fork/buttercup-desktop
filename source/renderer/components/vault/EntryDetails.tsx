@@ -247,8 +247,11 @@ const FieldRowChildren = styled.div`
 
 const FieldTextToolbar = styled(ButtonGroup)`
     margin-left: 0.5rem;
-    opacity: 0;
+    transition: opacity 0.15s;
 `;
+// Field buttons are always visible (muted), so they can be found without
+// hovering and work on touchscreens (upstream buttercup/ui#52); hovering or
+// focusing the field brings them to full strength
 const FieldTextWrapper = styled.div<{ disabled?: boolean; }>`
     border: 1px dashed transparent;
     border-radius: 2px;
@@ -260,7 +263,12 @@ const FieldTextWrapper = styled.div<{ disabled?: boolean; }>`
     word-break: break-all;
     pointer-events: ${p => (p.disabled ? "none" : "all")};
 
-    &:hover {
+    ${FieldTextToolbar} {
+        opacity: ${p => (p.disabled ? 0 : 0.45)};
+    }
+
+    &:hover,
+    &:focus-within {
         border-color: ${p =>
             p.disabled ? "transparent" : getThemeProp(p, "entry.fieldHoverBorder")};
 
