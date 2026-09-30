@@ -15,6 +15,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
+- An entry's field buttons (copy, show password, history) are always visible now, slightly muted, instead of appearing only on hover: easier to find, and usable on touchscreens and with the keyboard (they brighten on hover and on keyboard focus). Empty fields still show none (upstream buttercup/ui#52).
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
 - Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.
 - Building from source now requires Node.js 22 or newer (was 20), matching the core library. CI already built on 22.
