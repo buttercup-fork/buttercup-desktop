@@ -7,7 +7,9 @@ import {
     ButtercupImporter,
     CSVImporter,
     KeePass2XMLImporter,
+    KeePassXCCSVImporter,
     LastPassImporter,
+    OnePassword1PUXImporter,
     OnePasswordImporter
 } from "@buttercup/importer";
 import { mergeVaults } from "./buttercup";
@@ -29,8 +31,10 @@ export const IMPORTERS = [
     ["Buttercup", "csv", ButtercupCSVImporter],
     ["CSV", "csv", CSVImporter],
     ["KeePass", "xml", KeePass2XMLImporter],
+    ["KeePassXC", "csv", KeePassXCCSVImporter],
     ["Lastpass", "csv", LastPassImporter],
-    ["1Password", "1pif", OnePasswordImporter]
+    ["1Password", "1pif", OnePasswordImporter],
+    ["1Password", "1pux", OnePassword1PUXImporter]
 ];
 const IMPORTERS_WITH_PASSWORDS = [ButtercupImporter];
 
