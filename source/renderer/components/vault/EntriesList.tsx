@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from "react";
+import React, { MouseEvent, useContext, useEffect, useMemo, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { HotKeys } from "react-hotkeys";
 import { NonIdealState } from "@blueprintjs/core";
@@ -28,6 +28,45 @@ export const EntriesList = ({ className }: EntriesListProps) => {
     const { onUserCopy, readOnly } = useContext(VaultContext);
     const { selectedGroupID, trashSelected } = useGroups();
     const ref = useRef<HTMLInputElement | null>(null);
+    // Extra entries selected with ctrl/cmd- or shift-click (upstream
+    // buttercup/ui#25). The details pane keeps showing `selectedEntryID`; the
+    // context menu of a selected row acts on all of them.
+    const [multiSelection, setMultiSelection] = useState<Array<string>>([]);
+    const visibleSelection = useMemo(() => {
+        const visible = new Set(entries.map((entry) => entry.id));
+        return multiSelection.filter((id) => visible.has(id));
+    }, [entries, multiSelection]);
+    useEffect(() => {
+        setMultiSelection([]);
+    }, [selectedGroupID, filters.term]);
+    const handleRowClick = (event: MouseEvent, entryID: string) => {
+        const { entries, selectedEntryID } = liveRef.current;
+        if (event.shiftKey && selectedEntryID) {
+            const ids = entries.map((entry) => entry.id);
+            const from = ids.indexOf(selectedEntryID);
+            const to = ids.indexOf(entryID);
+            if (from !== -1 && to !== -1) {
+                event.preventDefault();
+                setMultiSelection(ids.slice(Math.min(from, to), Math.max(from, to) + 1));
+                return;
+            }
+        }
+        if ((event.ctrlKey || event.metaKey) && selectedEntryID) {
+            event.preventDefault();
+            setMultiSelection((current) => {
+                const selection = new Set(current.length > 0 ? current : [selectedEntryID]);
+                if (selection.has(entryID)) {
+                    selection.delete(entryID);
+                } else {
+                    selection.add(entryID);
+                }
+                return [...selection];
+            });
+            return;
+        }
+        setMultiSelection([]);
+        onSelectEntry(entryID);
+    };
     // react-hotkeys captures the handler closures when the list first gains focus
     // and does not refresh them on re-render (no `allowChanges`). Closing over
     // `entries` / `selectedEntryID` directly therefore makes a hotkey act on the
@@ -64,11 +103,13 @@ export const EntriesList = ({ className }: EntriesListProps) => {
         arrowUp: "up",
         arrowDown: "down",
         enter: "enter",
+        clearSelection: "esc",
         copyUsername: ["ctrl+b", "command+b"],
         copyPassword: ["ctrl+c", "command+c"]
     };
     const handleNavigation = (event, step) => {
         event.preventDefault();
+        setMultiSelection([]);
         const { entries, selectedEntryID } = liveRef.current;
         if (entries.length === 0) return;
         const currentIndex = entries.findIndex((entry) => entry.id === selectedEntryID);
@@ -102,6 +143,7 @@ export const EntriesList = ({ className }: EntriesListProps) => {
         }
     };
     const handlers = {
+        clearSelection: () => setMultiSelection([]),
         arrowUp: (event) => handleNavigation(event, -1),
         arrowDown: (event) => handleNavigation(event, 1),
         enter: (event) => {
@@ -145,8 +187,17 @@ export const EntriesList = ({ className }: EntriesListProps) => {
                                 tabIndex={entryIndex + 2}
                                 entry={entry}
                                 key={entry.id}
-                                onClick={(e) => onSelectEntry(entry.id)}
-                                selected={selectedEntryID === entry.id}
+                                onClick={(e) => handleRowClick(e, entry.id)}
+                                selected={
+                                    selectedEntryID === entry.id ||
+                                    visibleSelection.includes(entry.id)
+                                }
+                                bulkEntryIDs={
+                                    visibleSelection.length > 1 &&
+                                    visibleSelection.includes(entry.id)
+                                        ? visibleSelection
+                                        : null
+                                }
                                 innerRef={(el) => {
                                     if (selectedEntryID === entry.id) {
                                         ref.current = el;

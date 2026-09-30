@@ -10,6 +10,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Added
 
+- Select several entries at once: **Ctrl/Cmd+click** adds or removes an entry, **Shift+click** selects a range. Right-click one of them to move them all to another group or to the Trash. Esc, a plain click or the arrow keys clear the selection (upstream buttercup/ui#25).
 - Import from **KeePassXC (CSV)** (KeePassXC: Database → Export → CSV File): keeps the group tree, notes and TOTP codes. And from **1Password (1PUX)**, the export format of 1Password 8 (and 1Password 7 on Windows and Mac), which no longer export `.1pif`: one group per 1Password vault, logins with all their URLs, cards, secure notes, SSH keys, custom fields, TOTP codes, notes and tags. Attachments aren't imported. Both are in **Current Vault → Import** (importer fork, upstream buttercup-importer [#61](https://github.com/buttercup/buttercup-importer/issues/61) and [#58](https://github.com/buttercup/buttercup-importer/issues/58)).
 - A "Scan QR code" button next to an entry's OTP field, for sites that only offer a QR code during 2FA setup with no manual-entry fallback. It reads an image from the clipboard (screenshot the QR, then click scan) or, if the clipboard has no image, opens a file picker. Resolves upstream [#1042](https://github.com/buttercup/buttercup-desktop/issues/1042).
 

@@ -496,6 +496,8 @@
             "untitled": "(Untitled)"
         },
         "entry-menu": {
+            "move-several-to": "Move {{count}} entries to...",
+            "move-several-to-trash": "Move {{count}} entries to Trash",
             "move-to": "Move to...",
             "move-to-parent": "Move to {{group}}",
             "move-to-trash": "Move to Trash"
