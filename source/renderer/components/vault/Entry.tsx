@@ -111,7 +111,7 @@ const ContentWrapper = styled.div`
     min-width: 0;
 `;
 
-export function Entry({ entry, selected, onClick, innerRef, ...props }) {
+export function Entry({ entry, selected, onClick, innerRef, bulkEntryIDs = null, ...props }) {
     const [contextMenuOpen, setContextMenuVisibility] = useState(false);
     const { groups, onMoveEntryToGroup, onMoveEntryToTrash, trashID } = useGroups();
     const { iconsEnabled, readOnly } = useContext(VaultContext);
@@ -124,8 +124,12 @@ export function Entry({ entry, selected, onClick, innerRef, ...props }) {
         };
     }, []);
 
+    // With several entries selected, the menu of a selected row acts on all
+    const targetIDs: Array<string> = bulkEntryIDs || [entry.id];
+    const isBulk = targetIDs.length > 1;
+
     const handleMove = parentID => e => {
-        onMoveEntryToGroup(entry.id, parentID);
+        targetIDs.forEach(entryID => onMoveEntryToGroup(entryID, parentID));
     };
 
     const renderGroupsMenu = (items: Array<GroupTreeNodeInfo>, parentNode?: GroupTreeNodeInfo) => (
@@ -137,7 +141,7 @@ export function Entry({ entry, selected, onClick, innerRef, ...props }) {
                         key={parentNode.id}
                         icon={parentNode.icon}
                         onClick={handleMove(parentNode.id)}
-                        disabled={entry.parentID === parentNode.id || readOnly}
+                        disabled={(!isBulk && entry.parentID === parentNode.id) || readOnly}
                     />
                     <MenuDivider />
                 </>
@@ -160,7 +164,7 @@ export function Entry({ entry, selected, onClick, innerRef, ...props }) {
                             key={group.id}
                             icon={group.icon}
                             onClick={handleMove(group.id)}
-                            disabled={entry.parentID === group.id || readOnly}
+                            disabled={(!isBulk && entry.parentID === group.id) || readOnly}
                         />
                     )}
                 </Fragment>
@@ -173,14 +177,27 @@ export function Entry({ entry, selected, onClick, innerRef, ...props }) {
         setContextMenuVisibility(true);
         ContextMenu.show(
             <Menu>
-                <MenuItem text={t("vault-ui.entry-menu.move-to")} icon="add-to-folder">
+                <MenuItem
+                    text={
+                        isBulk
+                            ? t("vault-ui.entry-menu.move-several-to", { count: targetIDs.length })
+                            : t("vault-ui.entry-menu.move-to")
+                    }
+                    icon="add-to-folder"
+                >
                     {renderGroupsMenu(groups)}
                 </MenuItem>
                 {entry.parentID !== trashID && (
                     <MenuItem
-                        text={t("vault-ui.entry-menu.move-to-trash")}
+                        text={
+                            isBulk
+                                ? t("vault-ui.entry-menu.move-several-to-trash", {
+                                      count: targetIDs.length
+                                  })
+                                : t("vault-ui.entry-menu.move-to-trash")
+                        }
                         icon="trash"
-                        onClick={() => onMoveEntryToTrash(entry.id)}
+                        onClick={() => targetIDs.forEach(entryID => onMoveEntryToTrash(entryID))}
                         disabled={readOnly}
                     />
                 )}
