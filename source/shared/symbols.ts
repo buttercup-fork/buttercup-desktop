@@ -34,14 +34,14 @@ export const GOOGLE_DRIVE_SCOPES_STANDARD = [
     ...GOOGLE_DRIVE_BASE_SCOPES,
     "https://www.googleapis.com/auth/drive.file" // Per-file access
 ];
+// This fork's own Google OAuth client ("Buttercup (CodeKunde)", Desktop app type).
 // Sign-in uses a loopback redirect (http://127.0.0.1:<port>), which Google only
-// allows for OAuth clients of the "Desktop app" type. These are still upstream
-// Buttercup's IDs: they keep refreshing existing tokens, but new sign-ins need
-// our own Desktop app client here. Refresh tokens are tied to the client, so
-// after the switch existing Google Drive vaults ask to sign in again once.
+// allows for Desktop app clients. Google treats a Desktop app's secret as public:
+// it ships inside the app. Refresh tokens are tied to the client, so Google Drive
+// vaults added with the previous (upstream) client ask to sign in again once.
 export const GOOGLE_CLIENT_ID =
-    "327941947801-fumr4be9juk0bu3ekfuq9fr5bm7trh30.apps.googleusercontent.com";
-export const GOOGLE_CLIENT_SECRET = "2zCBNDSXp1yIu5dyE5BVUWQZ";
+    "333058351404-ojn6jj9mqsg4uf0ge70vg0uu2sbgn8ml.apps.googleusercontent.com";
+export const GOOGLE_CLIENT_SECRET = "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";
 export const ICON_UPLOAD = "upload";
 
 export const PREFERENCES_DEFAULT: Preferences = {
