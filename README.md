@@ -51,7 +51,7 @@ The app is built on [Electron](https://www.electronjs.org/) (see `package.json` 
 
 Builds are provided for:
 
- * Linux: x64 and arm64, as an AppImage (runs on most distributions, such as Ubuntu)
+ * Linux: x64 and arm64, as an AppImage (runs on most distributions, such as Ubuntu) and a `.deb` package (Debian/Ubuntu)
  * macOS: Intel (x64) and Apple Silicon (arm64)¹
  * Windows 10 / 11 (x64)
 
@@ -146,8 +146,8 @@ You can view the current releases on the [releases page](https://github.com/code
 | Windows (x64) | `Buttercup-win-x64-<version>-installer.exe` (installer), `Buttercup-win-x64-<version>-portable.exe` (portable), `Buttercup-win-x64-<version>.7z` (archive) |
 | macOS, Intel | `Buttercup-mac-x64-<version>.dmg` / `.zip` |
 | macOS, Apple Silicon | `Buttercup-mac-arm64-<version>.dmg` / `.zip` |
-| Linux, x64 | `Buttercup-linux-x86_64.AppImage` |
-| Linux, arm64 | `Buttercup-linux-arm64.AppImage` |
+| Linux, x64 | `Buttercup-linux-x86_64.AppImage`, `Buttercup-linux-amd64.deb` (Debian/Ubuntu) |
+| Linux, arm64 | `Buttercup-linux-arm64.AppImage`, `Buttercup-linux-arm64.deb` (Debian/Ubuntu) |
 
 **These builds are not code-signed**, so your OS will warn you the first time you run them:
 
@@ -156,9 +156,9 @@ You can view the current releases on the [releases page](https://github.com/code
 
 ### Linux
 
-We provide an **AppImage** build for Linux, because it supports auto-updating, a crucial feature (we feel) for a security application. Other package formats (deb, rpm, Snap) are not provided at this time.
+We provide an **AppImage** build for Linux, because it supports auto-updating, a crucial feature (we feel) for a security application. There is also a **`.deb`** package for Debian, Ubuntu and derivatives, installed with `sudo apt install ./Buttercup-linux-amd64.deb` (or `-arm64.deb`). The `.deb` does **not** update itself: to update, download the new release's `.deb` and install it over the old one. Other package formats (rpm, Snap) are not provided at this time.
 
-Buttercup registers its own `.desktop` entry and URL-scheme handler when run as an AppImage, so no extra tooling is required. Installing [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) is still a good way to integrate AppImages into your desktop (menu entries, icons, updates) if you'd like that.
+The `.deb` installs its own menu entry and URL-scheme handler. The AppImage registers its own `.desktop` entry and URL-scheme handler when run, so no extra tooling is required. Installing [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) is still a good way to integrate AppImages into your desktop (menu entries, icons, updates) if you'd like that.
 
 ## Development
 
@@ -210,7 +210,7 @@ To produce installers for the platform you are on:
 ```bash
 npm run package:win     # dist/*.exe, *.7z, portable  (run on Windows)
 npm run package:mac     # dist/*.dmg, *.zip           (run on macOS)
-npm run package:linux   # dist/*.AppImage             (run on Linux)
+npm run package:linux   # dist/*.AppImage, *.deb      (run on Linux)
 ```
 
 Each platform's installers must be built on that platform (macOS builds in particular cannot be produced or signed elsewhere). Run `npm run build` first if `build/` is stale. Output lands in `dist/`. These builds are **not code-signed**, so Windows SmartScreen and macOS Gatekeeper will warn on first run.
