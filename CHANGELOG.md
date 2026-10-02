@@ -46,6 +46,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - Adding a vault while other vaults were open left you on the previously active tab, or on the first tab if you had just removed the active vault. The app now switches to the vault you just added.
 - Linux: the AppImage kept showing "Uncaught Exception: Error: write EPIPE" once the terminal or launcher that started it had gone away. Every log line is also written to the console, and writing to a closed console crashed. Those writes are now dropped; the log file still gets every line (upstream [#1330](https://github.com/buttercup/buttercup-desktop/issues/1330)).
 - Adding an entry right after switching to another vault (for example the vault you just added) could fail with "Vault failed to save: … Cannot read properties of null (reading 'createEntry')". The group selected in the previous vault stayed selected, and the new entry was put in a group the vault doesn't have. The app now selects the vault's first group instead. Restarting the app worked around it.
+- Google Drive: when Google refused to renew the sign-in with anything other than a plain "expired" answer, the vault wouldn't open ("Failed fetching Google Drive vault: Bad refresh response"). It now asks you to sign in to Google again, and the log records Google's answer (upstream [#1391](https://github.com/buttercup/buttercup-desktop/issues/1391)).
 
 ### Security
 
