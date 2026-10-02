@@ -147,7 +147,12 @@ export const VaultProvider = ({
         // leaves the entries pane blank and "New Entry" disabled until the user
         // clicks a group (buttercup/buttercup-desktop#1045). Seed it with the
         // first group, matching the uncontrolled default above.
-        if (!onSelectGroup || extSelectedGroup || vaultState.groups.length === 0) return;
+        // The selection outlives a switch to another vault tab (VaultEditor is
+        // reused), so a group from the previous vault is treated as no
+        // selection: a new entry in it failed to save ("Cannot read
+        // properties of null (reading 'createEntry')").
+        if (!onSelectGroup || vaultState.groups.length === 0) return;
+        if (extSelectedGroup && vaultState.groups.some(group => group.id === extSelectedGroup)) return;
         onSelectGroup(vaultState.groups[0].id as GroupID);
     }, [onSelectGroup, extSelectedGroup, vaultState.groups]);
 
