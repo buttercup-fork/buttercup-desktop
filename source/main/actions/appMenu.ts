@@ -1,4 +1,4 @@
-import { Menu } from "electron";
+import { app, Menu } from "electron";
 import { VaultSourceStatus } from "buttercup";
 import { getSourceDescriptions, lockAllSources, lockSource } from "../services/buttercup";
 import { closeWindows, getMainWindow, openMainWindow } from "../services/windows";
@@ -206,14 +206,32 @@ async function getContextMenu(): Promise<Menu> {
             label: t("app-menu.edit"),
             role: "editMenu"
         },
-        {
-            label: t("app-menu.view"),
-            role: "viewMenu"
-        },
-        {
-            label: t("app-menu.debug"),
-            submenu: [{ label: t("app-menu.devtool"), role: "toggleDevTools" }]
-        }
+        // Release builds get no developer tools (#712): Electron's stock View
+        // menu brings Reload and Toggle Developer Tools (Ctrl+Shift+I) with it,
+        // so it's only used in development, next to the Debug menu.
+        ...(app.isPackaged
+            ? [
+                  {
+                      label: t("app-menu.view"),
+                      submenu: [
+                          { role: "resetZoom" as const },
+                          { role: "zoomIn" as const },
+                          { role: "zoomOut" as const },
+                          { type: "separator" as const },
+                          { role: "togglefullscreen" as const }
+                      ]
+                  }
+              ]
+            : [
+                  {
+                      label: t("app-menu.view"),
+                      role: "viewMenu" as const
+                  },
+                  {
+                      label: t("app-menu.debug"),
+                      submenu: [{ label: t("app-menu.devtool"), role: "toggleDevTools" as const }]
+                  }
+              ])
     ]);
 }
 
