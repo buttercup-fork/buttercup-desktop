@@ -278,6 +278,8 @@
             "language": "Language",
             "lock-vaults-after-time": "Lock vaults after time",
             "lock-vaults-after-time-desc": "Automatically lock vaults after some period of inactivity.",
+            "lock-vaults-system-lock": "Lock vaults when the computer locks",
+            "lock-vaults-system-lock-label": "Lock on screen lock or sleep",
             "lock-vaults-window-closed": "Lock vaults if vault window closed",
             "lock-vaults-window-closed-label": "Lock on close",
             "pre-release": {

@@ -265,6 +265,8 @@
             "language": "Taal",
             "lock-vaults-after-time": "Kluizen vergrendelen na tijd",
             "lock-vaults-after-time-desc": "Vergrendel kluizen automatisch na een bepaalde periode van inactiviteit.",
+            "lock-vaults-system-lock": "Kluizen vergrendelen als de computer vergrendelt",
+            "lock-vaults-system-lock-label": "Vergrendel bij schermvergrendeling of slaapstand",
             "lock-vaults-window-closed": "Kluizen vergrendelen bij het sluiten van kluisvenster",
             "lock-vaults-window-closed-label": "Vergrendel bij sluiten",
             "secure-file-host": {

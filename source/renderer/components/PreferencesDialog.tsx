@@ -256,6 +256,16 @@ export function PreferencesDialog() {
                     })}
                 />
             </FormGroup>
+            <FormGroup label={t("preferences.item.lock-vaults-system-lock")}>
+                <Switch
+                    checked={preferences.lockVaultsOnSystemLock}
+                    label={t("preferences.item.lock-vaults-system-lock-label")}
+                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setPreferences({
+                        ...naiveClone(preferences),
+                        lockVaultsOnSystemLock: evt.target.checked
+                    })}
+                />
+            </FormGroup>
         </>
     );
     const pageConnectivity = () => (

@@ -16,6 +16,7 @@ import { registerGoogleDriveAuthHandlers } from "./googleDrive";
 import { processLaunchConfiguration } from "./arguments";
 import { supportsBiometricUnlock } from "./biometrics";
 import { startAutoVaultLockTimer } from "./autoLock";
+import { startSystemLockWatcher } from "./systemLock";
 import { start as startBrowserAPI } from "./browser/index";
 import { generateBrowserKeys } from "./browserAuth";
 import { initialise as initialiseI18n, onLanguageChanged } from "../../shared/i18n/trans";
@@ -74,5 +75,6 @@ export async function initialise() {
         }`
     );
     startAutoVaultLockTimer();
+    startSystemLockWatcher();
     logInfo("Initialisation completed");
 }
