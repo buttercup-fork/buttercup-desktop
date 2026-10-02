@@ -275,6 +275,7 @@
         },
         "item": {
             "clear-clipboard": "Automatically clear clipboard",
+            "clear-clipboard-desc": "Clipboard history tools (such as Win+V on Windows) keep their own copy, which Buttercup can't clear.",
             "language": "Language",
             "lock-vaults-after-time": "Lock vaults after time",
             "lock-vaults-after-time-desc": "Automatically lock vaults after some period of inactivity.",

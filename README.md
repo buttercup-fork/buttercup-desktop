@@ -39,6 +39,8 @@ Buttercup securely encrypts your data in protected files, but this security is o
  * Don't include words or names in the password
  * Never share your password with anyone
 
+**Copied passwords and clipboard history:** new installs clear the clipboard 30 seconds after you copy a password (change it in **Preferences → Security → Automatically clear clipboard**). A clipboard history tool, such as Windows clipboard history (Win+V), Flycut, Maccy, Ditto or Klipper, keeps its own copy the moment you copy, and Buttercup can't remove it from there. Turn off the history, or exclude Buttercup in that tool, if you don't want passwords saved in it.
+
 _It is very important to note that no one associated with Buttercup will ever request your personal vault or its primary password. Do not share it or any of its related details with anyone. Developers or contributors working with Buttercup may request **example** vaults created via your system to try and reproduce issues, but please ensure to never use your real password or store actual credentails within such vaults._
 
 ### Versions
