@@ -1,7 +1,7 @@
 import { ipcRenderer } from "electron";
-import { shell } from "@electron/remote";
 import type { VaultSourceID } from "buttercup";
 import { logInfo } from "../library/log";
+import { openLinkExternally } from "../actions/link";
 
 // The sign-in itself runs in the main process (services/googleDrive.ts), which
 // listens on a loopback redirect for Google's auth code.
@@ -12,7 +12,7 @@ export async function authenticateGoogleDrive(): Promise<{
 }> {
     logInfo("Authenticating Google Drive");
     const url = await getGoogleDriveAuthURL();
-    shell.openExternal(url);
+    openLinkExternally(url);
     return waitForGoogleAuthCode();
 }
 

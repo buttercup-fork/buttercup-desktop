@@ -1,5 +1,5 @@
 import { EntryID, VaultFacade, VaultFormatID, VaultSourceID, VaultSourceStatus } from "buttercup";
-import { BrowserWindow, clipboard, ipcMain, shell } from "electron";
+import { BrowserWindow, clipboard, ipcMain } from "electron";
 import { Layerr } from "layerr";
 import {
     addVaultFromPayload,
@@ -57,6 +57,7 @@ import { isPortable } from "./library/portability";
 import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
 import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
+import { openExternalSafely } from "./services/navigation";
 import {
     AppEnvironmentFlags,
     AddVaultPayload,
@@ -284,8 +285,7 @@ ipcMain.handle("install-update", installUpdate);
 ipcMain.handle("mute-current-update", muteUpdate);
 
 ipcMain.handle("open-link", (_, link: string) => {
-    logInfo(`Opening external link: ${link}`);
-    shell.openExternal(link);
+    openExternalSafely(link);
 });
 
 ipcMain.handle(

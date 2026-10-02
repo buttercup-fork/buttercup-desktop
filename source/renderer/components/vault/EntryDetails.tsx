@@ -807,7 +807,10 @@ const FieldRow = ({
                         {field.property === "url" ? (
                             <a
                                 onClick={e => {
-                                    (e.ctrlKey || e.metaKey) && window.open(field.value, "_blank");
+                                    // Entry URLs are often saved without a scheme ("github.com"),
+                                    // which would resolve against the app's own file:// page.
+                                    const url = /^[a-z][a-z0-9+.-]*:/i.test(field.value) ? field.value : `https://${field.value}`;
+                                    (e.ctrlKey || e.metaKey) && window.open(url, "_blank");
                                 }}
                                 target="_blank"
                                 title="open with Ctrl/Cmd + click"

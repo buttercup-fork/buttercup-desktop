@@ -3,6 +3,7 @@ import { initialize as initialiseElectronRemote } from "@electron/remote/main";
 import "./ipc";
 import { initialise } from "./services/init";
 import { openMainWindow } from "./services/windows";
+import { guardNavigation } from "./services/navigation";
 import { handleProtocolCall, matchProtocolURL } from "./services/protocol";
 import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
@@ -21,6 +22,8 @@ logInfo("Application starting");
 if (process.platform === "win32") {
     app.commandLine.appendSwitch("disable-gpu-compositing");
 }
+
+guardNavigation();
 
 const lock = app.requestSingleInstanceLock();
 if (!lock) {
