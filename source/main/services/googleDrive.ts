@@ -90,8 +90,13 @@ async function authenticateGoogleDriveWithRefreshToken(
     try {
         results = await oauth2Client.refreshAccessToken(refreshToken);
     } catch (err) {
-        const { code, status } = Layerr.info(err);
-        if (code === ERR_REFRESH_FAILED && status === 400) {
+        // Google refused the refresh token (any 4xx). An expired or revoked
+        // token gets a 400, but the refresh has also failed with another 4xx
+        // (Ubuntu, 2026-10-03), which left the vault unopenable with "Bad
+        // refresh response" instead of asking to sign in again (#1391).
+        const { code, status, statusText } = Layerr.info(err);
+        if (code === ERR_REFRESH_FAILED) {
+            logWarn(`Google Drive token refresh refused: ${status} ${statusText ?? ""}`);
             return null;
         }
         throw err;
