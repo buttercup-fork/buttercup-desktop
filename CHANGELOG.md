@@ -30,6 +30,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- The bench illustration on the add-vault and locked-vault screens: the person's trousers had lost their colour and blended into the background.
 - Large vaults were slow to edit and import: after every change the core library rebuilt its whole list of groups, entries and tags, so each change took longer the bigger the vault. It now only updates what changed: adding 1,000 entries went from about 22 seconds to a fraction of a second (core fork #8).
 - The Trash counter stayed at 0 when entries were moved to the Trash: it only counted entries inside groups in the Trash, and counted those in nested groups more than once.
 - Entry icons showed only the generic placeholder: they came from upstream's icon service (`icon.buttercup.pw`), which is offline. Icons are now loaded straight from each entry's own site (`https://<site>/favicon.ico`), so no third party learns which sites a vault holds logins for. Sites without a favicon at that address keep the placeholder; the "show site icons" preference still turns them off. Also fixed the host-name lookup behind the icons, which kept the port and, for URLs saved without `https://`, the whole path.
