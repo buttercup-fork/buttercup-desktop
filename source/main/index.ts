@@ -9,8 +9,11 @@ import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
 import { logErr, logInfo } from "./library/log";
+import { ignoreBrokenPipes } from "./library/stdio";
 import { ACCEPTED_PROTOCOLS } from "./symbols";
 import { AppStartMode } from "./types";
+
+ignoreBrokenPipes([process.stdout, process.stderr]);
 
 logInfo("Application starting");
 

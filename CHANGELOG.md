@@ -31,8 +31,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
-- WebDAV and Dropbox: on Windows, a new vault created in a subfolder ended up as one file named `older
-ame.bcup` at the server root, because paths were joined with backslashes. New WebDAV file and folder names with accents are now saved in the composed Unicode form (NFC) that most servers expect (upstream buttercup-mobile [#90](https://github.com/buttercup/buttercup-mobile/issues/90)). Both come from the CodeKunde `file-interface` fork, which the app now uses.
+- WebDAV and Dropbox: on Windows, a new vault created in a subfolder ended up as one file named `folder\name.bcup` at the server root, because paths were joined with backslashes. New WebDAV file and folder names with accents are now saved in the composed Unicode form (NFC) that most servers expect (upstream buttercup-mobile [#90](https://github.com/buttercup/buttercup-mobile/issues/90)). Both come from the CodeKunde `file-interface` fork, which the app now uses.
 - The bench illustration on the add-vault and locked-vault screens: the person's trousers had lost their colour and blended into the background.
 - Large vaults were slow to edit and import: after every change the core library rebuilt its whole list of groups, entries and tags, so each change took longer the bigger the vault. It now only updates what changed: adding 1,000 entries went from about 22 seconds to a fraction of a second (core fork #8).
 - The Trash counter stayed at 0 when entries were moved to the Trash: it only counted entries inside groups in the Trash, and counted those in nested groups more than once.
@@ -45,6 +44,7 @@ ame.bcup` at the server root, because paths were joined with backslashes. New We
 - Saving to Google Drive could fail or corrupt the upload when a vault or attachment name contained non-ASCII characters (e.g. `café.bcup`, `日記.bcup`): the upload's `Content-Length` counted characters instead of bytes. Fixed in the `googledrive-client` fork, which the app now installs from instead of npm.
 - Switching vault tabs briefly flashed a bright line under the tab being left. The selected tab dropped its bottom border, and the tab animation then grew it back from the browser's default (3px, in the text colour). The selected tab now keeps a transparent border, so only the colour fades.
 - Adding a vault while other vaults were open left you on the previously active tab, or on the first tab if you had just removed the active vault. The app now switches to the vault you just added.
+- Linux: the AppImage kept showing "Uncaught Exception: Error: write EPIPE" once the terminal or launcher that started it had gone away. Every log line is also written to the console, and writing to a closed console crashed. Those writes are now dropped; the log file still gets every line (upstream [#1330](https://github.com/buttercup/buttercup-desktop/issues/1330)).
 
 ### Security
 
