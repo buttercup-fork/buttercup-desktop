@@ -1,4 +1,4 @@
-import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import { app, BrowserWindow, BrowserWindowConstructorOptions } from "electron";
 import { enable as enableWebContents } from "@electron/remote/main";
 import { VaultSourceID } from "buttercup";
 import debounce from "debounce";
@@ -37,7 +37,10 @@ async function createVaultWindow() {
         webPreferences: {
             contextIsolation: false,
             nodeIntegration: true,
-            spellcheck: false
+            spellcheck: false,
+            // No developer tools in release builds (#712): they'd give anyone at
+            // the keyboard a console with full access to the unlocked vaults.
+            devTools: !app.isPackaged
         }
     };
     if (typeof x === "number" && typeof y === "number" && !isNaN(x) && !isNaN(y)) {
