@@ -6,6 +6,7 @@ import { t } from "../../../shared/i18n/trans";
 import { NewVaultPlaceholder } from "../../types";
 import { chooseVaultFileForUpload } from "../../actions/vaultFile";
 import { showError, showSuccess } from "../../services/notifications";
+import { logErr, logInfo } from "../../library/log";
 
 /*
     File Manager for connecting vaults
@@ -195,8 +196,10 @@ export function FileChooser(props: FileChooserProps) {
             setCurrentItems(await props.fsInterface.getDirectoryContents(currentPath as PathIdentifier));
             setNewVault(null);
             setSelectedVaultPath({ identifier: uploaded.identifier, name });
+            logInfo(`Vault upload: uploaded ${name}`);
             showSuccess(t("dialog.file-chooser.upload.success", { name }));
         } catch (err) {
+            logErr("Vault upload failed", err);
             showError(t("dialog.file-chooser.upload.failed", { error: err.message }));
         } finally {
             setLoading(false);

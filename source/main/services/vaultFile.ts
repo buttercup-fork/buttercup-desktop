@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { dialog } from "electron";
 import { getMainWindow } from "./windows";
 import { t } from "../../shared/i18n/trans";
+import { logInfo, logWarn } from "../library/log";
 
 // Every encrypted Buttercup vault file starts with this signature
 const VAULT_SIGNATURE = "b~>buttercup/";
@@ -22,10 +23,15 @@ export async function chooseVaultFileForUpload(): Promise<VaultFileForUpload | n
         properties: ["openFile"]
     });
     const [filePath] = result.filePaths;
-    if (!filePath) return null;
+    if (!filePath) {
+        logInfo("Vault upload: no file chosen");
+        return null;
+    }
     const contents = await fs.readFile(filePath, "utf8");
     if (!contents.startsWith(VAULT_SIGNATURE)) {
+        logWarn(`Vault upload: refused ${filePath}, not a Buttercup vault`);
         return { error: t("dialog.vault-upload-chooser.not-a-vault") };
     }
+    logInfo(`Vault upload: chose ${filePath}`);
     return { contents, name: path.basename(filePath) };
 }

@@ -10,6 +10,7 @@ jest.unstable_mockModule("electron", () => ({
 }));
 jest.unstable_mockModule("./windows", () => ({ getMainWindow: () => null }));
 jest.unstable_mockModule("../../shared/i18n/trans", () => ({ t: (key: string) => key }));
+jest.unstable_mockModule("../library/log", () => ({ logInfo: jest.fn(), logWarn: jest.fn() }));
 
 let chooseVaultFileForUpload: typeof import("./vaultFile").chooseVaultFileForUpload;
 
