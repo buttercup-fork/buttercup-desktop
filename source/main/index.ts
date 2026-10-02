@@ -14,6 +14,19 @@ import { AppStartMode } from "./types";
 
 logInfo("Application starting");
 
+// Release builds have no developer tools (#712), and the fuses in afterPack.js
+// already block --inspect. Chromium's remote debugging switches have no fuse, and
+// would give a console with Node access to the unlocked vaults, so a packaged
+// build refuses to start with them.
+if (
+    app.isPackaged &&
+    (app.commandLine.hasSwitch("remote-debugging-port") ||
+        app.commandLine.hasSwitch("remote-debugging-pipe"))
+) {
+    logErr("Refusing to start: remote debugging is not allowed in release builds");
+    process.exit(1);
+}
+
 // Windows-only GPU-compositor workaround: on some Windows GPU driver / Chromium
 // combinations, the window leaves stale pixels between repaints - most visibly a
 // line between the menu bar and the vault-tab strip that only clears wherever the
