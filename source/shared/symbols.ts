@@ -45,7 +45,7 @@ export const GOOGLE_CLIENT_SECRET = "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";
 export const ICON_UPLOAD = "upload";
 
 export const PREFERENCES_DEFAULT: Preferences = {
-    autoClearClipboard: false, // seconds
+    autoClearClipboard: 30, // seconds, or false for never
     fileHostEnabled: false,
     language: null,
     lockVaultsAfterTime: false, // seconds

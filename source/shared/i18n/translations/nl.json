@@ -262,6 +262,7 @@
         },
         "item": {
             "clear-clipboard": "Automatisch klembord leegmaken",
+            "clear-clipboard-desc": "Klembordgeschiedenis (zoals Win+V op Windows) bewaart een eigen kopie, die Buttercup niet kan wissen.",
             "language": "Taal",
             "lock-vaults-after-time": "Kluizen vergrendelen na tijd",
             "lock-vaults-after-time-desc": "Vergrendel kluizen automatisch na een bepaalde periode van inactiviteit.",

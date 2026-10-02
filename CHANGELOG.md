@@ -18,6 +18,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
+- New installs clear the clipboard 30 seconds after a copy (was: never). Existing installs keep the setting they have. The setting now explains that clipboard history tools (Win+V, Flycut, Maccy, Klipper…) keep their own copy that Buttercup can't clear, and the README's Precautions say how to avoid that (upstream [#1158](https://github.com/buttercup/buttercup-desktop/issues/1158)).
 - An entry's field buttons (copy, show password, history) are always visible now, slightly muted, instead of appearing only on hover: easier to find, and usable on touchscreens and with the keyboard (they brighten on hover and on keyboard focus). Empty fields still show none (upstream buttercup/ui#52).
 - New application icon and artwork: the padlock badge for the app, tray/taskbar and file icons, the local-file, Dropbox, Google, Google Drive and WebDAV vault icons, the macOS tray template and Linux tray icons, and a recoloured DMG background.
 - Rewrote the README to match the fork as it is today: fixed the configuration, vault-storage and offline-cache paths (the folder is `Buttercup-nodejs`), documented the Apple Silicon and Linux arm64 builds and the real release assets and pipeline, corrected the `npm audit` statement, added the Google Drive sign-in known issue, and dropped the upstream project-closure notice, Keybase badge and Arch AUR section. The badges now show this fork and its latest release.

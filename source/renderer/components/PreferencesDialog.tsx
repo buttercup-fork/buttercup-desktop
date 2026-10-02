@@ -223,6 +223,7 @@ export function PreferencesDialog() {
                         </option>
                     ))}
                 </HTMLSelect>
+                <p>{t("preferences.item.clear-clipboard-desc")}</p>
             </FormGroup>
             <FormGroup label={t("preferences.item.lock-vaults-after-time")}>
                 <HTMLSelect
