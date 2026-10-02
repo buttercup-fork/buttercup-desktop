@@ -49,6 +49,7 @@ export const PREFERENCES_DEFAULT: Preferences = {
     fileHostEnabled: false,
     language: null,
     lockVaultsAfterTime: false, // seconds
+    lockVaultsOnSystemLock: true,
     lockVaultsOnWindowClose: false,
     prereleaseUpdates: false,
     startMode: AppStartMode.None,

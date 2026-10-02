@@ -63,6 +63,7 @@ export interface Preferences {
     fileHostEnabled: boolean;
     language: null | string;
     lockVaultsAfterTime: false | number;
+    lockVaultsOnSystemLock: boolean;
     lockVaultsOnWindowClose: boolean;
     prereleaseUpdates: boolean;
     startMode: AppStartMode;
