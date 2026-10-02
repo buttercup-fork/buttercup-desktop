@@ -26,7 +26,8 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          # Pinned in .nvmrc so release builds use a known Node/npm (#1193)
+          node-version-file: .nvmrc
           cache: npm
 
       # Installs deps and builds the buttercup-core git dependency via its
@@ -44,6 +45,20 @@ jobs:
         run: npm run ${{ matrix.package }} -- --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # What built these installers, attached to the release (#1193)
+      - name: Record build environment
+        shell: bash
+        run: |
+          {
+            echo "commit: $GITHUB_SHA"
+            echo "runner: $RUNNER_OS $ImageOS $ImageVersion"
+            echo "node: $(node --version)"
+            echo "npm: $(npm --version)"
+            echo "electron: $(node -p "require('electron/package.json').version")"
+            echo "electron-builder: $(node -p "require('electron-builder/package.json').version")"
+          } > "dist/build-info-${{ matrix.os }}.txt"
+          cat "dist/build-info-${{ matrix.os }}.txt"
 
       # GitHub has retired upload-artifact v3, and v4+ refuses to run on
       # non-GitHub servers such as Forgejo, so each server gets its own
@@ -63,6 +78,7 @@ jobs:
             dist/*.7z
             dist/*.blockmap
             dist/latest*.yml
+            dist/build-info-*.txt
 
       - name: Collect installers (Forgejo)
         if: github.server_url != 'https://github.com'
@@ -80,6 +96,7 @@ jobs:
             dist/*.7z
             dist/*.blockmap
             dist/latest*.yml
+            dist/build-info-*.txt
 
   release:
     name: Draft GitHub release
@@ -88,10 +105,16 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') && github.server_url == 'https://github.com'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5
+
       - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      # SHA256SUMS.txt for every installer, so downloads can be verified (#1193)
+      - name: Write checksums
+        run: node resources/scripts/checksums.js artifacts/checksums artifacts/buttercup-*/
 
       - name: Create draft release
         uses: softprops/action-gh-release@v2

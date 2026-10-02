@@ -10,6 +10,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Added
 
+- Releases come with a `SHA256SUMS.txt` for all installers and a `build-info-<os>.txt` per platform (commit, Node, npm, Electron and electron-builder versions), and the README explains how to verify a download. CI and release builds use the Node version pinned in `.nvmrc`. Builds are not byte-for-byte reproducible; the README says so (upstream [#1193](https://github.com/buttercup/buttercup-desktop/issues/1193)).
 - Vaults lock when you lock the screen or the computer goes to sleep (upstream [#1160](https://github.com/buttercup/buttercup-desktop/issues/1160)). On by default, also for existing installs; turn it off in **Preferences → Security → Lock vaults when the computer locks**. On Linux, Electron only reports sleep, so there it locks on sleep but not on a screen lock.
 - A `.deb` package for Debian, Ubuntu and derivatives, for x64 and arm64 (`Buttercup-linux-amd64.deb`, `Buttercup-linux-arm64.deb`), next to the AppImage. Install it with `sudo apt install ./Buttercup-linux-amd64.deb`. Unlike the AppImage it doesn't update itself: install each new release's `.deb` over the old one.
 - Select several entries at once: **Ctrl/Cmd+click** adds or removes an entry, **Shift+click** selects a range. Right-click one of them to move them all to another group or to the Trash. Esc, a plain click or the arrow keys clear the selection (upstream buttercup/ui#25).

@@ -5,6 +5,7 @@
   "main": "build/main/index.js",
   "scripts": {
     "build": "run-s clean build:app",
+    "checksums": "node ./resources/scripts/checksums.js",
     "build:app": "npm run set-version && webpack --config webpack.config.js --mode production",
     "clean": "rimraf build dist",
     "format": "prettier --write '{{resources,source,test}/**/*.{js,ts},webpack.config.js}'",
