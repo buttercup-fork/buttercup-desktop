@@ -1,8 +1,8 @@
-import { shell } from "electron";
 import { DatasourceAuthManager, GoogleDriveDatasource, VaultSourceID } from "buttercup";
 import { ERR_REFRESH_FAILED, GoogleToken, OAuth2Client } from "@buttercup/google-oauth2-client";
 import { Layerr } from "layerr";
 import { getMainWindow } from "./windows";
+import { openExternalSafely } from "./navigation";
 import { LoopbackAuthSession, startLoopbackAuth } from "../library/googleLoopback";
 import { logInfo, logWarn } from "../library/log";
 import {
@@ -77,7 +77,7 @@ export async function completeGoogleAuth(): Promise<{ accessToken: string; refre
 async function authenticateGoogleDrive(): Promise<{ accessToken: string; refreshToken: string }> {
     logInfo("Authenticating Google Drive");
     const url = await beginGoogleAuth();
-    shell.openExternal(url);
+    openExternalSafely(url);
     return completeGoogleAuth();
 }
 

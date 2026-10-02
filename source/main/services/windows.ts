@@ -1,5 +1,4 @@
-import path from "path";
-import { BrowserWindow, BrowserWindowConstructorOptions, shell } from "electron";
+import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
 import { enable as enableWebContents } from "@electron/remote/main";
 import { VaultSourceID } from "buttercup";
 import debounce from "debounce";
@@ -9,7 +8,7 @@ import { lockAllSources } from "./buttercup";
 import { setLastSourceID } from "./lastVault";
 import { logErr, logInfo } from "../library/log";
 import { Preferences } from "../types";
-import { getRootProjectPath } from "../library/paths";
+import { getAppPageURL } from "./navigation";
 import { sleep } from "../../shared/library/promise";
 
 export async function closeAndReopenMainWindow(): Promise<BrowserWindow> {
@@ -71,11 +70,6 @@ async function createVaultWindow() {
         "move",
         debounce(() => handleWindowBoundsUpdate(win), 750, false)
     );
-    win.webContents.setWindowOpenHandler((details) => {
-        logInfo(`Request to open external URL: ${details.url}`);
-        shell.openExternal(details.url);
-        return { action: "deny" };
-    });
     const loadedPromise = new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(
             () => reject(new Error("Timed-out waiting for window to load")),
@@ -86,8 +80,7 @@ async function createVaultWindow() {
             resolve();
         });
     });
-    const root = getRootProjectPath();
-    win.loadFile(path.join(root, "build/renderer/index.html"));
+    win.loadURL(getAppPageURL());
     await loadedPromise;
 }
 
