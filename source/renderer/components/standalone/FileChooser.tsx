@@ -4,6 +4,9 @@ import { Alignment, Breadcrumb, Breadcrumbs, Button, Card, Classes, Dialog, IBre
 import { FileIdentifier, FileItem, FileSystemInterface, PathIdentifier } from "@buttercup/file-interface";
 import { t } from "../../../shared/i18n/trans";
 import { NewVaultPlaceholder } from "../../types";
+import { chooseVaultFileForUpload } from "../../actions/vaultFile";
+import { showError, showSuccess } from "../../services/notifications";
+import { logErr, logInfo } from "../../library/log";
 
 /*
     File Manager for connecting vaults
@@ -34,6 +37,11 @@ interface FileChooserProps {
         fileName: string | null
     ) => void;
     fsInterface: FileSystemInterface;
+    /**
+     * Show an "Upload Vault" button that copies a local vault file into the
+     * current folder (Google Drive: the app can only see files it created)
+     */
+    allowUpload?: boolean;
 }
 
 const FILE_COLOUR = "#222";
@@ -167,6 +175,36 @@ export function FileChooser(props: FileChooserProps) {
         });
         setNewVaultFilename(null);
     }, [newVaultFilename, currentPath, currentItems]);
+    const handleUploadClick = useCallback(async () => {
+        const file = await chooseVaultFileForUpload();
+        if (!file) return;
+        if ("error" in file) {
+            showError(file.error);
+            return;
+        }
+        // Don't put a second file with the same name next to an existing one
+        const name = currentItems.some(ci => ci.name === file.name)
+            ? file.name.replace(/(\.bcup)?$/i, " (uploaded).bcup")
+            : file.name;
+        setLoading(true);
+        try {
+            const uploaded = await props.fsInterface.putFileContents(
+                { identifier: currentPath ? currentPath.identifier : null } as PathIdentifier,
+                { identifier: null, name },
+                file.contents
+            );
+            setCurrentItems(await props.fsInterface.getDirectoryContents(currentPath as PathIdentifier));
+            setNewVault(null);
+            setSelectedVaultPath({ identifier: uploaded.identifier, name });
+            logInfo(`Vault upload: uploaded ${name}`);
+            showSuccess(t("dialog.file-chooser.upload.success", { name }));
+        } catch (err) {
+            logErr("Vault upload failed", err);
+            showError(t("dialog.file-chooser.upload.failed", { error: err.message }));
+        } finally {
+            setLoading(false);
+        }
+    }, [currentItems, currentPath]);
     const showNewVaultPrompt = useCallback(() => {
         setNewVaultFilename(currentPath);
         setNewVaultFilename("");
@@ -195,6 +233,15 @@ export function FileChooser(props: FileChooserProps) {
             <Navbar>
                 <Navbar.Group align={Alignment.LEFT}>
                     <Button className="bp3-minimal" icon="new-object" text={t("dialog.file-chooser.nav.create-new")} onClick={showNewVaultPrompt} />
+                    {props.allowUpload && (
+                        <Button
+                            className="bp3-minimal"
+                            icon="upload"
+                            text={t("dialog.file-chooser.nav.upload")}
+                            title={t("dialog.file-chooser.nav.upload-title")}
+                            onClick={handleUploadClick}
+                        />
+                    )}
                     {newVault && (
                         <Button className="bp3-minimal" icon="graph-remove" text={t("dialog.file-chooser.nav.cancel-new")} onClick={() => {
                             if (newVault.filename === selectedVaultPath.name) {

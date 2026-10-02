@@ -21,7 +21,7 @@ It depends on the companion fork [`codekunde/buttercup-core`](https://github.com
 
 Buttercup is a free, open-source and cross-platform **password manager**, built on NodeJS with Typescript. It uses strong industry-standard encryption to protect your passwords and credentials (among other data you store in Buttercup vaults) at rest, within vault files (`.bcup`). Vaults can be loaded from and saved to a number of sources, such as the **local filesystem**, **Dropbox**, **Google Drive** or any **WebDAV**-enabled service (like _ownCloud_ or _Nextcloud_ ¹).
 
-> **Known issue:** **Google Drive** sign-in works, but this fork's Google sign-in app is still in Google's *Testing* mode until Google approves it. Until then, only Google accounts added as test users can sign in, and they have to sign in again every 7 days. Google Drive vaults added with a version before the new sign-in ask to sign in once more. Local files, Dropbox and WebDAV are unaffected.
+> **Known issue:** **Google Drive** sign-in works, but this fork's Google sign-in app is still in Google's *Testing* mode until Google approves it. Until then, only Google accounts added as test users can sign in, and they have to sign in again every 7 days. Google Drive vaults added with a version before the new sign-in ask to sign in once more. Buttercup can only see Drive files it created itself: to open a vault made elsewhere, download it and use **Upload Vault** when adding the Google Drive vault. Local files, Dropbox and WebDAV are unaffected.
 
 ### Why you need a password manager
 

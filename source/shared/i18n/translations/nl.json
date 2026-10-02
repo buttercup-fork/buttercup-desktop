@@ -139,7 +139,13 @@
             },
             "nav": {
                 "cancel-new": "Annuleer aanmaken",
-                "create-new": "Nieuwe kluis"
+                "create-new": "Nieuwe kluis",
+                "upload": "Kluis uploaden",
+                "upload-title": "Kopieer een kluisbestand van deze computer naar deze map, zodat Buttercup het kan openen"
+            },
+            "upload": {
+                "failed": "Uploaden mislukt: {{error}}",
+                "success": "{{name}} geüpload"
             }
         },
         "file-vault": {
@@ -203,6 +209,12 @@
             "label": "Kluiswachtwoord",
             "placeholder": "Kluiswachtwoord...",
             "title": "Kluis ontgrendelen"
+        },
+        "vault-upload-chooser": {
+            "filter-name": "Buttercup-kluis",
+            "not-a-vault": "Dat bestand is geen Buttercup-kluis.",
+            "submit-button": "Uploaden",
+            "title": "Kies een kluisbestand om te uploaden"
         }
     },
     "error": {
