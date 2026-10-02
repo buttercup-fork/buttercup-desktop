@@ -196,7 +196,7 @@ The e2e tests launch the real app in an isolated data directory. See [`e2e/READM
 
 ### Dependency security
 
-`npm audit` currently reports **2 moderate** findings, both the same issue: `csv-parse` pulled in by `@buttercup/importer` (used for importing from other password managers and CSV files). The only automatic fix is a breaking downgrade of that package, so it is not applied. Other transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
+`npm audit` reports **0 vulnerabilities** (checked 2026-10-02). The importer now comes from the CodeKunde fork, which fixed the `csv-parse` and `xml2js` findings. Other transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
 
 ## Building & Releasing
 
@@ -226,6 +226,21 @@ Each platform's installers must be built on that platform (macOS builds in parti
 `build.publish` in `package.json` targets `codekunde/buttercup-desktop`, which is also where the in-app updater looks for new versions.
 
 For **signed** releases there is `npm run publish` (see `resources/scripts/publish.js`): it builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set. The secrets are not currently configured, so releases are unsigned.
+
+### Verifying downloads
+
+Each release has a `SHA256SUMS.txt` listing the SHA-256 hash of every installer, and a `build-info-<os>.txt` per platform with the commit, runner, Node, npm, Electron and electron-builder versions that built it. Check a download against it:
+
+```bash
+sha256sum -c SHA256SUMS.txt --ignore-missing     # Linux
+shasum -a 256 -c SHA256SUMS.txt --ignore-missing # macOS
+```
+
+```powershell
+Get-FileHash .\Buttercup-win-x64-<version>-installer.exe -Algorithm SHA256   # Windows: compare with its line in SHA256SUMS.txt
+```
+
+The checksums show a file is the one the release workflow built; they don't make builds reproducible. Building the same commit yourself gives working installers with different hashes (timestamps and packaging metadata differ), as upstream [#1193](https://github.com/buttercup/buttercup-desktop/issues/1193) found. To get close to the release environment, use the Node version in `.nvmrc` and `npm ci`. Run `npm run checksums -- dist dist` after a local build to hash your own installers.
 
 ### Contributing
 
