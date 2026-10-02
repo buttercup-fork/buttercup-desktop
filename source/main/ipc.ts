@@ -57,6 +57,7 @@ import { isPortable } from "./library/portability";
 import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
 import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
+import { chooseVaultFileForUpload } from "./services/vaultFile";
 import { openExternalSafely } from "./services/navigation";
 import {
     AppEnvironmentFlags,
@@ -384,3 +385,5 @@ ipcMain.handle("write-clipboard", (_, text: string) => {
 ipcMain.handle("read-clipboard-qr-image", () => readClipboardQRImage());
 
 ipcMain.handle("choose-qr-image-file", () => chooseQRImageFile());
+
+ipcMain.handle("choose-vault-file-upload", () => chooseVaultFileForUpload());

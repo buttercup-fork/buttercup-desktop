@@ -412,7 +412,11 @@ export function AddVaultMenu() {
     const pageChoose = () => (
         <>
             <p>{t("add-vault-menu.choose-file-prompt")}</p>
-            <FileChooser callback={handleSelectedPathChange} fsInterface={fsInstance} />
+            <FileChooser
+                allowUpload={selectedType === SourceType.GoogleDrive}
+                callback={handleSelectedPathChange}
+                fsInterface={fsInstance}
+            />
         </>
     );
     const pageConfirm = () => (
