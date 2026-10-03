@@ -33,6 +33,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Fixed
 
 - Removing a vault whose settings were never changed no longer writes an error to the log (`Failed removing vault settings … ENOENT`). There was no settings file to delete; the vault was removed either way.
+- No more "Update failed: 404" message every 30 minutes when the release page can't be found (no releases published yet, or GitHub answering 404 as it does while the fork's account is suspended). The log notes it once per run instead. Real update failures still show the message.
 - WebDAV and Dropbox: on Windows, a new vault created in a subfolder ended up as one file named `folder\name.bcup` at the server root, because paths were joined with backslashes. New WebDAV file and folder names with accents are now saved in the composed Unicode form (NFC) that most servers expect (upstream buttercup-mobile [#90](https://github.com/buttercup/buttercup-mobile/issues/90)). Both come from the CodeKunde `file-interface` fork, which the app now uses.
 - The bench illustration on the add-vault and locked-vault screens: the person's trousers had lost their colour and blended into the background.
 - Large vaults were slow to edit and import: after every change the core library rebuilt its whole list of groups, entries and tags, so each change took longer the bigger the vault. It now only updates what changed: adding 1,000 entries went from about 22 seconds to a fraction of a second (core fork #8).
