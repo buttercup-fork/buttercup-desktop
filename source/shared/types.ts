@@ -23,6 +23,18 @@ export enum AppStartMode {
     None = "none"
 }
 
+export type ChangeMasterPasswordResult =
+    | {
+          ok: true;
+          backupPath: string;
+          /** What happened to the password stored for biometric unlock */
+          biometrics: "none" | "removed" | "updated";
+      }
+    | {
+          ok: false;
+          reason: "invalid-password" | "not-unlocked" | "same-password";
+      };
+
 export interface Config {
     browserClients: Record<
         string,

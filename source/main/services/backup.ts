@@ -22,7 +22,13 @@ export function attachSourceEncryptedListeners(source: VaultSource) {
     __removeListener[source.id] = () => source._datasource.off("encryptedContent", handler);
 }
 
-function getBackupFilename(sourceID: VaultSourceID, type: "save"): string {
+function getBackupRoot(sourceID: VaultSourceID, localBackupLocation: unknown): string {
+    return typeof localBackupLocation === "string" && localBackupLocation
+        ? path.resolve(VAULTS_BACKUP_PATH, path.join(localBackupLocation, sourceID))
+        : path.join(VAULTS_BACKUP_PATH, sourceID);
+}
+
+function getBackupFilename(sourceID: VaultSourceID, type: "password-change" | "save"): string {
     const date = new Date();
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -37,14 +43,8 @@ async function handleSourceSave(sourceID: VaultSourceID, content: string): Promi
     // Get settings for source
     const vaultSettings = await getVaultSettings(sourceID);
     if (!vaultSettings.localBackup) return;
-    // Calculate pat
-    const backupRoot =
-        typeof vaultSettings.localBackupLocation === "string" && vaultSettings.localBackupLocation
-            ? path.resolve(
-                  VAULTS_BACKUP_PATH,
-                  path.join(vaultSettings.localBackupLocation, sourceID)
-              )
-            : path.join(VAULTS_BACKUP_PATH, sourceID);
+    // Calculate path
+    const backupRoot = getBackupRoot(sourceID, vaultSettings.localBackupLocation);
     const backupPath = path.join(backupRoot, getBackupFilename(sourceID, "save"));
     // Create folders
     await fs.mkdir(backupRoot, {
@@ -54,4 +54,24 @@ async function handleSourceSave(sourceID: VaultSourceID, content: string): Promi
     logInfo(`Backing up source: ${sourceID} => ${backupPath}`);
     await fs.writeFile(backupPath, content);
     logInfo(`Source backup complete: ${sourceID}`);
+}
+
+/**
+ * Write a copy of the vault, still encrypted with the current password, before
+ * the master password is changed. Written whether or not local backups are on.
+ * @returns The path of the backup file
+ */
+export async function writePasswordChangeBackup(
+    sourceID: VaultSourceID,
+    content: string
+): Promise<string> {
+    const vaultSettings = await getVaultSettings(sourceID);
+    const backupRoot = getBackupRoot(sourceID, vaultSettings.localBackupLocation);
+    const backupPath = path.join(backupRoot, getBackupFilename(sourceID, "password-change"));
+    await fs.mkdir(backupRoot, {
+        recursive: true
+    });
+    logInfo(`Backing up source before password change: ${sourceID} => ${backupPath}`);
+    await fs.writeFile(backupPath, content);
+    return backupPath;
 }

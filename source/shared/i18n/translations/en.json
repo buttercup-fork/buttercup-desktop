@@ -420,6 +420,24 @@
             "upgrade-button": "Upgrade"
         },
         "not-unlocked": "Vault must be unlocked to access this area.",
+        "password": {
+            "biometrics-removed": "Biometric unlock was turned off for this vault because the new password could not be stored. Set it up again under Biometrics.",
+            "change-button": "Change password",
+            "confirm": "Confirm new password",
+            "confirm-body": "A backup of the vault, still locked with the current password, is saved first. Afterwards the vault opens only with the new password.",
+            "confirm-title": "Change master password?",
+            "current": "Current password",
+            "description": "Change the master password of this vault. <strong>Every other app or device that opens this vault</strong> (browser extension, mobile, other computers) will need the new password. Existing backups stay locked with the old password.",
+            "error": {
+                "failed": "Failed changing the master password",
+                "invalid-password": "The current password is not correct",
+                "same-password": "The new password must be different from the current one"
+            },
+            "mismatch": "The passwords do not match",
+            "new": "New password",
+            "success": "Master password changed. Backup of the vault with the old password: {{path}}",
+            "title": "Password"
+        },
         "title": "Vault Settings: {{title}}"
     },
     "vault-tabs": {

@@ -1,6 +1,19 @@
 import { VaultSourceID } from "buttercup";
 import { ipcRenderer } from "electron";
-import { VaultSettingsLocal } from "../types";
+import { ChangeMasterPasswordResult, VaultSettingsLocal } from "../types";
+
+export async function changeMasterPassword(
+    sourceID: VaultSourceID,
+    currentPassword: string,
+    newPassword: string
+): Promise<ChangeMasterPasswordResult> {
+    return ipcRenderer.invoke(
+        "change-source-master-password",
+        sourceID,
+        currentPassword,
+        newPassword
+    );
+}
 
 export async function getVaultSettings(sourceID: VaultSourceID): Promise<VaultSettingsLocal> {
     const settings = await ipcRenderer.invoke("get-vault-settings", sourceID);

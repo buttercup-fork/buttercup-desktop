@@ -58,10 +58,12 @@ import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
 import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
 import { chooseVaultFileForUpload } from "./services/vaultFile";
+import { changeVaultMasterPassword } from "./services/masterPassword";
 import { openExternalSafely } from "./services/navigation";
 import {
     AppEnvironmentFlags,
     AddVaultPayload,
+    ChangeMasterPasswordResult,
     LogLevel,
     Preferences,
     SearchResult,
@@ -203,6 +205,17 @@ ipcMain.handle(
 ipcMain.handle("browser-access-code-clear", async (_) => {
     await clearCode();
 });
+
+ipcMain.handle(
+    "change-source-master-password",
+    async (
+        _,
+        sourceID: VaultSourceID,
+        currentPassword: string,
+        newPassword: string
+    ): Promise<ChangeMasterPasswordResult> =>
+        changeVaultMasterPassword(sourceID, currentPassword, newPassword)
+);
 
 ipcMain.handle("check-source-biometrics", async (_, sourceID: VaultSourceID) => {
     const supportsBiometrics = await supportsBiometricUnlock();
