@@ -1,5 +1,6 @@
 import { logErr, logInfo } from "../library/log";
-import { getUnlockedSourcesCount, lockAllSources } from "./buttercup";
+import { getUnlockedSourcesCount } from "./buttercup";
+import { lockAllSourcesAfterSaving } from "../actions/unsaved";
 import { getConfigValue } from "./config";
 
 let __autoVaultLockTimeout: NodeJS.Timeout | null = null;
@@ -27,7 +28,7 @@ export async function startAutoVaultLockTimer(): Promise<void> {
         __autoVaultLockTimeout = null;
         if (getUnlockedSourcesCount() === 0) return;
         logInfo("Auto-lock timer elapsed - locking all vaults");
-        lockAllSources().catch((err) => logErr("Auto-lock: failed to lock vaults", err));
+        lockAllSourcesAfterSaving().catch((err) => logErr("Auto-lock: failed to lock vaults", err));
     }, lockVaultsAfterTime * 1000);
 }
 

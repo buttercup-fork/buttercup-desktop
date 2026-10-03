@@ -7,6 +7,8 @@ import { guardNavigation } from "./services/navigation";
 import { handleProtocolCall, matchProtocolURL } from "./services/protocol";
 import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
+import { getUnsavedSourceIDs } from "./services/buttercup";
+import { confirmUnsavedChanges } from "./actions/unsaved";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
 import { logErr, logInfo, logWarn } from "./library/log";
 import { ignoreBrokenPipes } from "./library/stdio";
@@ -70,6 +72,26 @@ const initialProtocolURL = process.argv.map(matchProtocolURL).find(Boolean) ?? n
 app.on("window-all-closed", () => {
     // Intentionally left blank: Buttercup keeps running in the system tray when
     // all windows are closed, so we don't call app.quit() here.
+});
+
+// Quitting drops vault changes that couldn't be saved: ask first (#1230)
+let __quitConfirmed = false;
+let __confirmingQuit = false;
+app.on("before-quit", (event) => {
+    if (__quitConfirmed || getUnsavedSourceIDs().length === 0) return;
+    event.preventDefault();
+    if (__confirmingQuit) return;
+    __confirmingQuit = true;
+    confirmUnsavedChanges("quit")
+        .then((confirmed) => {
+            if (!confirmed) return;
+            __quitConfirmed = true;
+            app.quit();
+        })
+        .catch((err) => logErr("Failed checking for unsaved changes before quitting", err))
+        .finally(() => {
+            __confirmingQuit = false;
+        });
 });
 
 app.on("activate", () => {

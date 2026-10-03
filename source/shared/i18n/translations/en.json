@@ -106,6 +106,21 @@
         }
     },
     "dialog": {
+        "unsaved-changes": {
+            "cancel": "Cancel",
+            "detail": "Changes in {{names}} couldn't be saved yet. Their storage may be unreachable, or a save may still be running. If you continue without saving, those changes are lost.",
+            "lock-anyway": "Lock Anyway",
+            "lost-on-auto-lock": "{{names}} locked automatically with changes that couldn't be saved. Those changes are lost.",
+            "message-lock": "Lock with unsaved changes?",
+            "message-quit": "Quit with unsaved changes?",
+            "quit-anyway": "Quit Anyway",
+            "save-failed-lock": "Saving failed, so the vault stays unlocked. Check its connection or file and try again.",
+            "save-failed-quit": "Saving failed, so Buttercup stays open. Check the vault's connection or file and try again.",
+            "save-lock": "Save and Lock",
+            "save-quit": "Save and Quit",
+            "timeout": "Saving took too long",
+            "title": "Unsaved Changes"
+        },
         "attachment-save": {
             "confirm-button": "Save",
             "title": "Download Attachment"

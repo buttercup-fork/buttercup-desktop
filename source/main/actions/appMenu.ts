@@ -1,6 +1,7 @@
 import { app, Menu } from "electron";
 import { VaultSourceStatus } from "buttercup";
-import { getSourceDescriptions, lockAllSources, lockSource } from "../services/buttercup";
+import { getSourceDescriptions } from "../services/buttercup";
+import { lockAllSourcesAfterConfirming, lockSourceAfterConfirming } from "./unsaved";
 import { closeWindows, getMainWindow, openMainWindow } from "../services/windows";
 import { getConfigValue, setConfigValue } from "../services/config";
 import { getLastSourceID } from "../services/lastVault";
@@ -89,7 +90,7 @@ async function getContextMenu(): Promise<Menu> {
                 {
                     label: t("app-menu.lock-all"),
                     accelerator: isOSX() ? "Cmd+Alt+L" : "Ctrl+Alt+L",
-                    click: () => lockAllSources()
+                    click: () => lockAllSourcesAfterConfirming()
                 }
             ]
         },
@@ -152,7 +153,7 @@ async function getContextMenu(): Promise<Menu> {
                         if (lastSource.state !== VaultSourceStatus.Unlocked) {
                             return;
                         }
-                        return lockSource(lastSource.id);
+                        return lockSourceAfterConfirming(lastSource.id);
                     }
                 },
                 { type: "separator" },

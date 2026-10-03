@@ -1,6 +1,7 @@
 import { powerMonitor } from "electron";
 import { getConfigValue } from "./config";
-import { getUnlockedSourcesCount, lockAllSources } from "./buttercup";
+import { getUnlockedSourcesCount } from "./buttercup";
+import { lockAllSourcesAfterSaving } from "../actions/unsaved";
 import { logErr, logInfo } from "../library/log";
 import type { Preferences } from "../types";
 
@@ -9,7 +10,7 @@ async function lockVaultsFor(reason: string) {
     if (!preferences.lockVaultsOnSystemLock || getUnlockedSourcesCount() === 0) return;
     logInfo(`Locking vaults: ${reason}`);
     try {
-        await lockAllSources();
+        await lockAllSourcesAfterSaving();
     } catch (err) {
         logErr(`Failed locking vaults (${reason})`, err);
     }

@@ -111,8 +111,8 @@ ipcMain.on("get-preferences", async (evt, sourceID) => {
 ipcMain.on("lock-source", async (evt, payload) => {
     const { sourceID } = JSON.parse(payload);
     try {
-        await lockSourceWithID(sourceID);
-        if (getLastSourceID() === sourceID) {
+        const locked = await lockSourceWithID(sourceID);
+        if (locked && getLastSourceID() === sourceID) {
             setLastSourceID(null);
         }
         evt.reply(
