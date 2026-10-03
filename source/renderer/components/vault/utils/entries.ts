@@ -20,6 +20,26 @@ export const filterEntries = (entries: Array<EntryFacade> = [], term = ""): Arra
     });
 };
 
+/**
+ * IDs of custom fields whose name is already used by another property field of
+ * the same entry. Saving such an entry would keep only the last field's value
+ * (core applies the fields one by one), silently erasing the other (#1159).
+ */
+export function getDuplicateFieldIDs(fields: EntryFacade["fields"] = []): Set<string> {
+    const properties = fields.filter(
+        (field) => field.propertyType === EntryPropertyType.Property && field.property
+    );
+    const counts = new Map<string, number>();
+    properties.forEach((field) => {
+        counts.set(field.property, (counts.get(field.property) ?? 0) + 1);
+    });
+    return new Set(
+        properties
+            .filter((field) => field.removeable && counts.get(field.property)! > 1)
+            .map((field) => field.id)
+    );
+}
+
 export function sortEntries(entries: Array<EntryFacade> = [], asc = true) {
     return entries.sort((a, b) => {
         const aTitleProp = a.fields.find(
