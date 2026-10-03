@@ -2,8 +2,7 @@ import fs from "fs";
 import path from "path";
 import rotate from "log-rotate";
 import pify from "pify";
-import { LOG_FILENAME, LOG_PATH } from "./storage";
-import { getPortableExeDir, isPortable } from "../library/portability";
+import { LOG_PATH } from "./storage";
 
 const appendFile = pify(fs.appendFile);
 const mkdir = pify(fs.mkdir);
@@ -11,7 +10,8 @@ const mkdir = pify(fs.mkdir);
 const LOG_RETENTION = 10;
 
 export function getLogPath(): string {
-    return isPortable() ? path.join(getPortableExeDir(), LOG_FILENAME) : LOG_PATH;
+    // The portable app's log is in its data folder too (see storage)
+    return LOG_PATH;
 }
 
 export async function initialise() {

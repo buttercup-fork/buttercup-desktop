@@ -2,6 +2,8 @@ import path from "path";
 import envPaths from "env-paths";
 import { FileStorage } from "../library/FileStorage";
 import { VaultSourceID } from "buttercup";
+import { getPortableHomeDir, isPortable } from "../library/portability";
+import { copyAppData } from "../library/appData";
 
 interface EnvPaths {
     data: string;
@@ -11,28 +13,26 @@ interface EnvPaths {
     temp: string;
 }
 
-let __envPaths: EnvPaths;
-if ("BUTTERCUP_HOME_DIR" in process.env) {
-    __envPaths = {
-        data: path.join(process.env.BUTTERCUP_HOME_DIR, "data"),
-        config: path.join(
-            process.env.BUTTERCUP_CONFIG_DIR || process.env.BUTTERCUP_HOME_DIR,
-            "config"
-        ),
-        cache: path.join(process.env.BUTTERCUP_HOME_DIR, "cache"),
-        log: path.join(process.env.BUTTERCUP_HOME_DIR, "log"),
-        temp: path.join(process.env.BUTTERCUP_TEMP_DIR || process.env.BUTTERCUP_HOME_DIR, "temp")
-    };
-} else {
-    const TEMP_ENV_PATHS = envPaths("Buttercup");
-    __envPaths = {
-        data: TEMP_ENV_PATHS.data,
-        config: TEMP_ENV_PATHS.config,
-        cache: TEMP_ENV_PATHS.cache,
-        log: TEMP_ENV_PATHS.log,
-        temp: TEMP_ENV_PATHS.temp
+function getDefaultEnvPaths(): EnvPaths {
+    const { data, config, cache, log, temp } = envPaths("Buttercup");
+    return { data, config, cache, log, temp };
+}
+
+function getHomeEnvPaths(homeDir: string): EnvPaths {
+    return {
+        data: path.join(homeDir, "data"),
+        config: path.join(process.env.BUTTERCUP_CONFIG_DIR || homeDir, "config"),
+        cache: path.join(homeDir, "cache"),
+        log: path.join(homeDir, "log"),
+        temp: path.join(process.env.BUTTERCUP_TEMP_DIR || homeDir, "temp")
     };
 }
+
+// One folder for all app data: BUTTERCUP_HOME_DIR, or the portable app's data
+// folder next to its exe (#1254). Otherwise the OS default locations.
+const HOME_DIR: string | null =
+    process.env.BUTTERCUP_HOME_DIR || (isPortable() ? getPortableHomeDir() : null);
+const __envPaths: EnvPaths = HOME_DIR ? getHomeEnvPaths(HOME_DIR) : getDefaultEnvPaths();
 
 const CONFIG_PATH = path.join(__envPaths.config, "desktop.config.json");
 export const LOG_FILENAME = "buttercup-desktop.log";
@@ -45,6 +45,24 @@ const VAULT_SETTINGS_PATH = path.join(__envPaths.config, "vault-config-SOURCEID.
 let __configStorage: FileStorage = null,
     __vaultStorage: FileStorage = null,
     __vaultCacheStorage: FileStorage = null;
+
+/**
+ * The folder holding all app data, or null when the OS default locations are
+ * used. Electron's own profile goes in its "electron" subfolder.
+ */
+export function getHomeDir(): string | null {
+    return HOME_DIR;
+}
+
+/**
+ * First start of the portable app with its own data folder: copy the vault list
+ * and settings from the default locations, where earlier versions kept them.
+ * @returns The copied files
+ */
+export function copyAppDataToPortableHome(): Array<string> {
+    if (!isPortable() || process.env.BUTTERCUP_HOME_DIR) return [];
+    return copyAppData(getDefaultEnvPaths(), __envPaths);
+}
 
 export function getConfigPath(): string {
     return CONFIG_PATH;
