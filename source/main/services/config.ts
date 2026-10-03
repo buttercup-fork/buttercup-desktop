@@ -70,6 +70,8 @@ export async function removeVaultSettings(sourceID: VaultSourceID): Promise<void
     try {
         await fs.unlink(path);
     } catch (err) {
+        // A vault whose settings were never changed has no settings file
+        if (err?.code === "ENOENT") return;
         logErr(`Failed removing vault settings: ${sourceID}`, err);
     }
 }
