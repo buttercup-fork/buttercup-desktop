@@ -8,6 +8,7 @@ import { clearDelayedInterval, setDelayedInterval } from "delayable-setinterval"
 import { getMainWindow } from "./windows";
 import { logErr, logInfo, logWarn } from "../library/log";
 import { fileExists } from "../library/file";
+import { isUpdateFeedUnavailable } from "../library/updateErrors";
 import { getConfigValue } from "./config";
 import { UpdateProgressInfo } from "../types";
 
@@ -20,6 +21,7 @@ let __eventListenersAttached = false,
     __readyUpdate: UpdateInfo = null,
     __updateCheckTimer: string = null,
     __updateErrored: boolean = false,
+    __updateFeedWarned: boolean = false,
     __updateMuted: boolean = false,
     __updatesDisabled: boolean = false;
 
@@ -28,6 +30,10 @@ function attachEventListeners(updater = autoUpdater) {
         __updateErrored = true;
         if (err?.message === "net::ERR_INTERNET_DISCONNECTED") {
             logInfo("Updates: Update failed due to no internet connection");
+            return;
+        }
+        if (isUpdateFeedUnavailable(err)) {
+            warnUpdateFeedUnavailable(err);
             return;
         }
         logErr("Updates: Error processing update", err);
@@ -105,6 +111,8 @@ async function checkForUpdateInternal() {
     try {
         await autoUpdater.checkForUpdates();
     } catch (err) {
+        // Already handled by the "error" listener
+        if (isUpdateFeedUnavailable(err)) return;
         logErr(`Updates: Update check failed: ${err.message}`);
         logErr(err);
     }
@@ -147,4 +155,14 @@ export async function startUpdateWatcher(): Promise<void> {
 
 export function stopUpdateWatcher(): void {
     clearDelayedInterval(__updateCheckTimer);
+}
+
+// The check repeats every 30 minutes: log a missing release feed once per run,
+// without the error toast, instead of an error each time
+function warnUpdateFeedUnavailable(err: Error) {
+    if (__updateFeedWarned) return;
+    __updateFeedWarned = true;
+    logWarn(
+        `Updates: Release feed not available, no updates to check: ${err.message.split("\n")[0]}`
+    );
 }
