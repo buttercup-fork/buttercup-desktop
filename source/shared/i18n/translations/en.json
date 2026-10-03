@@ -246,6 +246,7 @@
         "biometric-store-failed": "Failed storing biometric details",
         "biometric-unlock-failed": "Failed unlocking vault using biometrics",
         "fatal-boundary": "A fatal error has occurred - we're sorry this has happened. Please check out the details below in case they help diagnose the issue:",
+        "vault-damaged": "The vault file is incomplete or damaged, so it can't be opened. It was probably cut off while being saved. Restore it from a backup: your own copy, your sync service's file history, or Buttercup's local backups if they are on (Vault Settings → Backup).",
         "vault-settings-fetch-failed": "Failed fetching vault settings"
     },
     "file-host": {
