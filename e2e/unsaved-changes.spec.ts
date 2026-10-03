@@ -1,5 +1,5 @@
 import { join } from "path";
-import { chmodSync, mkdtempSync, rmSync } from "fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
@@ -45,9 +45,6 @@ test.describe("unsaved changes", () => {
     });
 
     test.afterAll(async () => {
-        try {
-            chmodSync(vaultPath, 0o666);
-        } catch {}
         await launched?.close().catch(() => {});
         rmSync(vaultDir, { recursive: true, force: true });
     });
@@ -75,7 +72,11 @@ test.describe("unsaved changes", () => {
         await passwordPrompt.fill(PASSWORD);
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
-        chmodSync(vaultPath, 0o444);
+        // Swap the vault file for a folder so saves fail (a read-only file
+        // doesn't stop CI, which runs as root)
+        const vaultFile = readFileSync(vaultPath);
+        rmSync(vaultPath);
+        mkdirSync(vaultPath);
         await window.getByRole("button", { name: "New Entry" }).click();
         await window.getByPlaceholder("Title").fill("Kept entry");
         await window.getByRole("button", { name: "Save" }).click();
@@ -101,9 +102,10 @@ test.describe("unsaved changes", () => {
                 "Saving failed, so Buttercup stays open. Check the vault's connection or file and try again."
             ]);
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
+        // Once the file is back, "Save and Quit" saves and quits
+        rmSync(vaultPath, { recursive: true });
+        writeFileSync(vaultPath, vaultFile);
         expect(await readEntryTitles(vaultPath)).toEqual([]);
-        // Once the file is writable again, "Save and Quit" saves and quits
-        chmodSync(vaultPath, 0o666);
         await answer(0);
         const closed = app.waitForEvent("close");
         await app.evaluate(({ app }) => app.quit());
