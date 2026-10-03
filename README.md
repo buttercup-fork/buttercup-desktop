@@ -162,6 +162,8 @@ We provide an **AppImage** build for Linux, because it supports auto-updating, a
 
 The `.deb` installs its own menu entry and URL-scheme handler. The AppImage registers its own `.desktop` entry and URL-scheme handler when run, so no extra tooling is required. Installing [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) is still a good way to integrate AppImages into your desktop (menu entries, icons, updates) if you'd like that.
 
+**Sandbox on Ubuntu 24.04 and later:** these releases restrict the unprivileged user namespaces that Chromium's sandbox (the one Electron uses) relies on. The `.deb` installs an AppArmor profile (`/etc/apparmor.d/buttercup`) that allows them, so it runs with the sandbox. The AppImage cannot install such a profile, so its launcher starts Buttercup with `--no-sandbox` when user namespaces are blocked, rather than failing with a sandbox error (upstream [#1355](https://github.com/buttercup/buttercup-desktop/issues/1355)). Buttercup notes this in its log ("Running without the Chromium sandbox"). On these systems we recommend the `.deb`.
+
 ## Development
 
 You need **Node 20 or greater** with **npm 9 or greater**. No IDE is required — any editor works (VS Code is convenient; see [`e2e/README.md`](e2e/README.md) for its optional Playwright extension).
