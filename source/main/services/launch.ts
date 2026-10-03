@@ -5,6 +5,7 @@ import untildify from "untildify";
 import { pathExists } from "path-exists";
 import { isLinux } from "../../shared/library/platform";
 
+const AUTOSTART_ARGS = ["--autostart"];
 const LINUX_AUTOSTART_DIR = "~/.config/autostart";
 const LINUX_DESKTOP = `
 [Desktop Entry]
@@ -41,19 +42,28 @@ async function setStartWithSessionLinux(enable: boolean): Promise<void> {
 }
 
 async function setStartWithSessionNative(enable: boolean): Promise<void> {
-    const isEnabled = app.getLoginItemSettings().openAtLogin;
+    // On Windows the login item only counts as ours when the path and args
+    // match the ones it was registered with, so query and change it with the
+    // same ones. Without them it always looked disabled and was never removed
+    // (#1267). The portable exe runs from a new temp folder on every start, so
+    // register the exe itself.
+    const loginItem = {
+        path: process.env.PORTABLE_EXECUTABLE_FILE || process.execPath,
+        args: AUTOSTART_ARGS
+    };
+    const isEnabled = app.getLoginItemSettings(loginItem).openAtLogin;
     if (enable && !isEnabled) {
         app.setLoginItemSettings({
+            ...loginItem,
             // `openAsHidden` is macOS-only and dropped from Electron's types.
             openAsHidden: true,
-            openAtLogin: true,
-            args: ["--autostart"]
+            openAtLogin: true
         } as Electron.Settings & { openAsHidden?: boolean });
     } else if (!enable && isEnabled) {
         app.setLoginItemSettings({
+            ...loginItem,
             openAsHidden: false,
-            openAtLogin: false,
-            args: []
+            openAtLogin: false
         } as Electron.Settings & { openAsHidden?: boolean });
     }
 }
