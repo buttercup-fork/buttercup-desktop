@@ -1,3 +1,4 @@
+import path from "path";
 import { app } from "electron";
 import { initialize as initialiseElectronRemote } from "@electron/remote/main";
 import "./ipc";
@@ -7,6 +8,7 @@ import { guardNavigation } from "./services/navigation";
 import { handleProtocolCall, matchProtocolURL } from "./services/protocol";
 import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
+import { copyAppDataToPortableHome, getHomeDir } from "./services/storage";
 import { getUnsavedSourceIDs } from "./services/buttercup";
 import { confirmUnsavedChanges } from "./actions/unsaved";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
@@ -50,6 +52,27 @@ if (process.platform === "linux" && app.commandLine.hasSwitch("no-sandbox")) {
 // "Fork-discovered" table). Must run before the app is ready.
 if (process.platform === "win32") {
     app.commandLine.appendSwitch("disable-gpu-compositing");
+}
+
+// When the app data has its own folder (portable app, or BUTTERCUP_HOME_DIR),
+// Electron's profile goes there too instead of the user's AppData (#1254). It
+// also holds the single-instance lock, so set it before taking that.
+const homeDir = getHomeDir();
+if (homeDir && !app.commandLine.hasSwitch("user-data-dir")) {
+    const userDataDir = path.join(homeDir, "electron");
+    app.setPath("userData", userDataDir);
+    app.setPath("sessionData", userDataDir);
+    app.setPath("crashDumps", path.join(userDataDir, "Crashpad"));
+}
+try {
+    const copied = copyAppDataToPortableHome();
+    if (copied.length > 0) {
+        logInfo(
+            `Copied the vault list and settings into the portable data folder: ${copied.join(", ")}`
+        );
+    }
+} catch (err) {
+    logErr("Failed copying app data into the portable data folder", err);
 }
 
 guardNavigation();
