@@ -1,6 +1,7 @@
 import { Menu, Tray } from "electron";
 import { VaultSourceStatus } from "buttercup";
-import { getSourceDescriptions, lockAllSources } from "../services/buttercup";
+import { getSourceDescriptions } from "../services/buttercup";
+import { lockAllSourcesAfterConfirming } from "./unsaved";
 import { openAndRepositionMainWindow, openMainWindow } from "../services/windows";
 import { getIconPath } from "../library/tray";
 import { logInfo } from "../library/log";
@@ -49,7 +50,7 @@ async function getContextMenu(): Promise<Menu> {
             label: t("app-menu.lock-all"),
             click: () => {
                 logInfo("Locking all sources");
-                lockAllSources();
+                lockAllSourcesAfterConfirming();
             }
         },
         {

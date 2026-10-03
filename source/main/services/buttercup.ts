@@ -31,6 +31,12 @@ import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
 import { OTP, SourceType, VaultSourceDescription } from "../types";
 
+// Latest edit per vault that isn't saved yet. Core's `format.dirty` can't tell
+// us: Format B vaults don't set it for regular edits.
+const __unsavedEdits = new Map<VaultSourceID, number>();
+let __lastEdit = 0;
+const __runningSaves = new Map<VaultSourceID, Promise<void>>();
+
 const __watchedVaultSources: Array<VaultSourceID> = [];
 let __vaultManager: VaultManager;
 
@@ -291,7 +297,12 @@ export async function loadVaultsFromDisk() {
 export async function lockAllSources() {
     const vaultManager = getVaultManager();
     if (vaultManager.unlockedSources.length === 0) return;
-    await Promise.all(vaultManager.unlockedSources.map((source) => source.lock()));
+    await Promise.all(
+        vaultManager.unlockedSources.map(async (source) => {
+            await source.lock();
+            __unsavedEdits.delete(source.id);
+        })
+    );
 }
 
 export async function lockSource(sourceID: VaultSourceID) {
@@ -299,6 +310,7 @@ export async function lockSource(sourceID: VaultSourceID) {
     const source = vaultManager.getSourceForID(sourceID);
     if (source.status === VaultSourceStatus.Unlocked) {
         await source.lock();
+        __unsavedEdits.delete(sourceID);
     }
 }
 
@@ -331,14 +343,66 @@ export async function removeSource(sourceID: VaultSourceID) {
 export async function saveSource(sourceID: VaultSourceID) {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
+    const edit = __unsavedEdits.get(sourceID);
     await source.save();
+    if (typeof edit === "number") markEditSaved(sourceID, edit);
 }
 
 export async function saveVaultFacade(sourceID: VaultSourceID, facade: VaultFacade): Promise<void> {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
+    const edit = ++__lastEdit;
+    __unsavedEdits.set(sourceID, edit);
     consumeVaultFacade(source.vault, facade);
-    await source.save();
+    const saving = source.save().then(() => markEditSaved(sourceID, edit));
+    __runningSaves.set(sourceID, saving);
+    try {
+        await saving;
+    } finally {
+        if (__runningSaves.get(sourceID) === saving) {
+            __runningSaves.delete(sourceID);
+        }
+    }
+}
+
+/**
+ * Wait (at most `timeout` ms) for running saves of the given vaults to finish,
+ * whether they succeed or not.
+ */
+export async function waitForRunningSaves(sourceIDs: Array<VaultSourceID>, timeout: number) {
+    const saves = sourceIDs
+        .map((sourceID) => __runningSaves.get(sourceID))
+        .filter(Boolean)
+        .map((saving) => saving.catch(() => {}));
+    if (saves.length === 0) return;
+    let timer: NodeJS.Timeout;
+    await Promise.race([
+        Promise.all(saves),
+        new Promise((resolve) => {
+            timer = setTimeout(resolve, timeout);
+        })
+    ]);
+    clearTimeout(timer);
+}
+
+/**
+ * Unlocked vaults holding edits that haven't been saved: the save failed,
+ * timed out or is still running. Locking or quitting would lose them (#1230).
+ */
+export function getUnsavedSourceIDs(): Array<VaultSourceID> {
+    // Also keeps a quit during startup from creating the vault manager
+    if (__unsavedEdits.size === 0) return [];
+    const vaultManager = getVaultManager();
+    return [...__unsavedEdits.keys()].filter(
+        (sourceID) => vaultManager.getSourceForID(sourceID)?.status === VaultSourceStatus.Unlocked
+    );
+}
+
+function markEditSaved(sourceID: VaultSourceID, edit: number) {
+    // A newer edit may have arrived during the save: that one isn't saved yet
+    if (__unsavedEdits.get(sourceID) === edit) {
+        __unsavedEdits.delete(sourceID);
+    }
 }
 
 export function sendSourcesToWindows() {

@@ -11,8 +11,10 @@ jest.unstable_mockModule("./config", () => ({
     getConfigValue: () => Promise.resolve(mockPreferences)
 }));
 jest.unstable_mockModule("./buttercup", () => ({
-    getUnlockedSourcesCount: () => mockUnlockedCount,
-    lockAllSources: mockLockAllSources
+    getUnlockedSourcesCount: () => mockUnlockedCount
+}));
+jest.unstable_mockModule("../actions/unsaved", () => ({
+    lockAllSourcesAfterSaving: mockLockAllSources
 }));
 jest.unstable_mockModule("../library/log", () => ({ logErr: jest.fn(), logInfo: jest.fn() }));
 

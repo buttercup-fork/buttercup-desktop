@@ -32,6 +32,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- Changes that couldn't be saved (the vault's file or server was unreachable, or a save was still running) are no longer thrown away silently. Quitting or locking a vault by hand now asks first: **Save and Quit/Lock** tries again and only goes ahead if that works, **Quit/Lock Anyway** discards the changes, **Cancel** keeps everything open. When a vault locks by itself (idle timer, screen lock, sleep), Buttercup tries one more save, then locks anyway and tells you if changes were lost (upstream [#1230](https://github.com/buttercup/buttercup-desktop/issues/1230)).
 - Adding a custom field with a name the entry already uses (for example a second `username`) no longer erases the other field's value on save. The clashing name is now marked in red and **Save** stays disabled until you rename or remove the field (upstream [#1159](https://github.com/buttercup/buttercup-desktop/issues/1159)).
 - Removing a vault whose settings were never changed no longer writes an error to the log (`Failed removing vault settings … ENOENT`). There was no settings file to delete; the vault was removed either way.
 - No more "Update failed: 404" message every 30 minutes when the release page can't be found (no releases published yet, or GitHub answering 404 as it does while the fork's account is suspended). The log notes it once per run instead. Real update failures still show the message.
