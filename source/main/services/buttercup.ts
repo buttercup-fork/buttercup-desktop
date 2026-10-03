@@ -90,6 +90,21 @@ export async function attachVaultManagerWatchers() {
     });
 }
 
+export async function changeSourceMasterPassword(
+    sourceID: VaultSourceID,
+    currentPassword: string,
+    newPassword: string
+): Promise<void> {
+    const vaultManager = getVaultManager();
+    const source = vaultManager.getSourceForID(sourceID);
+    logInfo(`changing master password: ${sourceID}`);
+    await source.changeMasterPassword(currentPassword, newPassword);
+    // The stored source credentials are encrypted with the master password: store them
+    // again now rather than waiting on the "updated" event, so a restart can't see the
+    // old ones next to a vault that uses the new password
+    await vaultManager.dehydrateSource(source);
+}
+
 export async function convertVaultFormatAToB(sourceID: VaultSourceID): Promise<void> {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
@@ -134,6 +149,24 @@ export async function exportVault(sourceID: VaultSourceID): Promise<string> {
     const source = vaultManager.getSourceForID(sourceID);
     const exported = await exportVaultToCSV(source.vault);
     return exported;
+}
+
+/**
+ * Encrypt the unlocked vault with the given password, for a backup copy, and check
+ * that the result opens again with that password
+ */
+export async function exportSourceEncrypted(
+    sourceID: VaultSourceID,
+    password: string
+): Promise<string> {
+    const source = getVaultManager().getSourceForID(sourceID);
+    const creds = Credentials.fromPassword(password);
+    const tds = new TextDatasource(Credentials.fromPassword(password));
+    const content = await tds.save(source.vault.format.getHistory(), creds);
+    const check = new TextDatasource(Credentials.fromPassword(password));
+    check.setContent(content);
+    await check.load(Credentials.fromPassword(password));
+    return content;
 }
 
 export function getAllOTPs(): Array<OTP> {

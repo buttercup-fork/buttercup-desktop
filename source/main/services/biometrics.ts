@@ -62,6 +62,22 @@ export async function getSourcePasswordViaBiometrics(sourceID: VaultSourceID): P
     }
 }
 
+/**
+ * Replace the stored password after a master password change, so biometric unlock
+ * keeps working. Does nothing when biometric unlock isn't set up for the source.
+ * No Touch ID prompt: the user has just typed the current password.
+ * @returns True if a stored password was replaced
+ */
+export async function replaceSourceBiometricPassword(
+    sourceID: VaultSourceID,
+    password: string
+): Promise<boolean> {
+    if (!(await sourceEnabledForBiometricUnlock(sourceID))) return false;
+    logInfo(`Replacing keychain source password (${sourceID}) for app: ${APP_ID}`);
+    await keytar.setPassword(APP_ID, sourceID, password);
+    return true;
+}
+
 export async function sourceEnabledForBiometricUnlock(sourceID: VaultSourceID): Promise<boolean> {
     try {
         const password = await keytar.getPassword(APP_ID, sourceID);
