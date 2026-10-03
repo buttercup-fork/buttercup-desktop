@@ -8,7 +8,7 @@ import { handleProtocolCall, matchProtocolURL } from "./services/protocol";
 import { ensureLinuxProtocolHandler } from "./services/linuxProtocol";
 import { getConfigValue } from "./services/config";
 import { shouldShowMainWindow, wasAutostarted } from "./services/arguments";
-import { logErr, logInfo } from "./library/log";
+import { logErr, logInfo, logWarn } from "./library/log";
 import { ignoreBrokenPipes } from "./library/stdio";
 import { ACCEPTED_PROTOCOLS } from "./symbols";
 import { AppStartMode } from "./types";
@@ -28,6 +28,17 @@ if (
 ) {
     logErr("Refusing to start: remote debugging is not allowed in release builds");
     process.exit(1);
+}
+
+// The AppImage's launcher adds --no-sandbox by itself when the system blocks the
+// user namespaces Chromium's sandbox needs (Ubuntu 24.04 and later restrict them
+// through AppArmor), so the app starts instead of crashing (#1355). Say so in the
+// log: the .deb ships an AppArmor profile and keeps the sandbox.
+if (process.platform === "linux" && app.commandLine.hasSwitch("no-sandbox")) {
+    logWarn(
+        "Running without the Chromium sandbox (--no-sandbox). The AppImage turns it off when " +
+            "the system blocks unprivileged user namespaces; the .deb package keeps it."
+    );
 }
 
 // Windows-only GPU-compositor workaround: on some Windows GPU driver / Chromium
