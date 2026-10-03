@@ -42,6 +42,7 @@ import { getThemeProp } from "./utils/theme";
 import { ErrorBoundary } from "../ErrorBoundary";
 import { PasswordGenerator } from "../standalone/PasswordGenerator";
 import { ScanOTPButton } from "./ScanOTPButton";
+import { getDuplicateFieldIDs } from "./utils/entries";
 
 interface AttachmentItem extends AttachmentDetails {
     sizeEncFriendly: string;
@@ -661,6 +662,7 @@ const FieldText = ({ entryFacade, field }) => {
 
 const FieldRow = ({
     field,
+    duplicate = false,
     editing,
     entryFacade,
     onFieldNameUpdate,
@@ -671,13 +673,16 @@ const FieldRow = ({
     const [passwordMgrVisible, setPasswordMgrVisible] = useState(false);
     const label =
         editing && field.removeable ? (
-            <EditableText
-                placeholder={t("vault-ui.entry.click-to-edit")}
-                value={field.property}
-                onChange={value => {
-                    onFieldNameUpdate(field, value);
-                }}
-            />
+            <span title={duplicate ? t("vault-ui.entry.duplicate-field-name") : undefined}>
+                <EditableText
+                    intent={duplicate ? Intent.DANGER : Intent.NONE}
+                    placeholder={t("vault-ui.entry.click-to-edit")}
+                    value={field.property}
+                    onChange={value => {
+                        onFieldNameUpdate(field, value);
+                    }}
+                />
+            </span>
         ) : (
             field.title || field.property
         );
@@ -874,6 +879,7 @@ const EntryDetailsContent = () => {
     const mainFields = useMemo(() => editableFields.filter(field => !field.removeable), [editableFields]);
     const removeableFields = useMemo(() => editableFields.filter(field => field.removeable), [editableFields]);
     const hasUntitledFields = useMemo(() => removeableFields.some(field => !field.property), [removeableFields]);
+    const duplicateFieldIDs = useMemo(() => getDuplicateFieldIDs(editing ? entry?.fields : []), [editing, entry]);
 
     return (
         <>
@@ -908,6 +914,7 @@ const EntryDetailsContent = () => {
                         {removeableFields.map(field => (
                             <FieldRow
                                 key={field.id}
+                                duplicate={duplicateFieldIDs.has(field.id)}
                                 entryFacade={entry}
                                 field={field}
                                 onFieldNameUpdate={onFieldNameUpdate}
@@ -965,7 +972,7 @@ const EntryDetailsContent = () => {
                         <Fragment>
                             <div>
                                 <Button
-                                    disabled={readOnly || hasUntitledFields}
+                                    disabled={readOnly || hasUntitledFields || duplicateFieldIDs.size > 0}
                                     icon="tick"
                                     intent={Intent.PRIMARY}
                                     onClick={onSaveEdit}
@@ -974,6 +981,8 @@ const EntryDetailsContent = () => {
                                             ? t("vault-ui.entry.save-disabled-title.readonly")
                                             : hasUntitledFields
                                             ? t("vault-ui.entry.save-disabled-title.untitled")
+                                            : duplicateFieldIDs.size > 0
+                                            ? t("vault-ui.entry.save-disabled-title.duplicate")
                                             : undefined
                                     }
                                 >

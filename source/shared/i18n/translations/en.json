@@ -504,6 +504,7 @@
             "cancel-edit": "Cancel",
             "click-to-edit": "Click to edit",
             "custom-fields": "Custom Fields",
+            "duplicate-field-name": "Another field already has this name: rename it to save",
             "edit": "Edit",
             "edit-document": "Edit Document",
             "field-controls": {
@@ -518,6 +519,7 @@
             },
             "save": "Save",
             "save-disabled-title": {
+                "duplicate": "Two fields have the same name: rename or remove one",
                 "readonly": "Editing not possible right now",
                 "untitled": "Some fields are missing titles"
             },

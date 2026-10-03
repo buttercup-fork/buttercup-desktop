@@ -32,6 +32,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- Adding a custom field with a name the entry already uses (for example a second `username`) no longer erases the other field's value on save. The clashing name is now marked in red and **Save** stays disabled until you rename or remove the field (upstream [#1159](https://github.com/buttercup/buttercup-desktop/issues/1159)).
 - Removing a vault whose settings were never changed no longer writes an error to the log (`Failed removing vault settings … ENOENT`). There was no settings file to delete; the vault was removed either way.
 - No more "Update failed: 404" message every 30 minutes when the release page can't be found (no releases published yet, or GitHub answering 404 as it does while the fork's account is suspended). The log notes it once per run instead. Real update failures still show the message.
 - WebDAV and Dropbox: on Windows, a new vault created in a subfolder ended up as one file named `folder\name.bcup` at the server root, because paths were joined with backslashes. New WebDAV file and folder names with accents are now saved in the composed Unicode form (NFC) that most servers expect (upstream buttercup-mobile [#90](https://github.com/buttercup/buttercup-mobile/issues/90)). Both come from the CodeKunde `file-interface` fork, which the app now uses.
