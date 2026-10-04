@@ -238,6 +238,7 @@
         }
     },
     "error": {
+        "vault-already-added": "This vault is already in Buttercup as \"{{name}}\". Open that one instead.",
         "attachment-add": "Failed adding attachments",
         "attachment-delete": "Failed deleting attachment",
         "attachment-download": "Failed downloading attachment",

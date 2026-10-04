@@ -1,8 +1,9 @@
 import path from "path";
 import { BrowserWindow, dialog } from "electron";
 import { Credentials, VaultSourceID } from "buttercup";
-import { addVault } from "../services/buttercup";
+import { addVault, findSourceByLocationKey } from "../services/buttercup";
 import { logInfo } from "../library/log";
+import { getVaultLocationKey } from "../library/vaultLocation";
 import { t } from "../../shared/i18n/trans";
 import { AddVaultPayload, SourceType } from "../types";
 
@@ -31,6 +32,19 @@ export async function addVaultFromPayload(payload: AddVaultPayload): Promise<Vau
         default:
             throw new Error(`Unsupported vault type: ${payload.datasourceConfig.type}`);
     }
+    // The same vault added twice showed up in two tabs, and creating a "new"
+    // vault over one already in the list replaced its file (#1172)
+    const locationKey = getVaultLocationKey(payload.datasourceConfig);
+    const existing = locationKey ? findSourceByLocationKey(locationKey) : null;
+    if (existing) {
+        logInfo(`Not adding vault "${name}": already added as ${existing.id}`);
+        throw new Error(
+            t("error.vault-already-added", {
+                name: existing.name,
+                interpolation: { escapeValue: false }
+            })
+        );
+    }
     logInfo(
         `Adding vault "${name}" (${payload.datasourceConfig.type}) (new = ${
             payload.createNew ? "yes" : "no"
@@ -41,7 +55,8 @@ export async function addVaultFromPayload(payload: AddVaultPayload): Promise<Vau
         credentials,
         Credentials.fromPassword(payload.masterPassword),
         payload.datasourceConfig.type,
-        payload.createNew
+        payload.createNew,
+        locationKey
     );
     logInfo(`Added vault "${name}" (${sourceID})`);
     return sourceID;

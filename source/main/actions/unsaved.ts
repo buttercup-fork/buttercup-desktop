@@ -87,7 +87,10 @@ export async function confirmUnsavedChanges(
         type: "warning",
         title: t("dialog.unsaved-changes.title"),
         message: t(`dialog.unsaved-changes.message-${action}`),
-        detail: t("dialog.unsaved-changes.detail", { names }),
+        detail: t("dialog.unsaved-changes.detail", {
+            names,
+            interpolation: { escapeValue: false }
+        }),
         buttons: [
             t(`dialog.unsaved-changes.save-${action}`),
             t(`dialog.unsaved-changes.${action}-anyway`),
@@ -151,7 +154,10 @@ export async function lockAllSourcesAfterSaving(): Promise<void> {
     showMessageBox({
         type: "error",
         title: t("dialog.unsaved-changes.title"),
-        message: t("dialog.unsaved-changes.lost-on-auto-lock", { names }),
+        message: t("dialog.unsaved-changes.lost-on-auto-lock", {
+            names,
+            interpolation: { escapeValue: false }
+        }),
         detail: failed
             .map(({ sourceID, error }) => `${getSourceNames([sourceID])}: ${error.message}`)
             .join("\n"),
