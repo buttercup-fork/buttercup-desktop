@@ -31,6 +31,7 @@ import { logErr, logInfo } from "../library/log";
 import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
 import { isDamagedVaultError } from "../library/vaultErrors";
+import { offerOfflineCopyRestore } from "./damagedVault";
 import { t } from "../../shared/i18n/trans";
 import { OTP, SourceType, VaultSourceDescription } from "../types";
 
@@ -491,11 +492,11 @@ export async function unlockSource(sourceID: VaultSourceID, password: string) {
     try {
         await source.unlock(Credentials.fromPassword(password));
     } catch (err) {
-        if (isDamagedVaultError(err)) {
-            logErr(`Vault file of '${sourceID}' is damaged`, err);
+        if (!isDamagedVaultError(err)) throw err;
+        logErr(`Vault file of '${sourceID}' is damaged`, err);
+        if (!(await offerOfflineCopyRestore(source, password))) {
             throw new Error(t("error.vault-damaged"));
         }
-        throw err;
     }
     // Arm auto-lock now rather than waiting for the next user-activity ping.
     void startAutoVaultLockTimer();

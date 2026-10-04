@@ -121,6 +121,14 @@
             "timeout": "Saving took too long",
             "title": "Unsaved Changes"
         },
+        "restore-offline-copy": {
+            "cancel": "Cancel",
+            "detail-file": "Buttercup has a copy of this vault from the last time it was opened or saved on this computer. Restoring writes that copy over the damaged file, which is kept in the vault's backup folder first. Changes saved on other devices after that time will be missing.",
+            "detail-remote": "Buttercup has a copy of this vault from the last time it was opened or saved on this computer. Restoring writes that copy over the damaged file. Changes saved on other devices after that time will be missing.",
+            "message": "The file of \"{{name}}\" is incomplete or damaged. Restore the last saved copy?",
+            "restore": "Restore Last Saved Copy",
+            "title": "Damaged Vault File"
+        },
         "attachment-save": {
             "confirm-button": "Save",
             "title": "Download Attachment"
@@ -248,6 +256,7 @@
         "biometric-unlock-failed": "Failed unlocking vault using biometrics",
         "fatal-boundary": "A fatal error has occurred - we're sorry this has happened. Please check out the details below in case they help diagnose the issue:",
         "vault-damaged": "The vault file is incomplete or damaged, so it can't be opened. It was probably cut off while being saved. Restore it from a backup: your own copy, your sync service's file history, or Buttercup's local backups if they are on (Vault Settings → Backup).",
+        "vault-restore-failed": "The vault file is damaged, and restoring the last saved copy failed: {{message}}",
         "vault-settings-fetch-failed": "Failed fetching vault settings"
     },
     "file-host": {

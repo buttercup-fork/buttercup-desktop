@@ -28,7 +28,10 @@ function getBackupRoot(sourceID: VaultSourceID, localBackupLocation: unknown): s
         : path.join(VAULTS_BACKUP_PATH, sourceID);
 }
 
-function getBackupFilename(sourceID: VaultSourceID, type: "password-change" | "save"): string {
+function getBackupFilename(
+    sourceID: VaultSourceID,
+    type: "damaged" | "password-change" | "save"
+): string {
     const date = new Date();
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -73,5 +76,25 @@ export async function writePasswordChangeBackup(
     });
     logInfo(`Backing up source before password change: ${sourceID} => ${backupPath}`);
     await fs.writeFile(backupPath, content);
+    return backupPath;
+}
+
+/**
+ * Keep a copy of a damaged vault file before it is replaced by the last saved
+ * copy (#1233). Written whether or not local backups are on.
+ * @returns The path of the backup file
+ */
+export async function writeDamagedVaultBackup(
+    sourceID: VaultSourceID,
+    vaultPath: string
+): Promise<string> {
+    const vaultSettings = await getVaultSettings(sourceID);
+    const backupRoot = getBackupRoot(sourceID, vaultSettings.localBackupLocation);
+    const backupPath = path.join(backupRoot, getBackupFilename(sourceID, "damaged"));
+    await fs.mkdir(backupRoot, {
+        recursive: true
+    });
+    logInfo(`Backing up damaged vault file: ${sourceID} => ${backupPath}`);
+    await fs.copyFile(vaultPath, backupPath);
     return backupPath;
 }
