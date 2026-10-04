@@ -13,11 +13,12 @@ jest.unstable_mockModule("../../shared/i18n/trans", () => ({ t: (key: string) =>
 jest.unstable_mockModule("../library/log", () => ({ logInfo: jest.fn(), logWarn: jest.fn() }));
 
 let chooseVaultFileForUpload: typeof import("./vaultFile").chooseVaultFileForUpload;
+let isVaultFile: typeof import("./vaultFile").isVaultFile;
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bcup-upload-"));
 
 beforeAll(async () => {
-    ({ chooseVaultFileForUpload } = await import("./vaultFile"));
+    ({ chooseVaultFileForUpload, isVaultFile } = await import("./vaultFile"));
 });
 
 afterAll(() => {
@@ -46,4 +47,23 @@ test("refuses a file that isn't a vault", async () => {
 test("returns null when the dialog is cancelled", async () => {
     mockChosenPaths = [];
     expect(await chooseVaultFileForUpload()).toBeNull();
+});
+
+describe("isVaultFile", () => {
+    const write = (name: string, contents: string) => {
+        const file = path.join(dir, name);
+        fs.writeFileSync(file, contents);
+        return file;
+    };
+
+    test("recognises a vault file, whatever its extension", async () => {
+        expect(await isVaultFile(write("vault", "b~>buttercup/bABCDEF"))).toBe(true);
+        expect(await isVaultFile(write("vault.txt", "b~>buttercup/bABCDEF"))).toBe(true);
+    });
+
+    test("refuses other files, empty ones and ones shorter than the signature", async () => {
+        expect(await isVaultFile(write("notes.bcup", "just some text"))).toBe(false);
+        expect(await isVaultFile(write("empty.bcup", ""))).toBe(false);
+        expect(await isVaultFile(write("short.bcup", "b~>butter"))).toBe(false);
+    });
 });
