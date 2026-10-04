@@ -70,6 +70,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - Release notes in the update dialog have readable line spacing and scroll when long (upstream [#1016](https://github.com/buttercup/buttercup-desktop/issues/1016)).
 - Untranslated English text can now be translated (upstream [#1275](https://github.com/buttercup/buttercup-desktop/issues/1275)): the password generator, the field history dialog, attachment details, "Not set.", "Empty" and "No username" in the entries list, the format upgrade confirmation, the link tooltip and the OTP error. An OTP that can't be read now shows "ERROR" instead of the raw error text.
 - Closing the window to the notification area right after moving or resizing it no longer shows "Object has been destroyed", and the window opens again where you left it (upstream [#688](https://github.com/buttercup/buttercup-desktop/issues/688)). Its new position was saved 750 ms after the last move, by then the window was gone; closing now saves it right away.
+- Clicking a new entry right after saving it keeps the keyboard in the entries list: copying the username or password with Ctrl/Cmd+B and Ctrl/Cmd+C and moving with the arrow keys work straight away. Before, if the click came before the save had finished, the list lost the focus when the save finished and the shortcuts did nothing until you clicked again.
 
 ### Security
 
