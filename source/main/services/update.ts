@@ -1,5 +1,5 @@
 import path from "path";
-import { app } from "electron";
+import { app, dialog } from "electron";
 import { UpdateInfo, autoUpdater } from "electron-updater";
 import isDev from "electron-is-dev";
 import debounce from "debounce-promise";
@@ -10,8 +10,14 @@ import { logErr, logInfo, logWarn } from "../library/log";
 import { fileExists } from "../library/file";
 import { isUpdateFeedUnavailable } from "../library/updateErrors";
 import { getConfigValue } from "./config";
+import { openExternalSafely } from "./navigation";
+import { t } from "../../shared/i18n/trans";
 import { UpdateProgressInfo } from "../types";
 
+// Where to get the installer by hand when the update can't install itself
+const RELEASES_URL = "https://github.com/codekunde/buttercup-desktop/releases/latest";
+// How long after "install" a failure to start the installer can still arrive
+const INSTALL_WATCH_TIME = ms("10s");
 const UPDATE_AUTO_CHECK = ms("30m");
 
 export const checkForUpdate = debounce(checkForUpdateInternal, 2500);
@@ -136,7 +142,59 @@ async function hasDevUpdate(): Promise<boolean> {
 }
 
 export function installUpdate() {
+    // quitAndInstall() starts the installer and quits right away. When the
+    // installer can't be started (#690: blocked by Windows or a virus scanner,
+    // file gone, no permission), the error arrives just before the quit and the
+    // app would close without updating. Stay open and offer the download page.
+    let installError: Error | null = null;
+    const onError = (err: Error) => {
+        installError = err;
+    };
+    const onBeforeQuit = (event: Electron.Event) => {
+        if (!installError) return;
+        event.preventDefault();
+        stopWatching();
+        showInstallFailed(installError).catch((err) =>
+            logErr("Updates: Failed showing the install error", err)
+        );
+    };
+    const stopWatching = () => {
+        autoUpdater.off("error", onError);
+        app.off("before-quit", onBeforeQuit);
+    };
+    autoUpdater.on("error", onError);
+    app.on("before-quit", onBeforeQuit);
     autoUpdater.quitAndInstall();
+    if (!(autoUpdater as unknown as { quitAndInstallCalled: boolean }).quitAndInstallCalled) {
+        // Nothing to install (already reported through the "error" event), no quit coming
+        stopWatching();
+        return;
+    }
+    setTimeout(stopWatching, INSTALL_WATCH_TIME);
+}
+
+async function showInstallFailed(err: Error): Promise<void> {
+    logErr("Updates: Couldn't start the installer", err);
+    const win = getMainWindow();
+    const options: Electron.MessageBoxOptions = {
+        type: "error",
+        title: t("update.install-failed.title"),
+        message: t("update.install-failed.message"),
+        detail: err.message,
+        buttons: [
+            t("update.install-failed.download-button"),
+            t("update.install-failed.close-button")
+        ],
+        defaultId: 0,
+        cancelId: 1,
+        noLink: true
+    };
+    const { response } = win
+        ? await dialog.showMessageBox(win, options)
+        : await dialog.showMessageBox(options);
+    if (response === 0) {
+        openExternalSafely(RELEASES_URL);
+    }
 }
 
 export function muteUpdate() {
