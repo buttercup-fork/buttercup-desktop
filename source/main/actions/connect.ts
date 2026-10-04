@@ -2,7 +2,8 @@ import path from "path";
 import { BrowserWindow, dialog } from "electron";
 import { Credentials, VaultSourceID } from "buttercup";
 import { addVault, findSourceByLocationKey } from "../services/buttercup";
-import { logInfo } from "../library/log";
+import { logInfo, logWarn } from "../library/log";
+import { isVaultFile } from "../services/vaultFile";
 import { getVaultLocationKey } from "../library/vaultLocation";
 import { t } from "../../shared/i18n/trans";
 import { AddVaultPayload, SourceType } from "../types";
@@ -66,11 +67,28 @@ export async function showExistingFileVaultDialog(win: BrowserWindow): Promise<s
     const result = await dialog.showOpenDialog(win, {
         title: t("dialog.file-vault.add-existing.title"),
         buttonLabel: t("dialog.file-vault.add-existing.confirm-button"),
-        filters: [{ name: t("dialog.file-vault.add-existing.bcup-filter"), extensions: ["bcup"] }],
+        // Vault files may have another extension, or none (#1371)
+        filters: [
+            { name: t("dialog.file-vault.add-existing.bcup-filter"), extensions: ["bcup"] },
+            { name: t("dialog.file-vault.add-existing.all-files-filter"), extensions: ["*"] }
+        ],
         properties: ["openFile"]
     });
     const [vaultPath] = result.filePaths;
-    return vaultPath || null;
+    if (!vaultPath) return null;
+    if (!(await isVaultFile(vaultPath))) {
+        logWarn(`Not adding ${vaultPath}: not a Buttercup vault`);
+        await dialog.showMessageBox(win, {
+            type: "warning",
+            title: t("dialog.file-vault.add-existing.title"),
+            message: t("dialog.file-vault.add-existing.not-a-vault", {
+                name: path.basename(vaultPath),
+                interpolation: { escapeValue: false }
+            })
+        });
+        return null;
+    }
+    return vaultPath;
 }
 
 export async function showNewFileVaultDialog(win: BrowserWindow): Promise<string> {

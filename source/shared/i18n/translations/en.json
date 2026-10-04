@@ -173,8 +173,10 @@
         },
         "file-vault": {
             "add-existing": {
+                "all-files-filter": "All Files",
                 "bcup-filter": "Buttercup Vaults",
                 "confirm-button": "Add",
+                "not-a-vault": "\"{{name}}\" isn't a Buttercup vault file, so it can't be added.",
                 "title": "Add Existing Vault"
             },
             "add-new": {
@@ -239,6 +241,7 @@
             "title": "Vault Unlock"
         },
         "vault-upload-chooser": {
+            "all-files-filter": "All files",
             "filter-name": "Buttercup vault",
             "not-a-vault": "That file isn't a Buttercup vault.",
             "submit-button": "Upload",
