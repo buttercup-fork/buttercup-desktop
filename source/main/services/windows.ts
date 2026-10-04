@@ -52,14 +52,19 @@ async function createVaultWindow() {
         win.maximize();
     }
     enableWebContents(win.webContents);
+    // Moves and resizes are saved 750 ms after the last one. Closing the window
+    // saves a pending one right away: once it's destroyed, reading its bounds
+    // throws "Object has been destroyed" (#688)
+    const saveBounds = debounce(() => handleWindowBoundsUpdate(win), 750, false);
+    win.on("close", () => {
+        saveBounds.flush();
+    });
     win.on("closed", () => {
+        saveBounds.clear();
         win.removeAllListeners();
         handleWindowClosed();
     });
-    win.on(
-        "resize",
-        debounce(() => handleWindowBoundsUpdate(win), 750, false)
-    );
+    win.on("resize", saveBounds);
 
     win.on("maximize", async () => {
         await setConfigValue("isMaximised", win.isMaximized());
@@ -69,10 +74,7 @@ async function createVaultWindow() {
         await setConfigValue("isMaximised", win.isMaximized());
     });
 
-    win.on(
-        "move",
-        debounce(() => handleWindowBoundsUpdate(win), 750, false)
-    );
+    win.on("move", saveBounds);
     const loadedPromise = new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(
             () => reject(new Error("Timed-out waiting for window to load")),
@@ -93,6 +95,7 @@ export function getMainWindow(): BrowserWindow {
 }
 
 async function handleWindowBoundsUpdate(win: BrowserWindow) {
+    if (win.isDestroyed()) return;
     const { x, y, width, height } = win.getBounds();
     await setConfigValue("windowWidth", width);
     await setConfigValue("windowHeight", height);
