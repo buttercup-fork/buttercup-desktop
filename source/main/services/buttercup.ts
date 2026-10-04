@@ -29,6 +29,8 @@ import { setAutoLockSuspended, startAutoVaultLockTimer } from "./autoLock";
 import { logErr, logInfo } from "../library/log";
 import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
+import { isDamagedVaultError } from "../library/vaultErrors";
+import { t } from "../../shared/i18n/trans";
 import { OTP, SourceType, VaultSourceDescription } from "../types";
 
 // Latest edit per vault that isn't saved yet. Core's `format.dirty` can't tell
@@ -449,7 +451,15 @@ export async function toggleAutoUpdate(autoUpdateEnabled: boolean = true) {
 export async function unlockSource(sourceID: VaultSourceID, password: string) {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
-    await source.unlock(Credentials.fromPassword(password));
+    try {
+        await source.unlock(Credentials.fromPassword(password));
+    } catch (err) {
+        if (isDamagedVaultError(err)) {
+            logErr(`Vault file of '${sourceID}' is damaged`, err);
+            throw new Error(t("error.vault-damaged"));
+        }
+        throw err;
+    }
     // Arm auto-lock now rather than waiting for the next user-activity ping.
     void startAutoVaultLockTimer();
 }
