@@ -1,4 +1,12 @@
-import React, { MouseEvent, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+    FocusEvent,
+    MouseEvent,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from "react";
 import PropTypes from "prop-types";
 import { HotKeys } from "react-hotkeys";
 import { NonIdealState } from "@blueprintjs/core";
@@ -79,6 +87,24 @@ export const EntriesList = ({ className }: EntriesListProps) => {
     // handler, where `ref.current` still points at the previously selected row -
     // which is what made Enter jump the selection back to that row).
     const pendingRowFocusRef = useRef(false);
+    // A new entry gets its ID when its first save finishes, and its row is then
+    // rendered again under the new key. If the old row had focus, the focus went
+    // to <body> with it and the shortcuts (copy, arrows) did nothing until the
+    // list was clicked again: give it to the selected row.
+    const focusedRowRef = useRef<HTMLElement | null>(null);
+    // Not an onFocus on <HotKeys>: it replaces the one that turns the shortcuts on
+    const handleListFocus = (event: FocusEvent<HTMLElement>) => {
+        focusedRowRef.current = event.target;
+    };
+    useEffect(() => {
+        const focusedRow = focusedRowRef.current;
+        // The selected row may only arrive in a later render: wait for it
+        if (!focusedRow || focusedRow.isConnected || !ref.current?.isConnected) return;
+        focusedRowRef.current = null;
+        if (document.activeElement === document.body) {
+            ref.current.focus();
+        }
+    });
     useEffect(() => {
         if (!pendingRowFocusRef.current) return;
         pendingRowFocusRef.current = false;
@@ -179,7 +205,7 @@ export const EntriesList = ({ className }: EntriesListProps) => {
                 onTermChange={(term) => onEntriesFilterTermChange(term)}
                 onSortModeChange={(sortMode) => onEntriesFilterSortModeChange(sortMode)}
             />
-            <PaneContent>
+            <PaneContent onFocus={handleListFocus}>
                 {entries.length > 0 && (
                     <HotKeys keyMap={keyMap} handlers={handlers} tabIndex={1}>
                         {entries.map((entry, entryIndex) => (
