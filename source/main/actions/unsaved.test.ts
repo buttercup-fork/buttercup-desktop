@@ -28,8 +28,10 @@ jest.unstable_mockModule("../library/log", () => ({
     logWarn: jest.fn()
 }));
 jest.unstable_mockModule("../../shared/i18n/trans", () => ({
-    t: (key: string, vars?: Record<string, string>) =>
-        vars ? `${key} ${JSON.stringify(vars)}` : key
+    t: (key: string, options?: Record<string, unknown>) => {
+        const { interpolation, ...vars } = options ?? {};
+        return Object.keys(vars).length > 0 ? `${key} ${JSON.stringify(vars)}` : key;
+    }
 }));
 
 let unsaved: typeof import("./unsaved");

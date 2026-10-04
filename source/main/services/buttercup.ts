@@ -21,6 +21,7 @@ import {
 } from "buttercup";
 import { exportVaultToCSV } from "@buttercup/exporter";
 import { describeSource } from "../library/sources";
+import { getVaultLocationKey } from "../library/vaultLocation";
 import { clearFacadeCache } from "./facades";
 import { notifyWindowsOfSourceUpdate } from "./windows";
 import { getVaultCacheStorage, getVaultStorage } from "./storage";
@@ -64,11 +65,14 @@ export async function addVault(
     sourceCredentials: Credentials,
     passCredentials: Credentials,
     type: SourceType,
-    createNew: boolean = false
+    createNew: boolean = false,
+    locationKey: string | null = null
 ): Promise<VaultSourceID> {
     const credsSecure = await sourceCredentials.toSecureString();
     const vaultManager = getVaultManager();
-    const source = new VaultSource(name, type, credsSecure);
+    const source = new VaultSource(name, type, credsSecure, {
+        meta: locationKey ? { locationKey } : {}
+    });
     await vaultManager.interruptAutoUpdate(async () => {
         await vaultManager.addSource(source);
         await source.unlock(passCredentials, { initialiseRemote: createNew });
@@ -91,9 +95,42 @@ export async function attachVaultManagerWatchers() {
                 __watchedVaultSources.push(source.id);
             }
             attachSourceEncryptedListeners(source);
+            storeLocationKey(source).catch((err) =>
+                logErr(`Failed storing the location key of source: ${source.id}`, err)
+            );
         });
         await updateSearchCaches(vaultManager.unlockedSources);
     });
+}
+
+/**
+ * The vault already added from the same location, if any (#1172)
+ */
+export function findSourceByLocationKey(locationKey: string): VaultSourceDescription | null {
+    const source = getVaultManager().sources.find((item) => item.meta.locationKey === locationKey);
+    return source ? describeSource(source) : null;
+}
+
+/**
+ * Vaults added before location keys existed get theirs once unlocked, when
+ * their datasource (and so their location) is available (#1172)
+ */
+async function storeLocationKey(source: VaultSource) {
+    if (source.meta.locationKey) return;
+    // The datasource holds the location: file and WebDAV path, the WebDAV
+    // settings, the Google Drive file ID
+    const datasource = source._datasource as any;
+    if (!datasource) return;
+    const locationKey = getVaultLocationKey({
+        type: source.type,
+        path: datasource.path,
+        fileID: datasource.fileID,
+        endpoint: datasource._config?.endpoint,
+        username: datasource._config?.username
+    });
+    if (!locationKey) return;
+    source._meta = { ...source._meta, locationKey };
+    await getVaultManager().dehydrateSource(source);
 }
 
 export async function changeSourceMasterPassword(
