@@ -203,6 +203,8 @@ const FormContainer = styled.div<{ primary?: boolean; }>`
     border-radius: 5px;
     padding: 1rem;
     margin-bottom: 1rem;
+    // Field rows lay themselves out by this width (see FieldRowContainer)
+    container-type: inline-size;
 `;
 const CustomFieldsHeading = styled.h5`
     color: ${p => getThemeProp(p, "entry.separatorTextColor")};
@@ -225,18 +227,36 @@ const CustomFieldsHeading = styled.h5`
         padding: 0 0.5rem;
     }
 `;
-const FieldRowContainer = styled.div`
-    display: flex;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem 0;
-`;
 const FieldRowLabel = styled.div`
     display: flex;
     justify-content: flex-end;
     align-items: center;
     color: ${p => getThemeProp(p, "entry.separatorTextColor")};
     width: 100px;
+    flex-shrink: 0;
     margin-right: 1rem;
+    text-align: right;
+    overflow-wrap: anywhere;
+`;
+const FieldRowContainer = styled.div`
+    display: flex;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0;
+
+    // In a narrow pane the label goes above the value: beside it, the value
+    // was left a few letters wide and split letter by letter (#1329)
+    @container (max-width: 320px) {
+        flex-direction: column;
+        align-items: stretch;
+        margin-bottom: 0.25rem;
+
+        ${FieldRowLabel} {
+            justify-content: flex-start;
+            width: auto;
+            margin: 0 0 0.25rem;
+            text-align: left;
+        }
+    }
 `;
 const FieldRowChildren = styled.div`
     display: flex;
@@ -244,6 +264,7 @@ const FieldRowChildren = styled.div`
     align-items: center;
     width: 100%;
     flex: 1;
+    min-width: 0;
 
     ${`.${Classes.CONTROL_GROUP}`} {
         flex: 1;
@@ -251,6 +272,7 @@ const FieldRowChildren = styled.div`
 `;
 
 const FieldTextToolbar = styled(ButtonGroup)`
+    flex-shrink: 0;
     margin-left: 0.5rem;
     transition: opacity 0.15s;
 `;
@@ -265,8 +287,17 @@ const FieldTextWrapper = styled.div<{ disabled?: boolean; }>`
     justify-content: space-between;
     align-items: center;
     padding: 2px;
-    word-break: break-all;
+    min-width: 0;
     pointer-events: ${p => (p.disabled ? "none" : "all")};
+
+    // The value takes the space the buttons leave and wraps between words,
+    // breaking a word only when it doesn't fit on a line by itself. It used to
+    // break anywhere, so values were split letter by letter (#1329)
+    > :first-child {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
 
     ${FieldTextToolbar} {
         opacity: ${p => (p.disabled ? 0 : 0.45)};
@@ -292,7 +323,7 @@ const HistoryScrollContainer = styled.div`
     overflow-y: scroll;
 `;
 const NoWrapText = styled.span`
-    word-break: keep-all;
+    white-space: nowrap;
 `;
 
 const Attachments = ({
@@ -396,7 +427,7 @@ const Attachments = ({
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <strong>ID</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.id")}</strong>
                                         </td>
                                         <td>
                                             <code>{previewingAttachment.id}</code>
@@ -404,7 +435,7 @@ const Attachments = ({
                                     </tr>
                                     <tr>
                                         <td>
-                                            <strong>Filename</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.filename")}</strong>
                                         </td>
                                         <td>
                                             <code>{previewingAttachment.name}</code>
@@ -412,25 +443,25 @@ const Attachments = ({
                                     </tr>
                                     <tr>
                                         <td>
-                                            <strong>Type</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.type")}</strong>
                                         </td>
                                         <td>{previewingAttachment.type}</td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <strong>Size</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.size")}</strong>
                                         </td>
                                         <td>{previewingAttachment.sizeOrigFriendly}</td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <strong>Stored</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.stored")}</strong>
                                         </td>
                                         <td>{previewingAttachment.sizeEncFriendly}</td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <strong>Date added</strong>
+                                            <strong>{t("vault-ui.entry.attachment-info.added")}</strong>
                                         </td>
                                         <td>{previewingAttachment.created}</td>
                                     </tr>
@@ -532,7 +563,7 @@ const FieldText = ({ entryFacade, field }) => {
             {field.valueType === EntryPropertyValueType.OTP && (
                 <OTPDigits otpURI={field.value} otpRef={value => (otpRef.current = value)} />
             ) || (!field.value && (
-                <Text className={Classes.TEXT_MUTED}>Not set.</Text>
+                <Text className={Classes.TEXT_MUTED}>{t("vault-ui.entry.not-set")}</Text>
             )) || (field.valueType === EntryPropertyValueType.Note && (
                 <ValueWithNewLines>{field.value}</ValueWithNewLines>
             )) || (field.formatting && field.formatting.options && (
@@ -583,12 +614,17 @@ const FieldText = ({ entryFacade, field }) => {
                     small
                     disabled={historyItems.length <= 0}
                     onClick={() => setHistoryDialogVisible(true)}
+                    title={
+                        historyItems.length > 0
+                            ? t("vault-ui.entry.field-history.button-title")
+                            : t("vault-ui.entry.field-history.no-previous")
+                    }
                 />
             </FieldTextToolbar>
             <Dialog
                 icon="history"
                 onClose={() => setHistoryDialogVisible(false)}
-                title="Entry field history"
+                title={t("vault-ui.entry.field-history.title")}
                 isOpen={historyDialogVisible}
             >
                 <div className={Classes.DIALOG_BODY}>
@@ -598,8 +634,8 @@ const FieldText = ({ entryFacade, field }) => {
                         >
                             <thead>
                                 <tr>
-                                    <th>Previous Value</th>
-                                    <th>Created</th>
+                                    <th>{t("vault-ui.entry.field-history.previous-value")}</th>
+                                    <th>{t("vault-ui.entry.field-history.set")}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -610,7 +646,7 @@ const FieldText = ({ entryFacade, field }) => {
                                             <code>{change.value}</code>
                                         </td>
                                         <td>
-                                            {change.ts && (
+                                            {change.ts ? (
                                                 <Fragment>
                                                     {new Date(change.ts).toLocaleTimeString()}{" "}
                                                     {new Date(change.ts).toLocaleDateString(undefined, {
@@ -619,6 +655,11 @@ const FieldText = ({ entryFacade, field }) => {
                                                         day: "numeric"
                                                     })}
                                                 </Fragment>
+                                            ) : (
+                                                // Format A vaults don't record when a value was set (#1145)
+                                                <Text className={Classes.TEXT_MUTED}>
+                                                    {t("vault-ui.entry.field-history.not-recorded")}
+                                                </Text>
                                             )}
                                         </td>
                                         <td>
@@ -655,7 +696,7 @@ const FieldText = ({ entryFacade, field }) => {
                             intent={Intent.PRIMARY}
                             onClick={() => setHistoryDialogVisible(false)}
                         >
-                            Close
+                            {t("vault-ui.entry.field-history.close")}
                         </Button>
                     </div>
                 </div>
@@ -835,7 +876,7 @@ const FieldRow = ({
                                     (e.ctrlKey || e.metaKey) && window.open(url, "_blank");
                                 }}
                                 target="_blank"
-                                title="open with Ctrl/Cmd + click"
+                                title={t("vault-ui.entry.open-url-title")}
                             >
                                 <FieldText field={field} entryFacade={entryFacade} />
                             </a>

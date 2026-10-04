@@ -304,6 +304,20 @@
         "vault-saved": "Vault saved",
         "vault-settings-saved": "Saved vault settings"
     },
+    "password-generator": {
+        "characters": "Characters",
+        "copy": "Copy",
+        "digits": "Digits",
+        "generate": "Generate",
+        "lowercase": "Lowercase Letters",
+        "options": "Options",
+        "space": "Space",
+        "symbols": "Symbols",
+        "underscore-dash": "Underscore & Dash",
+        "uppercase": "Uppercase Letters",
+        "use": "Use This",
+        "words": "Words"
+    },
     "preferences": {
         "button": {
             "cancel": "Cancel",
@@ -445,6 +459,8 @@
         "format": {
             "a-description": "Format A is the original Buttercup vault format that uses deltas to store vault structure.",
             "b-description": "Format B is the new Buttercup vault format that uses a JSON structure to manage vault structure and history.",
+            "confirm-body": "Changing format cannot be reversed: Ensure that you have a backup in place before performing this action.",
+            "confirm-title": "Confirm Format Upgrade",
             "a-upgrade-b": "You should upgrade to Format B, which is currently <strong>stable</strong>. It is recommended that you backup your vault before doing this.",
             "description": "Manage current vault format and updates.",
             "format-type": "Format {{format}}",
@@ -520,7 +536,9 @@
             "create-one-cta": "Why not create one?",
             "documents": "Documents",
             "filter-placeholder": "Filter...",
+            "empty": "Empty",
             "filters-no-matches": "No matches",
+            "no-username": "No username",
             "no-entries": "No Documents",
             "sort": {
                 "alphabetical-asc": "Alphabetical (ascending)",
@@ -539,6 +557,26 @@
             "duplicate-field-name": "Another field already has this name: rename it to save",
             "edit": "Edit",
             "edit-document": "Edit Document",
+            "attachment-info": {
+                "added": "Date added",
+                "filename": "Filename",
+                "id": "ID",
+                "size": "Size",
+                "stored": "Stored",
+                "type": "Type"
+            },
+            "field-history": {
+                "button-title": "Previous values",
+                "close": "Close",
+                "no-previous": "No previous values",
+                "not-recorded": "Not recorded",
+                "previous-value": "Previous Value",
+                "set": "Set",
+                "title": "Entry field history"
+            },
+            "not-set": "Not set.",
+            "open-url-title": "Open with Ctrl/Cmd + click",
+            "otp-error": "ERROR",
             "field-controls": {
                 "password": {
                     "hide": "Hide",

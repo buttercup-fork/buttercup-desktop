@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Intent, Spinner, Text } from "@blueprintjs/core";
 import * as OTPAuth from "otpauth";
+import { t } from "../../shared/i18n/trans";
 
 const Container = styled.div`
     display: flex;
@@ -67,7 +68,7 @@ export class OTPDigits extends Component<{
         const rightDigits = this.state.digits.substring(this.state.digits.length / 2);
         return (
             <Container>
-                {this.state.error || typeof this.state.period !== "number" || isNaN(this.state.timeLeft) && (
+                {(this.state.error || typeof this.state.period !== "number" || isNaN(this.state.timeLeft)) && (
                     <Fragment>
                         <TimeLeftSpinner
                             intent={Intent.DANGER}
@@ -75,7 +76,7 @@ export class OTPDigits extends Component<{
                             value={1}
                         />
                         <DigitsContainer>
-                            <Digits>ERROR</Digits>
+                            <Digits>{t("vault-ui.entry.otp-error")}</Digits>
                         </DigitsContainer>
                     </Fragment>
                 ) || (
