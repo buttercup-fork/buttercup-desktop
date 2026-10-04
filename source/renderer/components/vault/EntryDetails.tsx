@@ -104,6 +104,10 @@ const ActionBar = styled.div`
         margin-right: 10px;
     }
 `;
+
+const SaveDisabledReason = styled.span`
+    font-size: 12px;
+`;
 const AttachmentDropInstruction = styled.div`
     padding: 20px;
     width: 100%;
@@ -671,11 +675,24 @@ const FieldRow = ({
     onRemoveField
 }) => {
     const [passwordMgrVisible, setPasswordMgrVisible] = useState(false);
+    // A field added without a name opens its name for typing (#1394). Captured
+    // once: the name stops being empty with the first key typed
+    const [editNameOnMount] = useState(() => editing && field.removeable && !field.property);
     const label =
         editing && field.removeable ? (
-            <span title={duplicate ? t("vault-ui.entry.duplicate-field-name") : undefined}>
+            <span
+                title={
+                    duplicate
+                        ? t("vault-ui.entry.duplicate-field-name")
+                        : !field.property
+                        ? t("vault-ui.entry.save-disabled-title.untitled")
+                        : undefined
+                }
+            >
                 <EditableText
-                    intent={duplicate ? Intent.DANGER : Intent.NONE}
+                    intent={duplicate ? Intent.DANGER : !field.property ? Intent.WARNING : Intent.NONE}
+                    disabled={false}
+                    isEditing={editNameOnMount || undefined}
                     placeholder={t("vault-ui.entry.click-to-edit")}
                     value={field.property}
                     onChange={value => {
@@ -880,6 +897,12 @@ const EntryDetailsContent = () => {
     const removeableFields = useMemo(() => editableFields.filter(field => field.removeable), [editableFields]);
     const hasUntitledFields = useMemo(() => removeableFields.some(field => !field.property), [removeableFields]);
     const duplicateFieldIDs = useMemo(() => getDuplicateFieldIDs(editing ? entry?.fields : []), [editing, entry]);
+    // Shown next to the buttons too: a disabled button's tooltip often doesn't show (#1394)
+    const saveDisabledReason = hasUntitledFields
+        ? t("vault-ui.entry.save-disabled-title.untitled")
+        : duplicateFieldIDs.size > 0
+        ? t("vault-ui.entry.save-disabled-title.duplicate")
+        : null;
 
     return (
         <>
@@ -979,16 +1002,15 @@ const EntryDetailsContent = () => {
                                     title={
                                         readOnly
                                             ? t("vault-ui.entry.save-disabled-title.readonly")
-                                            : hasUntitledFields
-                                            ? t("vault-ui.entry.save-disabled-title.untitled")
-                                            : duplicateFieldIDs.size > 0
-                                            ? t("vault-ui.entry.save-disabled-title.duplicate")
-                                            : undefined
+                                            : saveDisabledReason || undefined
                                     }
                                 >
                                     {t("vault-ui.entry.save")}
                                 </Button>
                                 <Button onClick={onCancelEdit}>{t("vault-ui.entry.cancel-edit")}</Button>
+                                {saveDisabledReason && (
+                                    <SaveDisabledReason className={Classes.TEXT_MUTED}>{saveDisabledReason}</SaveDisabledReason>
+                                )}
                             </div>
                             {entry && !entry.isNew && (
                                 <ConfirmButton

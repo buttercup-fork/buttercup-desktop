@@ -553,7 +553,7 @@
             "save-disabled-title": {
                 "duplicate": "Two fields have the same name: rename or remove one",
                 "readonly": "Editing not possible right now",
-                "untitled": "Some fields are missing titles"
+                "untitled": "Give every custom field a name to save"
             },
             "trash-move": {
                 "message": "Are you sure you want to move this entry to Trash?",

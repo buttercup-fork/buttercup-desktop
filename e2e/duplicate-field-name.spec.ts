@@ -39,12 +39,15 @@ test.describe("duplicate field names", () => {
         await passwordPrompt.press("Enter");
         // New login entry with a username
         await window.getByRole("button", { name: "New Entry" }).click();
+        // A new entry focuses its title shortly after opening: wait for it, so
+        // it doesn't take the focus from the custom field added below
+        await expect(window.getByPlaceholder("Title")).toBeFocused();
         await window.getByPlaceholder("Title").fill("Bank");
         await window.getByPlaceholder("Username").fill("alice");
         const save = window.getByRole("button", { name: "Save" });
         // A custom field named like the built-in username field
+        // A new field opens with its name ready for typing
         await window.getByRole("button", { name: "Add Custom Field" }).click();
-        await window.getByText("Click to edit").click();
         await window.keyboard.type("username");
         await window.keyboard.press("Enter");
         // Custom fields come after the built-in ones
