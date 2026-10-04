@@ -6,6 +6,7 @@ import { Button, Intent } from "@blueprintjs/core";
 import { COLOURS } from "../../../shared/symbols";
 import { copyToClipboard } from "../../library/clipboard";
 import { selectElementContents } from "../../library/ui";
+import { t } from "../../../shared/i18n/trans";
 
 interface GeneratorUIProps {
     autoGenerate?: boolean;
@@ -210,7 +211,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                         checked={config.mode === "characters"}
                         onChange={() => changeType("characters")}
                     />{" "}
-                    Characters
+                    {t("password-generator.characters")}
                 </GeneratorLabel>
                 <GeneratorLabel>
                     <input
@@ -218,12 +219,12 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                         checked={config.mode === "words"}
                         onChange={() => changeType("words")}
                     />{" "}
-                    Words
+                    {t("password-generator.words")}
                 </GeneratorLabel>
             </GenerationTypes>
             {config.mode === "characters" && (
                 <GeneratorFieldset>
-                    <GeneratorLegend>Options</GeneratorLegend>
+                    <GeneratorLegend>{t("password-generator.options")}</GeneratorLegend>
                     <GeneratorRangeLabel>
                         <input
                             type="range"
@@ -240,7 +241,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("UPPERCASE")}
                             onChange={() => toggleCharacterSet("UPPERCASE")}
                         />{" "}
-                        Uppercase Letters
+                        {t("password-generator.uppercase")}
                     </GeneratorLabel>
                     <GeneratorLabel>
                         <input
@@ -248,7 +249,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("LOWERCASE")}
                             onChange={() => toggleCharacterSet("LOWERCASE")}
                         />{" "}
-                        Lowercase Letters
+                        {t("password-generator.lowercase")}
                     </GeneratorLabel>
                     <GeneratorLabel>
                         <input
@@ -256,7 +257,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("DIGITS")}
                             onChange={() => toggleCharacterSet("DIGITS")}
                         />{" "}
-                        Digits
+                        {t("password-generator.digits")}
                     </GeneratorLabel>
                     <GeneratorLabel>
                         <input
@@ -264,7 +265,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("SPACE")}
                             onChange={() => toggleCharacterSet("SPACE")}
                         />{" "}
-                        Space
+                        {t("password-generator.space")}
                     </GeneratorLabel>
                     <GeneratorLabel>
                         <input
@@ -272,7 +273,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("UNDERSCORE_DASH")}
                             onChange={() => toggleCharacterSet("UNDERSCORE_DASH")}
                         />{" "}
-                        Underscore &amp; Dash
+                        {t("password-generator.underscore-dash")}
                     </GeneratorLabel>
                     <GeneratorLabel>
                         <input
@@ -280,13 +281,13 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             checked={enabledCharacterSets.includes("SYMBOLS")}
                             onChange={() => toggleCharacterSet("SYMBOLS")}
                         />{" "}
-                        Symbols
+                        {t("password-generator.symbols")}
                     </GeneratorLabel>
                 </GeneratorFieldset>
             )}
             <GeneratorControls>
                 <Button onClick={() => generateNewPassword()} intent={Intent.PRIMARY} className="generate-button">
-                    Generate
+                    {t("password-generator.generate")}
                 </Button>
                 {copyMode && (
                     <Button
@@ -295,11 +296,11 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                             onGenerate(password);
                         }}
                     >
-                        Copy
+                        {t("password-generator.copy")}
                     </Button>
                 ) || (
                     <Button onClick={() => onGenerate(password)}>
-                        Use This
+                        {t("password-generator.use")}
                     </Button>
                 )}
             </GeneratorControls>

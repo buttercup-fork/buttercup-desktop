@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useEffect, useMemo, useRef, useState } from "react";
 import { useReducer } from "use-reducer-state";
 import { EntryFacade, EntryFacadeField, EntryID, EntryPropertyValueType, EntryType, GroupFacade, GroupID, VaultFacade, createEntryFacade, createGroupFacade } from "buttercup";
 import { EntryActionType, entryReducer, getInitialEntryState } from "./reducers/entry";
@@ -84,6 +84,10 @@ export interface VaultProviderProps {
 
 const NOOP = () => {};
 
+function getEntryTitle(entry: EntryFacade): string {
+    return entry.fields.find(field => field.propertyType === "property" && field.property === "title")?.value ?? "";
+}
+
 export const VaultContext = createContext<VaultContextState>({} as VaultContextState);
 
 export const VaultProvider = ({
@@ -139,6 +143,11 @@ export const VaultProvider = ({
         ]
     );
 
+    // A new entry only gets its ID once the main process has saved it and sent
+    // the vault back, so it can't be selected before that: remember the IDs
+    // known when it was saved and select the one that's new in its group then
+    const pendingNewEntryRef = useRef<{ knownIDs: Set<EntryID>; parentID: GroupID; title: string } | null>(null);
+
     const selectedEntry = vaultState.entries.find(entry => entry.id === selectedEntryID) ?? null;
     const currentEntries = vaultState.entries.filter(entry => entry.parentID === selectedGroupID);
 
@@ -164,6 +173,19 @@ export const VaultProvider = ({
                 payload: vaultSource
             });
             setLastVaultFacadeTag(vaultFacadeTag);
+            const pending = pendingNewEntryRef.current;
+            if (pending) {
+                const added = vaultSource.entries.filter(
+                    entry => entry.id && entry.parentID === pending.parentID && !pending.knownIDs.has(entry.id)
+                );
+                // Another new entry may arrive at the same time (eg. synced): prefer the same title
+                const created =
+                    added.find(entry => getEntryTitle(entry) === pending.title) ?? (added.length === 1 ? added[0] : null);
+                if (created) {
+                    pendingNewEntryRef.current = null;
+                    setSelectedEntryID(created.id);
+                }
+            }
         } else if (vaultState._tag === null) {
             // Internal updated, fire update event for external save
             onUpdate(vaultState);
@@ -281,6 +303,7 @@ export const VaultProvider = ({
             }
             facade.parentID = selectedGroupID;
             facade.isNew = true;
+            pendingNewEntryRef.current = null;
             dispatchEditing({
                 type: EntryActionType.SetEntry,
                 payload: facade
@@ -300,6 +323,7 @@ export const VaultProvider = ({
             if (!selectedEntry) {
                 return;
             }
+            pendingNewEntryRef.current = null;
             dispatchEditing({
                 type: EntryActionType.SetEntry,
                 payload: naiveClone(selectedEntry)
@@ -321,6 +345,13 @@ export const VaultProvider = ({
             onEditing(false);
             if (editingEntryState.entry.id) {
                 setSelectedEntryID(editingEntryState.entry.id);
+            } else {
+                // New entry: selected once it has an ID (see pendingNewEntryRef)
+                pendingNewEntryRef.current = {
+                    knownIDs: new Set(vaultState.entries.map(entry => entry.id).filter(Boolean)),
+                    parentID: editingEntryState.entry.parentID as GroupID,
+                    title: getEntryTitle(editingEntryState.entry)
+                };
             }
         },
         onCancelEdit: () => {
@@ -336,6 +367,9 @@ export const VaultProvider = ({
             if (editingEntryState.entry) {
                 return;
             }
+            // The just-saved entry has no ID yet: it is selected once it has one
+            if (!entryID && pendingNewEntryRef.current) return;
+            pendingNewEntryRef.current = null;
             setSelectedEntryID(entryID);
         },
         onAddField: () => {

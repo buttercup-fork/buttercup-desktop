@@ -433,9 +433,9 @@ export function VaultSettingsDialog() {
                     setPromptFormatB(false);
                 }}
                 open={promptFormatB}
-                title="Confirm Format Upgrade"
+                title={t("vault-settings.format.confirm-title")}
             >
-                <p>Changing format cannot be reversed: Ensure that you have a backup in place before performing this action.</p>
+                <p>{t("vault-settings.format.confirm-body")}</p>
             </ConfirmDialog>
             <ConfirmDialog
                 confirmIntent={Intent.DANGER}

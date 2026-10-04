@@ -11,6 +11,28 @@ const ReleaseHeading = styled.h2`
     margin-top: 0px;
 `;
 
+// Release notes are HTML from the release; Blueprint's tight default line
+// height made them hard to read (#1016)
+const ReleaseNotes = styled.div`
+    line-height: 1.5;
+    max-height: 50vh;
+    overflow-y: auto;
+
+    p,
+    ul,
+    ol {
+        margin: 0 0 10px;
+    }
+
+    li {
+        margin-bottom: 4px;
+    }
+
+    > :last-child {
+        margin-bottom: 0;
+    }
+`;
+
 export function UpdateDialog() {
     const showDialogState = useHookState(SHOW_UPDATE_DIALOG);
     const currentUpdateState = useHookState(CURRENT_UPDATE);
@@ -46,7 +68,7 @@ export function UpdateDialog() {
                 )}
                 {currentUpdate && (
                     <Card>
-                        <div dangerouslySetInnerHTML={{ __html: currentUpdate.releaseNotes as string }} ref={updateContentRef} />
+                        <ReleaseNotes dangerouslySetInnerHTML={{ __html: currentUpdate.releaseNotes as string }} ref={updateContentRef} />
                     </Card>
                 )}
             </div>

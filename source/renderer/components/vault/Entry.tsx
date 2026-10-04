@@ -29,18 +29,18 @@ function getEntryDomain(entry: EntryFacade): string | null {
 }
 
 function title(entry: EntryFacade): string | JSX.Element {
-    return getFacadeField(entry, "title") || <i>(Untitled)</i>;
+    return getFacadeField(entry, "title") || <i>{t("vault-ui.entry.untitled")}</i>;
 }
 
 function username(entry: EntryFacade): string | JSX.Element {
     if (entry.type === EntryType.Note) {
         const note = getFacadeField(entry, "note");
-        return (note && note.slice(0, 60)) || <i>Empty</i>;
+        return (note && note.slice(0, 60)) || <i>{t("vault-ui.entries-list.empty")}</i>;
     } else if (entry.type === EntryType.SSHKey) {
         const key = getFacadeField(entry, "publicKey");
-        return (key && key.slice(0, 60)) || <i>Empty</i>;
+        return (key && key.slice(0, 60)) || <i>{t("vault-ui.entries-list.empty")}</i>;
     }
-    return getFacadeField(entry, "username") || <i>No username</i>;
+    return getFacadeField(entry, "username") || <i>{t("vault-ui.entries-list.no-username")}</i>;
 }
 
 const EntryWrapper = styled.div<{
