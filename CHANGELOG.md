@@ -69,6 +69,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - Field history: the time column is now "Set" (when that value was set, it said "Created"), and shows "Not recorded" for Format A vaults, which don't store it, instead of staying empty (upstream [#1145](https://github.com/buttercup/buttercup-desktop/issues/1145)). The history button says "No previous values" when it's disabled.
 - Release notes in the update dialog have readable line spacing and scroll when long (upstream [#1016](https://github.com/buttercup/buttercup-desktop/issues/1016)).
 - Untranslated English text can now be translated (upstream [#1275](https://github.com/buttercup/buttercup-desktop/issues/1275)): the password generator, the field history dialog, attachment details, "Not set.", "Empty" and "No username" in the entries list, the format upgrade confirmation, the link tooltip and the OTP error. An OTP that can't be read now shows "ERROR" instead of the raw error text.
+- Closing the window to the notification area right after moving or resizing it no longer shows "Object has been destroyed", and the window opens again where you left it (upstream [#688](https://github.com/buttercup/buttercup-desktop/issues/688)). Its new position was saved 750 ms after the last move, by then the window was gone; closing now saves it right away.
 
 ### Security
 
