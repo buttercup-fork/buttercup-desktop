@@ -6,9 +6,9 @@ import {
     getSourceDescriptions,
     getSourceStatus,
     getUnlockedSourceIDs,
-    getVaultFacadeBySource,
-    lockSource
+    getVaultFacadeBySource
 } from "../../buttercup";
+import { lockSourceAfterSaving } from "../../../actions/unsaved";
 import { VaultUnlockParamSchema } from "../models";
 import { openMainWindow } from "../../windows";
 import { respondJSON, respondText } from "../response";
@@ -66,7 +66,8 @@ export async function promptVaultLock(req: Request, res: Response) {
         res.status(202).send("Accepted");
         return;
     }
-    await lockSource(sourceID);
+    // Save unsaved changes first, as an automatic lock does (#1317)
+    await lockSourceAfterSaving(sourceID);
     res.status(200);
     await respondText(res, "OK");
 }

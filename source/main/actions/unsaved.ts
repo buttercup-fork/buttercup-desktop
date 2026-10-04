@@ -143,10 +143,29 @@ export async function lockAllSourcesAfterConfirming(): Promise<void> {
  * changes were lost, say so for when the user comes back.
  */
 export async function lockAllSourcesAfterSaving(): Promise<void> {
-    const unsaved = getUnsavedSourceIDs();
+    await lockAfterSaving(null);
+}
+
+/**
+ * Lock one vault for the browser extension (#1317): the user is in the
+ * browser and the app may be hidden, so like an automatic lock, save first
+ * and then lock, saying so if changes were lost.
+ */
+export async function lockSourceAfterSaving(sourceID: VaultSourceID): Promise<void> {
+    await lockAfterSaving([sourceID]);
+}
+
+async function lockAfterSaving(sourceIDs: Array<VaultSourceID> | null): Promise<void> {
+    const unsaved = getUnsavedSourceIDs().filter(
+        (sourceID) => !sourceIDs || sourceIDs.includes(sourceID)
+    );
     const failed =
         unsaved.length > 0 ? await trySaving(unsaved, SAVE_BEFORE_AUTO_LOCK_TIMEOUT) : [];
-    await lockAllSources();
+    if (sourceIDs) {
+        await Promise.all(sourceIDs.map((sourceID) => lockSource(sourceID)));
+    } else {
+        await lockAllSources();
+    }
     if (failed.length === 0) return;
     const names = getSourceNames(failed.map(({ sourceID }) => sourceID));
     logErr(`Locked with unsaved changes, which are lost: ${names}`);
