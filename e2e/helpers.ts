@@ -9,6 +9,8 @@ export interface LaunchedApp {
     app: ElectronApplication;
     /** The first application window (the vault window). */
     window: Page;
+    /** The throwaway folder holding Buttercup's config, vault list, backups and logs. */
+    homeDir: string;
     /** Call in test teardown. Closes the app and removes its temp data. */
     close: () => Promise<void>;
 }
@@ -59,6 +61,7 @@ export async function launchApp(): Promise<LaunchedApp> {
     return {
         app,
         window,
+        homeDir: sandboxDir,
         close: async () => {
             await app.close();
             rmSync(sandboxDir, { recursive: true, force: true });
