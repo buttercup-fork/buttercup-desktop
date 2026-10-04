@@ -181,3 +181,29 @@ describe("lockAllSourcesAfterSaving", () => {
         }
     });
 });
+
+describe("lockSourceAfterSaving", () => {
+    test("saves only that vault's changes, then locks only that vault", async () => {
+        mockUnsaved = ["a", "b"];
+        const order: Array<string> = [];
+        mockSaveSource.mockImplementation(async (sourceID) => void order.push(`save ${sourceID}`));
+        mockLockSource.mockImplementationOnce(
+            async (sourceID) => void order.push(`lock ${sourceID}`)
+        );
+        await unsaved.lockSourceAfterSaving("b");
+        expect(order).toEqual(["save b", "lock b"]);
+        expect(mockLockAllSources).not.toHaveBeenCalled();
+        expect(mockShowMessageBox).not.toHaveBeenCalled();
+    });
+
+    test("locks anyway when saving fails, and says the changes are lost", async () => {
+        mockUnsaved = ["a"];
+        mockShowMessageBox.mockResolvedValue({ response: 0 });
+        mockSaveSource.mockRejectedValue(new Error("offline"));
+        await unsaved.lockSourceAfterSaving("a");
+        expect(mockLockSource).toHaveBeenCalledWith("a");
+        expect(messages()).toEqual([
+            'dialog.unsaved-changes.lost-on-auto-lock {"names":"Personal"}'
+        ]);
+    });
+});
