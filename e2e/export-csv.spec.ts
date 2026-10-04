@@ -61,6 +61,18 @@ test.describe("CSV export", () => {
         await passwordPrompt.press("Enter");
         await expect(passwordPrompt).toBeHidden();
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
+        // The "Current Vault" menu is rebuilt in the background after a vault
+        // change, and its Import/Export act on the vault it was built for
+        await expect
+            .poll(() =>
+                launched.app.evaluate(
+                    ({ Menu }) =>
+                        Menu.getApplicationMenu().items.find(
+                            (item) => item.label === "Current Vault"
+                        )?.submenu?.items[0]?.label
+                )
+            )
+            .toBe(name);
     };
 
     test("starts with a UTF-8 BOM and imports again", async () => {
