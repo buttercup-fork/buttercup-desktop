@@ -9,6 +9,8 @@ import { logInfo } from "../library/log";
 
 const writeFile = pify(fs.writeFile);
 
+const UTF8_BOM = "\uFEFF";
+
 export async function exportVaultSource(sourceID: VaultSourceID): Promise<void> {
     const mainWindow = getMainWindow();
     const sourceDetails = getSourceDescription(sourceID);
@@ -26,7 +28,10 @@ export async function exportVaultSource(sourceID: VaultSourceID): Promise<void> 
     if (result.canceled) return null;
     const csvData = await exportVault(sourceID);
     logInfo(`Export source (${sourceID}) to CSV file: ${result.filePath}`);
-    await writeFile(result.filePath, csvData);
+    // A UTF-8 BOM first, or Excel reads the file in the local code page and
+    // shows accented characters wrong ("Accès" as "AccÃ¨s", #749). The importer
+    // skips it.
+    await writeFile(result.filePath, `${UTF8_BOM}${csvData}`);
     mainWindow.webContents.send(
         "notify-success",
         t("notification.export-success", { name: sourceDetails.name })
