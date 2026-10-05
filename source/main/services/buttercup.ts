@@ -92,18 +92,31 @@ export async function attachVaultManagerWatchers() {
         logErr(`Auto update failed for source: ${source.id}`, error);
     });
     vaultManager.on("sourcesUpdated", async () => {
-        sendSourcesToWindows();
+        // Each step on its own: one failing (eg. a window closing while the list
+        // is sent) must not skip the rest, like storing the location key (B-457).
+        // This handler's rejection would go unlogged.
+        try {
+            sendSourcesToWindows();
+        } catch (err) {
+            logErr("Failed sending the vault list to windows", err);
+        }
         vaultManager.unlockedSources.forEach((source) => {
-            if (!__watchedVaultSources.includes(source.id)) {
-                source.on("updated", () => onVaultSourceUpdated(source));
-                __watchedVaultSources.push(source.id);
+            try {
+                if (!__watchedVaultSources.includes(source.id)) {
+                    source.on("updated", () => onVaultSourceUpdated(source));
+                    __watchedVaultSources.push(source.id);
+                }
+                attachSourceEncryptedListeners(source);
+            } catch (err) {
+                logErr(`Failed watching source: ${source.id}`, err);
             }
-            attachSourceEncryptedListeners(source);
             storeLocationKey(source).catch((err) =>
                 logErr(`Failed storing the location key of source: ${source.id}`, err)
             );
         });
-        await updateSearchCaches(vaultManager.unlockedSources);
+        await updateSearchCaches(vaultManager.unlockedSources).catch((err) =>
+            logErr("Failed updating the search caches", err)
+        );
     });
 }
 
