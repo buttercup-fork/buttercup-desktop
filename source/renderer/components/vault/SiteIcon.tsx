@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { ipcRenderer } from "electron";
 import styled from "styled-components";
 import { DEFAULT_ENTRY_TYPE, EntryType } from "buttercup";
 import ICON_LOGIN from "../../../../resources/images/login.png";
@@ -6,11 +7,8 @@ import ICON_WEBSITE from "../../../../resources/images/website.png";
 import ICON_NOTE from "../../../../resources/images/note.png";
 import ICON_SSH from "../../../../resources/images/ssh.png";
 import ICON_CREDITCARD from "../../../../resources/images/credit-card.png";
-import { getFaviconURL } from "./utils/domain";
+import { isIconDomain } from "./utils/domain";
 
-const DYNAMIC_STATE_FAILED = 2;
-const DYNAMIC_STATE_LOADED = 1;
-const DYNAMIC_STATE_LOADING = 0;
 const ICON_TYPES = {
     [EntryType.Login]: ICON_LOGIN,
     [EntryType.Website]: ICON_WEBSITE,
@@ -18,7 +16,21 @@ const ICON_TYPES = {
     [EntryType.Note]: ICON_NOTE,
     [EntryType.CreditCard]: ICON_CREDITCARD
 };
-const NOOP = () => {};
+
+// One lookup per host for the whole window: the main process finds the icon
+// (the page's <link rel="icon">, else /favicon.ico) and caches it on disk (#1071)
+const __icons = new Map<string, Promise<string | null>>();
+
+function getSiteIcon(domain: string): Promise<string | null> {
+    const key = domain.toLowerCase();
+    if (!__icons.has(key)) {
+        __icons.set(
+            key,
+            ipcRenderer.invoke("get-site-icon", key).catch(() => null) as Promise<string | null>
+        );
+    }
+    return __icons.get(key);
+}
 
 const FallbackIcon = styled.img<{ dynamicLoading: boolean }>`
     opacity: ${(props) => (props.dynamicLoading ? "0.5" : "1.0")};
@@ -34,47 +46,30 @@ const IconContainer = styled.div`
 
 export function SiteIcon(props) {
     const { className, domain = null, type = DEFAULT_ENTRY_TYPE } = props;
-    const imgRef = useRef<HTMLImageElement | null>(null);
-    const [dynamicState, setDynamicState] = useState(DYNAMIC_STATE_LOADING);
-    const onImgError = useMemo(
-        () => () => {
-            if (!imgRef.current) return;
-            imgRef.current.removeEventListener("error", onImgError);
-            imgRef.current.removeEventListener("load", onImgLoad);
-            setDynamicState(DYNAMIC_STATE_FAILED);
-        },
-        [imgRef.current]
-    );
-    const onImgLoad = useMemo(
-        () => () => {
-            if (!imgRef.current) return;
-            imgRef.current.removeEventListener("error", onImgError);
-            imgRef.current.removeEventListener("load", onImgLoad);
-            setDynamicState(DYNAMIC_STATE_LOADED);
-        },
-        [imgRef.current]
+    // undefined: still looking, null: no icon (or icons are off)
+    const [icon, setIcon] = useState<string | null | undefined>(
+        isIconDomain(domain) ? undefined : null
     );
     useEffect(() => {
-        const faviconURL = getFaviconURL(domain);
-        if (!faviconURL) {
-            setDynamicState(DYNAMIC_STATE_FAILED);
-            return NOOP;
+        if (!isIconDomain(domain)) {
+            setIcon(null);
+            return;
         }
-        if (!imgRef.current) return NOOP;
-        imgRef.current.addEventListener("error", onImgError);
-        imgRef.current.addEventListener("load", onImgLoad);
-        imgRef.current.setAttribute("src", faviconURL);
-    }, [imgRef.current]);
+        let current = true;
+        setIcon(undefined);
+        getSiteIcon(domain).then((found) => {
+            if (current) setIcon(found);
+        });
+        return () => {
+            current = false;
+        };
+    }, [domain]);
     return (
         <IconContainer className={className}>
-            {(dynamicState === DYNAMIC_STATE_LOADED || dynamicState === DYNAMIC_STATE_LOADING) && (
-                <img ref={imgRef} loading="lazy" />
-            )}
-            {(dynamicState === DYNAMIC_STATE_FAILED || dynamicState === DYNAMIC_STATE_LOADING) && (
-                <FallbackIcon
-                    src={ICON_TYPES[type]}
-                    dynamicLoading={dynamicState === DYNAMIC_STATE_LOADING}
-                />
+            {icon ? (
+                <img src={icon} alt="" />
+            ) : (
+                <FallbackIcon src={ICON_TYPES[type]} dynamicLoading={icon === undefined} />
             )}
         </IconContainer>
     );

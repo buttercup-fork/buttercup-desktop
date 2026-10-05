@@ -60,6 +60,7 @@ import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
 import { chooseVaultFileForUpload } from "./services/vaultFile";
 import { changeVaultMasterPassword } from "./services/masterPassword";
 import { openExternalSafely } from "./services/navigation";
+import { getSiteIcon } from "./services/siteIcons";
 import {
     AppEnvironmentFlags,
     AddVaultPayload,
@@ -266,6 +267,9 @@ ipcMain.handle("get-new-vault-filename", async (evt) => {
 });
 
 ipcMain.handle("get-ready-update", getReadyUpdate);
+
+// An entry's site icon as a data URL, or null (#1071)
+ipcMain.handle("get-site-icon", (_, host: string) => getSiteIcon(host));
 
 ipcMain.handle("get-selected-source", async () => {
     const sourceID = await getConfigValue("selectedSource");

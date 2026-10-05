@@ -1,4 +1,4 @@
-import { extractDomain, getFaviconURL } from "./domain";
+import { extractDomain, isIconDomain } from "./domain";
 
 describe("extractDomain", () => {
     test("takes the host name from a URL", () => {
@@ -16,20 +16,17 @@ describe("extractDomain", () => {
     });
 });
 
-describe("getFaviconURL", () => {
-    test("fetches the favicon from the site itself", () => {
-        expect(getFaviconURL("www.example.com")).toBe("https://www.example.com/favicon.ico");
+describe("isIconDomain", () => {
+    test("accepts a plain host name", () => {
+        expect(isIconDomain("www.example.com")).toBe(true);
+        expect(isIconDomain("intranet")).toBe(true);
     });
 
-    test("never uses an icon service", () => {
-        expect(getFaviconURL("example.com")).not.toMatch(/buttercup\.pw/);
-    });
-
-    test("gives nothing for a missing or odd domain", () => {
-        expect(getFaviconURL(null)).toBeNull();
-        expect(getFaviconURL("")).toBeNull();
-        expect(getFaviconURL("javascript:alert(1)")).toBeNull();
-        expect(getFaviconURL("evil.test/../x")).toBeNull();
-        expect(getFaviconURL("a b.test")).toBeNull();
+    test("refuses a missing or odd domain", () => {
+        expect(isIconDomain(null)).toBe(false);
+        expect(isIconDomain("")).toBe(false);
+        expect(isIconDomain("javascript:alert(1)")).toBe(false);
+        expect(isIconDomain("evil.test/../x")).toBe(false);
+        expect(isIconDomain("a b.test")).toBe(false);
     });
 });

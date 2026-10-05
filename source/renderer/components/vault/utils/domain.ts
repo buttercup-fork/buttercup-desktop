@@ -12,10 +12,10 @@ export function extractDomain(str: string): string {
 }
 
 /**
- * The favicon URL for an entry's domain, fetched straight from the entry's own
- * site: no icon service, so no third party ever sees which sites a vault holds
- * logins for. Null for anything that isn't a plain host name.
+ * Whether a domain is a plain host name the main process can look up an icon
+ * for (#1071). The icon comes from the entry's own site, never an icon service,
+ * so no third party sees which sites a vault holds logins for.
  */
-export function getFaviconURL(domain: string | null): string | null {
-    return domain && HOSTNAME.test(domain) ? `https://${domain}/favicon.ico` : null;
+export function isIconDomain(domain: string | null): boolean {
+    return !!domain && HOSTNAME.test(domain);
 }
