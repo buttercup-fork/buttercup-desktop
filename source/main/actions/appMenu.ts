@@ -1,5 +1,5 @@
 import { app, Menu } from "electron";
-import { VaultSourceStatus } from "buttercup";
+import { VaultSourceID, VaultSourceStatus } from "buttercup";
 import { getSourceDescriptions } from "../services/buttercup";
 import { lockAllSourcesAfterConfirming, lockSourceAfterConfirming } from "./unsaved";
 import { closeWindows, getMainWindow, openMainWindow } from "../services/windows";
@@ -17,6 +17,22 @@ import { t } from "../../shared/i18n/trans";
 import { isOSX } from "../../shared/library/platform";
 import { getIconForProvider, getNativeImageMenuIcon } from "../library/icons";
 import { logErr } from "../library/log";
+import { VaultSourceDescription } from "../types";
+
+/**
+ * The vault the "Current Vault" items act on, read when one is clicked. The
+ * menu is rebuilt in the background after switching vaults, so the vault it
+ * was built for can be the previous one (B-454).
+ */
+function getCurrentSource(): VaultSourceDescription | null {
+    const sourceID = getLastSourceID();
+    return getSourceDescriptions().find((source) => source.id === sourceID) || null;
+}
+
+function getCurrentUnlockedSourceID(): VaultSourceID | null {
+    const source = getCurrentSource();
+    return source && source.state === VaultSourceStatus.Unlocked ? source.id : null;
+}
 
 async function getContextMenu(): Promise<Menu> {
     const sources = getSourceDescriptions();
@@ -114,10 +130,12 @@ async function getContextMenu(): Promise<Menu> {
                     type: "checkbox",
                     checked: biometricsEnabled,
                     click: async () => {
-                        if (biometricsEnabled) {
+                        const sourceID = getCurrentSource()?.id;
+                        if (!sourceID) return;
+                        if (await sourceEnabledForBiometricUnlock(sourceID)) {
                             const mainWindow = getMainWindow();
                             try {
-                                await disableSourceBiometricUnlock(lastSourceID);
+                                await disableSourceBiometricUnlock(sourceID);
                                 if (mainWindow) {
                                     mainWindow.webContents.send(
                                         "notify-success",
@@ -125,10 +143,7 @@ async function getContextMenu(): Promise<Menu> {
                                     );
                                 }
                             } catch (err) {
-                                logErr(
-                                    `Failed disabling biometrics for source: ${lastSourceID}`,
-                                    err
-                                );
+                                logErr(`Failed disabling biometrics for source: ${sourceID}`, err);
                                 if (mainWindow) {
                                     mainWindow.webContents.send(
                                         "notify-error",
@@ -139,7 +154,7 @@ async function getContextMenu(): Promise<Menu> {
                                 }
                             }
                         } else {
-                            const window = await openMainWindow(`/source/${lastSourceID}`);
+                            const window = await openMainWindow(`/source/${sourceID}`);
                             window.webContents.send("open-biometric-registration");
                         }
                     }
@@ -150,10 +165,9 @@ async function getContextMenu(): Promise<Menu> {
                     enabled: !!lastSource && lastSourceUnlocked,
                     accelerator: isOSX() ? "Cmd+L" : "Ctrl+L",
                     click: async () => {
-                        if (lastSource.state !== VaultSourceStatus.Unlocked) {
-                            return;
-                        }
-                        return lockSourceAfterConfirming(lastSource.id);
+                        const sourceID = getCurrentUnlockedSourceID();
+                        if (!sourceID) return;
+                        return lockSourceAfterConfirming(sourceID);
                     }
                 },
                 { type: "separator" },
@@ -164,16 +178,15 @@ async function getContextMenu(): Promise<Menu> {
                         label: `${importer} (${extension.toUpperCase()})`,
                         enabled: !!lastSource && lastSourceUnlocked,
                         click: () => {
-                            startImport(
-                                lastSourceID,
-                                importer,
-                                extension,
-                                importerConstructor
-                            ).catch(async (err) => {
-                                logErr("Import failed", err);
-                                const window = await openMainWindow();
-                                window.webContents.send("notify-error", err.message);
-                            });
+                            const sourceID = getCurrentUnlockedSourceID();
+                            if (!sourceID) return;
+                            startImport(sourceID, importer, extension, importerConstructor).catch(
+                                async (err) => {
+                                    logErr("Import failed", err);
+                                    const window = await openMainWindow();
+                                    window.webContents.send("notify-error", err.message);
+                                }
+                            );
                         }
                     }))
                 },
@@ -181,7 +194,9 @@ async function getContextMenu(): Promise<Menu> {
                     label: t("app-menu.export"),
                     enabled: !!lastSource && lastSourceUnlocked,
                     click: async () => {
-                        await exportVaultSource(lastSourceID);
+                        const sourceID = getCurrentUnlockedSourceID();
+                        if (!sourceID) return;
+                        await exportVaultSource(sourceID);
                     }
                 }
             ]
