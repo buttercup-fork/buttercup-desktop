@@ -1,6 +1,7 @@
 import { join } from "path";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
+import { parse } from "csv-parse/sync";
 import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
 
@@ -106,5 +107,41 @@ test.describe("CSV export", () => {
         await groups.nth(1).click();
         await window.getByText("Café crème", { exact: true }).click();
         await expect(window.getByText("élodie", { exact: true }).first()).toBeVisible();
+    });
+    test("exports a field named like an Object.prototype member", async () => {
+        const { window } = launched;
+        await createVault("fields");
+        const addEntry = async (title: string) => {
+            await window.getByRole("button", { name: "New Entry" }).click();
+            await expect(window.getByPlaceholder("Title")).toBeFocused();
+            await window.getByPlaceholder("Title").fill(title);
+        };
+        const save = async () => {
+            await window.getByRole("button", { name: "Save" }).click();
+            await expect(window.getByRole("button", { name: "Edit" })).toBeVisible();
+        };
+        // Only one entry has the field: the other rows used to read the
+        // inherited Object.prototype.toString and the whole export failed
+        await addEntry("Router");
+        await window.getByRole("button", { name: "Add Custom Field" }).click();
+        await window.keyboard.type("toString");
+        await window.keyboard.press("Enter");
+        await window.getByRole("textbox").last().fill("admin-pin");
+        await save();
+        await addEntry("Printer");
+        await save();
+
+        const exported = join(dir, "fields.csv");
+        await setPaths({ save: exported });
+        await clickMenu(["Current Vault", "Export"]);
+        await expect(window.getByText("Successfully exported vault: fields")).toBeVisible();
+        await expect.poll(() => existsSync(exported)).toBe(true);
+        const rows: Array<Record<string, string>> = parse(readFileSync(exported, "utf8"), {
+            bom: true,
+            columns: true
+        });
+        const cell = (title: string) => rows.find((row) => row.title === title).toString;
+        expect(cell("Router")).toBe("admin-pin");
+        expect(cell("Printer")).toBe("");
     });
 });
