@@ -32,6 +32,7 @@ import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
 import { isDamagedVaultError } from "../library/vaultErrors";
 import { offerOfflineCopyRestore } from "./damagedVault";
+import { lockVaultSource } from "./lockVault";
 import { t } from "../../shared/i18n/trans";
 import { OTP, SourceType, VaultSourceDescription } from "../types";
 
@@ -339,7 +340,7 @@ export async function lockAllSources() {
     if (vaultManager.unlockedSources.length === 0) return;
     await Promise.all(
         vaultManager.unlockedSources.map(async (source) => {
-            await source.lock();
+            await lockVaultSource(source);
             __unsavedEdits.delete(source.id);
         })
     );
@@ -349,7 +350,7 @@ export async function lockSource(sourceID: VaultSourceID) {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
     if (source.status === VaultSourceStatus.Unlocked) {
-        await source.lock();
+        await lockVaultSource(source);
         __unsavedEdits.delete(sourceID);
     }
 }
