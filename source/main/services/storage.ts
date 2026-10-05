@@ -40,6 +40,7 @@ export const LOG_PATH = path.join(__envPaths.log, LOG_FILENAME);
 export const VAULTS_BACKUP_PATH = path.join(__envPaths.data, "backup");
 const VAULTS_CACHE_PATH = path.join(__envPaths.temp, "vaults-offline.cache.json");
 const VAULTS_PATH = path.join(__envPaths.data, "vaults.json");
+const SITE_ICONS_PATH = path.join(__envPaths.cache, "site-icons");
 const VAULT_SETTINGS_PATH = path.join(__envPaths.config, "vault-config-SOURCEID.json");
 
 let __configStorage: FileStorage = null,
@@ -99,4 +100,9 @@ export function getVaultStorage(): FileStorage {
 
 export function getVaultStoragePath(): string {
     return VAULTS_PATH;
+}
+
+/** Folder for downloaded site icons (#1071) */
+export function getSiteIconCachePath(): string {
+    return SITE_ICONS_PATH;
 }
