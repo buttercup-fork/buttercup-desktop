@@ -78,6 +78,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 - The CSV export opens in Excel with accented characters intact: it now starts with a UTF-8 BOM, which tells Excel the file is UTF-8. Before, Excel read it in the local code page, so "Accès" showed as "AccÃ¨s" (upstream [#749](https://github.com/buttercup/buttercup-desktop/issues/749)). The importer skips the BOM, so these exports still import, and so do CSV files Excel saved as "CSV UTF-8". The duplicate `!group_id`/`!group_name` columns from that report were already gone with the exporter update behind the export round-trip fix above.
 - Exporting a vault to CSV failed for the whole vault when any entry had a field named like a built-in object property, such as `toString` or `constructor`. Entries without that field read the built-in function instead of an empty value. The export now comes from exporter `a98ef49`.
 - Importing a Buttercup CSV export dropped fields named `constructor` or `prototype`, so such a field was lost on export and re-import. They now import like any other field (only `__proto__` is still skipped). The import now comes from importer `5e576eb`.
+- A field's history (**Previous Value**) listed the field's current value as a previous one after a save that merged changes from another device (eg. a vault shared through a sync service). Merges now keep only the values that really came before. A field that was deleted and added again also keeps that deletion in its history in the newer vault format. Needs `buttercup-core` `f26e7ff`.
 
 ### Security
 
