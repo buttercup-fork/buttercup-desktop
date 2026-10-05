@@ -1,5 +1,5 @@
 import { join } from "path";
-import { mkdtempSync, rmSync } from "fs";
+import { mkdtempSync, readFileSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
@@ -59,5 +59,37 @@ test.describe("password generator", () => {
         await popover.getByRole("button", { name: "Use This" }).click();
         await expect(popover).toBeHidden();
         await expect(window.getByRole("textbox", { name: "Password" })).toHaveValue(chosen);
+    });
+
+    test("makes word passwords from the 8,192-word list", async () => {
+        const { window } = launched;
+        const words = new Set<string>(
+            JSON.parse(
+                readFileSync(
+                    join(process.cwd(), "node_modules/@buttercup/generator/resources/words.json"),
+                    "utf8"
+                )
+            )
+        );
+        expect(words.size).toBe(8192);
+        await window.locator("button:has([data-icon=key])").first().click();
+        const popover = window.locator(".Popover-body");
+        const shown = popover.locator("pre");
+        // The radio sits in a styled wrapper, not a <label>
+        await popover
+            .locator(":has(> input[type=radio])", { hasText: "Words" })
+            .locator("input[type=radio]")
+            .check();
+        // The default: 4 words joined by "-"
+        await expect(shown).toHaveText(/^[a-z]+(-[a-z]+){3}$/);
+        for (let i = 0; i < 5; i += 1) {
+            const previous = await shown.textContent();
+            await popover.getByRole("button", { name: "Generate" }).click();
+            await expect(shown).not.toHaveText(previous);
+            const password = await shown.textContent();
+            for (const word of password.split("-")) {
+                expect(words.has(word)).toBe(true);
+            }
+        }
     });
 });
