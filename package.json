@@ -294,7 +294,7 @@
     "@blueprintjs/icons": "^4.16.0",
     "@blueprintjs/popover2": "^1.14.11",
     "@blueprintjs/select": "^4.9.24",
-    "@buttercup/generator": "^2.0.0",
+    "@buttercup/generator": "git+http://192.168.168.6:3050/buttercup.codekunde/buttercup-generator.git#master",
     "@buttercup/react-formatted-input": "^1.4.0",
     "@electron/fuses": "^1.8.0",
     "@fontsource/inter": "^4.5.15",
