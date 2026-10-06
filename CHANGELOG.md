@@ -22,7 +22,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
-- Word passwords from the password generator are stronger: words now come from an 8,192-word list instead of a 1,700-word one, so the default 4 words give about 52 bits instead of 43. The generator is now at `f7284ba`.
+- Word passwords from the password generator are stronger: words now come from an 8,192-word list instead of a 1,700-word one, so the default 4 words give about 52 bits instead of 43. The generator is now at `f594e3a`.
 - Refreshed the file vault icon shown in the **Add Vault** menu and on file vault tabs.
 - The README's Google Drive notice said sign-in doesn't complete, which stopped being true with the new sign-in. It now describes the real limit: while the fork's Google sign-in app is in Testing mode, only test users can sign in, and they sign in again every 7 days.
 - New installs clear the clipboard 30 seconds after a copy (was: never). Existing installs keep the setting they have. The setting now explains that clipboard history tools (Win+V, Flycut, Maccy, Klipper…) keep their own copy that Buttercup can't clear, and the README's Precautions say how to avoid that (upstream [#1158](https://github.com/buttercup/buttercup-desktop/issues/1158)).
