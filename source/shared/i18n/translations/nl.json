@@ -447,6 +447,10 @@
             "attachments": "Bijlagen",
             "cancel-edit": "Annuleren",
             "click-to-edit": "Klik om te bewerken",
+            "note": {
+                "show-less": "Minder tonen",
+                "show-more": "Meer tonen"
+            },
             "custom-fields": "Aangepaste velden",
             "edit": "Bewerken",
             "edit-document": "Bewerk document",

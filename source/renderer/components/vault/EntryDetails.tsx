@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import cx from "classnames";
 import TextArea from "react-textarea-autosize";
@@ -196,6 +196,17 @@ const AttachmentsContainer = styled.div`
 `;
 const ValueWithNewLines = styled.span`
     white-space: pre-wrap;
+`;
+// Notes longer than this many lines show collapsed, with "Show more" (B-458)
+const NOTE_COLLAPSED_LINES = 10;
+const NoteContainer = styled.div`
+    flex: 1;
+    min-width: 0;
+`;
+const NoteText = styled(ValueWithNewLines)<{ $collapsed: boolean; }>`
+    display: block;
+    overflow-wrap: anywhere;
+    ${p => (p.$collapsed ? `max-height: ${NOTE_COLLAPSED_LINES}lh; overflow: hidden;` : "")}
 `;
 const FormContainer = styled.div<{ primary?: boolean; }>`
     background-color: ${p =>
@@ -544,6 +555,44 @@ function copiedFieldMessage(field): string {
     return label ? t("notification.copied-field", { field: label }) : t("notification.copied");
 }
 
+const NoteValue = ({ value }: { value: string }) => {
+    const textRef = useRef<HTMLSpanElement>(null);
+    const [expanded, setExpanded] = useState(false);
+    const [overflowing, setOverflowing] = useState(false);
+    // Another entry (or a saved edit) starts collapsed again
+    useEffect(() => setExpanded(false), [value]);
+    // Only offer "Show more" when the collapsed note actually hides something
+    useLayoutEffect(() => {
+        const el = textRef.current;
+        if (!el || expanded) return;
+        const measure = () => setOverflowing(el.scrollHeight > el.clientHeight + 1);
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [value, expanded]);
+    return (
+        <NoteContainer>
+            <NoteText ref={textRef} $collapsed={!expanded} data-testid="note-value">
+                {value}
+            </NoteText>
+            {(overflowing || expanded) && (
+                <Button
+                    minimal
+                    small
+                    icon={expanded ? "chevron-up" : "chevron-down"}
+                    text={
+                        expanded
+                            ? t("vault-ui.entry.note.show-less")
+                            : t("vault-ui.entry.note.show-more")
+                    }
+                    onClick={() => setExpanded(!expanded)}
+                />
+            )}
+        </NoteContainer>
+    );
+};
+
 const FieldText = ({ entryFacade, field }) => {
     const { onUserCopy } = useContext(VaultContext);
     const [visible, toggleVisibility] = useState(false);
@@ -565,7 +614,7 @@ const FieldText = ({ entryFacade, field }) => {
             ) || (!field.value && (
                 <Text className={Classes.TEXT_MUTED}>{t("vault-ui.entry.not-set")}</Text>
             )) || (field.valueType === EntryPropertyValueType.Note && (
-                <ValueWithNewLines>{field.value}</ValueWithNewLines>
+                <NoteValue value={field.value} />
             )) || (field.formatting && field.formatting.options && (
                 <Fragment>
                     {typeof field.formatting.options === "object"
@@ -783,6 +832,7 @@ const FieldRow = ({
                         {field.valueType === EntryPropertyValueType.Note && (
                             <TextArea
                                 className={cx(Classes.INPUT, Classes.FILL)}
+                                maxRows={NOTE_COLLAPSED_LINES}
                                 value={field.value}
                                 onChange={val => onFieldUpdate(field, val.target.value)}
                             />
