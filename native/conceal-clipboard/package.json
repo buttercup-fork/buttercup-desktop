@@ -1,0 +1,12 @@
+{
+  "name": "@codekunde/conceal-clipboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Copy text to the clipboard marked as confidential (kept out of clipboard history). Windows only for now.",
+  "main": "index.js",
+  "license": "MIT",
+  "gypfile": true,
+  "scripts": {
+    "install": "node-gyp rebuild"
+  }
+}
