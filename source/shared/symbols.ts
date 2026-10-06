@@ -24,7 +24,7 @@ export const COLOURS = {
     LEVEL_0: "#E71D36"
 };
 
-export const APP_ID = "pw.buttercup.desktop";
+export const APP_ID = "net.codekunde.buttercup";
 export const ATTACHMENTS_MAX_SIZE = 20 * 1024 * 1024;
 export const DEFAULT_LANGUAGE = "en";
 export const DROPBOX_CLIENT_ID = "5fstmwjaisrt06t";
