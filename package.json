@@ -69,7 +69,7 @@
       }
     ],
     "afterPack": "./resources/scripts/afterPack.js",
-    "appId": "pw.buttercup.desktop",
+    "appId": "net.codekunde.buttercup",
     "asar": true,
     "productName": "Buttercup",
     "copyright": "Copyright © Vault Garden",
