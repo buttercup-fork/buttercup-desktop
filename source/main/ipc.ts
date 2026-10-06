@@ -1,5 +1,5 @@
 import { EntryID, VaultFacade, VaultFormatID, VaultSourceID, VaultSourceStatus } from "buttercup";
-import { BrowserWindow, clipboard, ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import { Layerr } from "layerr";
 import {
     addVaultFromPayload,
@@ -51,6 +51,7 @@ import {
     supportsBiometricUnlock
 } from "./services/biometrics";
 import { restartAutoClearClipboardTimer } from "./services/autoClearClipboard";
+import { writeClipboardText } from "./services/clipboardWrite";
 import { startAutoVaultLockTimer } from "./services/autoLock";
 import { log as logRaw, logInfo, logErr } from "./library/log";
 import { isPortable } from "./library/portability";
@@ -396,7 +397,7 @@ ipcMain.handle("unlock-source", async (evt, sourceID: VaultSourceID, password: s
 });
 
 ipcMain.handle("write-clipboard", (_, text: string) => {
-    clipboard.writeText(text);
+    writeClipboardText(text);
 });
 
 ipcMain.handle("read-clipboard-qr-image", () => readClipboardQRImage());

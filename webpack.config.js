@@ -14,6 +14,7 @@ module.exports = [
         entry: path.resolve(__dirname, "./source/main/index.ts"),
 
         externals: [
+            "@codekunde/conceal-clipboard",
             "@electron/remote",
             "delayable-setinterval",
             "electron",
