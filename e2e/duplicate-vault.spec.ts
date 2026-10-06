@@ -1,5 +1,5 @@
 import { join } from "path";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import {
     test,
@@ -22,6 +22,8 @@ test.describe("adding a vault twice", () => {
     let vaultPath: string;
     let app: ElectronApplication;
     let window: Page;
+    // The app's console output (its log lines, unhandled errors) for the report
+    let output = "";
 
     const launch = async () => {
         app = await electron.launch({
@@ -44,6 +46,12 @@ test.describe("adding a vault twice", () => {
                 BUTTERCUP_E2E: "1"
             }
         });
+        output = "";
+        for (const stream of [app.process().stdout, app.process().stderr]) {
+            stream?.on("data", (chunk) => {
+                output += chunk.toString();
+            });
+        }
         window = await app.firstWindow();
         await window.waitForLoadState("domcontentloaded");
         await app.evaluate(({ dialog }, filePath) => {
@@ -71,6 +79,18 @@ test.describe("adding a vault twice", () => {
         root = mkdtempSync(join(tmpdir(), "buttercup-e2e-duplicate-"));
         homeDir = join(root, "home");
         vaultPath = join(root, "test.bcup");
+    });
+
+    // A failure of the location-key test happened once and couldn't be
+    // reproduced (B-457): keep the app's output and the vault list with the report
+    test.afterEach(async ({}, testInfo) => {
+        if (testInfo.status === testInfo.expectedStatus) return;
+        // As a file, so it lands in test-results (which CI uploads)
+        const outputFile = testInfo.outputPath("app-output.txt");
+        writeFileSync(outputFile, output);
+        await testInfo.attach("app-output.txt", { path: outputFile });
+        const vaultsJSON = join(homeDir, "data", "vaults.json");
+        if (existsSync(vaultsJSON)) await testInfo.attach("vaults.json", { path: vaultsJSON });
     });
 
     test.afterAll(async () => {
