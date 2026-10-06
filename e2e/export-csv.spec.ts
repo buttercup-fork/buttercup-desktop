@@ -63,7 +63,7 @@ test.describe("CSV export", () => {
         await expect(passwordPrompt).toBeHidden();
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         // The "Current Vault" menu is rebuilt in the background after a vault
-        // change, and its Import/Export act on the vault it was built for
+        // change: wait until it shows the new vault
         await expect
             .poll(() =>
                 launched.app.evaluate(
@@ -143,5 +143,32 @@ test.describe("CSV export", () => {
         const cell = (title: string) => rows.find((row) => row.title === title).toString;
         expect(cell("Router")).toBe("admin-pin");
         expect(cell("Printer")).toBe("");
+    });
+
+    test("a menu built for the previous vault acts on the current one (B-454)", async () => {
+        const { app, window } = launched;
+        await createVault("older");
+        await window.getByRole("button", { name: "New Entry" }).click();
+        await expect(window.getByPlaceholder("Title")).toBeFocused();
+        await window.getByPlaceholder("Title").fill("Older entry");
+        await window.getByRole("button", { name: "Save" }).click();
+        await expect(window.getByRole("button", { name: "Edit" })).toBeVisible();
+        // Keep the Export item of the menu built for "older": right after a
+        // vault switch, that is the menu a quick click still lands on
+        await app.evaluate(({ Menu }) => {
+            const current = Menu.getApplicationMenu().items.find(
+                (item) => item.label === "Current Vault"
+            );
+            (globalThis as any).__staleExport = current.submenu.items.find(
+                (item) => item.label === "Export"
+            );
+        });
+        await createVault("newer");
+        const exported = join(dir, "stale-menu.csv");
+        await setPaths({ save: exported });
+        await app.evaluate(() => (globalThis as any).__staleExport.click());
+        await expect(window.getByText("Successfully exported vault: newer")).toBeVisible();
+        await expect.poll(() => existsSync(exported)).toBe(true);
+        expect(readFileSync(exported, "utf8")).not.toContain("Older entry");
     });
 });
