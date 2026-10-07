@@ -6,12 +6,13 @@ import { muteCurrentUpdate, startCurrentUpdate } from "../../services/update";
 import { CURRENT_UPDATE, SHOW_UPDATE_DIALOG } from "../../state/update";
 import { openLinkExternally } from "../../actions/link";
 import { t } from "../../../shared/i18n/trans";
+import { sanitiseReleaseNotes } from "../../library/sanitise";
 
 const ReleaseHeading = styled.h2`
     margin-top: 0px;
 `;
 
-// Release notes are HTML from the release; Blueprint's tight default line
+// Release notes are HTML from the release (sanitised before display); Blueprint's tight default line
 // height made them hard to read (#1016)
 const ReleaseNotes = styled.div`
     line-height: 1.5;
@@ -64,11 +65,11 @@ export function UpdateDialog() {
             <div className={Classes.DIALOG_HEADER}>{t("update.dialog.title", { version })}</div>
             <div className={Classes.DIALOG_BODY}>
                 {currentUpdate && (
-                    <ReleaseHeading dangerouslySetInnerHTML={{ __html: currentUpdate.releaseName }} />
+                    <ReleaseHeading>{currentUpdate.releaseName}</ReleaseHeading>
                 )}
                 {currentUpdate && (
                     <Card>
-                        <ReleaseNotes dangerouslySetInnerHTML={{ __html: currentUpdate.releaseNotes as string }} ref={updateContentRef} />
+                        <ReleaseNotes dangerouslySetInnerHTML={{ __html: sanitiseReleaseNotes(currentUpdate.releaseNotes as string) }} ref={updateContentRef} />
                     </Card>
                 )}
             </div>
