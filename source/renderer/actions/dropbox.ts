@@ -8,6 +8,6 @@ export async function authDropbox(): Promise<string> {
     const authUri = `https://www.dropbox.com/1/oauth2/authorize?client_id=${DROPBOX_CLIENT_ID}&redirect_uri=${DROPBOX_REDIRECT_URL}&response_type=token`;
     logInfo(`Authenticating Dropbox using client ID: ${DROPBOX_CLIENT_ID}`);
     const token = await authenticate(authUri, /access_token=([^&]*)/);
-    logInfo("Received Dropbox auth token");
+    logInfo(token ? "Received Dropbox auth token" : "Dropbox sign-in ended without a token");
     return token;
 }

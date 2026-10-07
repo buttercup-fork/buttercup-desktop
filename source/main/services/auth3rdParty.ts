@@ -1,5 +1,6 @@
 import { BrowserWindow } from "electron";
 import { logInfo } from "../library/log";
+import { allowSignInNavigation } from "./navigation";
 
 // The default Electron user-agent contains "Electron/<version>" and the app
 // name; some providers (Google, when signing into Dropbox with a Google
@@ -58,6 +59,7 @@ export async function authenticate(
                 partition
             }
         });
+        allowSignInNavigation(authWin.webContents);
         authWin.webContents.setUserAgent(desktopUserAgent());
 
         authWin.loadURL(authURL);
@@ -83,6 +85,8 @@ export async function authenticate(
 
         authWin.webContents.on("did-start-navigation", (e, url) => navigateCB(url));
         authWin.webContents.on("will-redirect", (e, url) => navigateCB(url));
+        // A link or button on the page that leads to the redirect address
+        authWin.webContents.on("will-navigate", (e, url) => navigateCB(url));
         authWin.on("close", () => {
             // Wipe the throwaway session so no auth cookies / tokens linger.
             try {
