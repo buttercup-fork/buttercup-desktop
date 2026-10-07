@@ -4,7 +4,7 @@ This is the Codekunde-maintained fork of Buttercup Desktop. The original Butterc
 
 ## Supported versions
 
-Only the latest release on the [releases page](https://github.com/codekunde/buttercup-desktop/releases) receives security fixes. Please update before reporting.
+Only the latest release on the [releases page](https://github.com/buttercup-fork/buttercup-desktop/releases) receives security fixes. Please update before reporting.
 
 ## Reporting a vulnerability
 

@@ -15,7 +15,11 @@ import { t } from "../../shared/i18n/trans";
 import { UpdateProgressInfo } from "../types";
 
 // Where to get the installer by hand when the update can't install itself
-const RELEASES_URL = "https://github.com/codekunde/buttercup-desktop/releases/latest";
+const RELEASES_URL = "https://github.com/buttercup-fork/buttercup-desktop/releases/latest";
+// Releases aren't code-signed (D-017), so the app doesn't download or install an
+// update itself: it announces the new version and opens the releases page. Set to
+// false only once Windows and macOS builds are signed.
+const MANUAL_UPDATES = true;
 // How long after "install" a failure to start the installer can still arrive
 const INSTALL_WATCH_TIME = ms("10s");
 const UPDATE_AUTO_CHECK = ms("30m");
@@ -103,7 +107,7 @@ async function checkForUpdateInternal() {
     autoUpdater.autoDownload = false;
     autoUpdater.setFeedURL({
         provider: "github",
-        owner: "codekunde",
+        owner: "buttercup-fork",
         repo: "buttercup-desktop"
     });
     if (isDev) {
@@ -203,6 +207,11 @@ export function muteUpdate() {
 }
 
 export async function startUpdate(): Promise<void> {
+    if (MANUAL_UPDATES) {
+        logInfo("Updates: Opening the releases page (manual updates)");
+        openExternalSafely(RELEASES_URL);
+        return;
+    }
     await autoUpdater.downloadUpdate();
 }
 

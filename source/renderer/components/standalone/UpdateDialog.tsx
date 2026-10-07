@@ -78,9 +78,9 @@ export function UpdateDialog() {
                     <Button
                         intent={Intent.PRIMARY}
                         onClick={update}
-                        title={t("update.dialog.update-button-title")}
+                        title={t("update.dialog.download-button-title")}
                     >
-                        {t("update.dialog.update-button")}
+                        {t("update.dialog.download-button")}
                     </Button>
                     <Button
                         onClick={close}

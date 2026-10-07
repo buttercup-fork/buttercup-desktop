@@ -1,7 +1,7 @@
 # Buttercup Desktop
 > Buttercup for Desktop - Mac, Linux and Windows
 
-[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/codekunde/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/codekunde/buttercup-desktop?label=latest)](https://github.com/codekunde/buttercup-desktop/releases/latest)
+[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/buttercup-fork/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/codekunde/buttercup-desktop?label=latest)](https://github.com/buttercup-fork/buttercup-desktop/releases/latest)
 
 <img width="1406" alt="Buttercup Desktop screenshot" src="https://github.com/buttercup/buttercup-desktop/assets/3869469/1320b163-3e5c-4423-a4fd-8de7ffad2a0e">
 
@@ -141,7 +141,7 @@ _Note that logs for portable Windows applications will be written to the same di
 
 ## Published Applications
 
-You can view the current releases on the [releases page](https://github.com/codekunde/buttercup-desktop/releases). Under each release are the binaries and installers for each supported platform. Make sure to pick the right operating system and architecture for your machine:
+You can view the current releases on the [releases page](https://github.com/buttercup-fork/buttercup-desktop/releases). Under each release are the binaries and installers for each supported platform. Make sure to pick the right operating system and architecture for your machine:
 
 | Platform | Assets |
 |----------|--------|
@@ -225,7 +225,7 @@ Each platform's installers must be built on that platform (macOS builds in parti
  2. Merge that to `master`, then tag it `v<version>` and push the tag (`git tag v2.31.0 && git push origin v2.31.0`).
  3. The `Build` workflow builds everything and drafts the release. Review the draft and publish it by hand.
 
-`build.publish` in `package.json` targets `codekunde/buttercup-desktop`, which is also where the in-app updater looks for new versions.
+`build.publish` in `package.json` targets `buttercup-fork/buttercup-desktop`, which is also where the in-app update check looks for new versions. Releases aren't code-signed (D-017), so the app only tells the user a new version exists and opens the releases page; it doesn't download or install anything itself.
 
 For **signed** releases there is `npm run publish` (see `resources/scripts/publish.js`): it builds all three platforms, code-signs them (Windows via a YubiKey — `WIN_YUBIKEY_PIN`; macOS via Apple notarization — `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`), and uploads the artifacts plus the `latest*.yml` auto-update metadata to a GitHub release via `electron-builder` (`GH_TOKEN` required). It only completes on macOS and needs all of those secrets set. The secrets are not currently configured, so releases are unsigned.
 

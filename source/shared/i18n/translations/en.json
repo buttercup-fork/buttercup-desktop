@@ -389,6 +389,8 @@
         "dialog": {
             "close-button": "Close",
             "close-button-title": "Close update information",
+            "download-button": "Download",
+            "download-button-title": "Open the download page in your browser",
             "title": "Upgrade to {{version}}",
             "update-button": "Update",
             "update-button-title": "Update the application now"

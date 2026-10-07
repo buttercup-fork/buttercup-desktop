@@ -23,6 +23,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
+- Updates are manual for now: when a new version is out, the update dialog shows what's new and its **Download** button opens the releases page. The app no longer downloads or installs an update itself, because releases aren't code-signed and the app couldn't check who built one. The update check and the repository links now point at `buttercup-fork/buttercup-desktop`.
 - The app ID is now `net.codekunde.buttercup` instead of the original project's `pw.buttercup.desktop`, so this fork no longer shares an install identity (Windows installer and taskbar ID, macOS bundle ID) or keychain entries with an installed upstream Buttercup. An earlier test build of this fork installs alongside the new one instead of being upgraded: uninstall it by hand. On macOS, Touch ID unlock has to be turned on again once per vault. Vaults, settings and the vault list are not affected.
 - Browsing a large Google Drive when adding a vault is much faster: the Google Drive client no longer scans every file once per folder (upstream googledrive-client #4). On a drive with 30,000 items, opening a folder goes from about 7 seconds to well under a second. The Google Drive client is now at `e91dfc3`.
 - Word passwords from the password generator are stronger: words now come from an 8,192-word list instead of a 1,700-word one, so the default 4 words give about 52 bits instead of 43. The generator is now at `f594e3a`.
