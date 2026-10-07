@@ -6,7 +6,10 @@ const mockPreferences = { lockVaultsOnSystemLock: true };
 const mockLockAllSources = jest.fn(() => Promise.resolve());
 let mockUnlockedCount = 1;
 
-jest.unstable_mockModule("electron", () => ({ powerMonitor: mockPowerMonitor }));
+jest.unstable_mockModule("electron", () => ({
+    app: new EventEmitter(),
+    powerMonitor: mockPowerMonitor
+}));
 jest.unstable_mockModule("./config", () => ({
     getConfigValue: () => Promise.resolve(mockPreferences)
 }));
@@ -16,7 +19,11 @@ jest.unstable_mockModule("./buttercup", () => ({
 jest.unstable_mockModule("../actions/unsaved", () => ({
     lockAllSourcesAfterSaving: mockLockAllSources
 }));
-jest.unstable_mockModule("../library/log", () => ({ logErr: jest.fn(), logInfo: jest.fn() }));
+jest.unstable_mockModule("../library/log", () => ({
+    logErr: jest.fn(),
+    logInfo: jest.fn(),
+    logWarn: jest.fn()
+}));
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
