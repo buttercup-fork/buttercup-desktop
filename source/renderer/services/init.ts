@@ -1,7 +1,7 @@
 import { ipcRenderer } from "electron";
 import { init } from "buttercup";
 import { logInfo } from "../library/log";
-import { attachUpdatedListener, getThemeType, updateBodyTheme } from "../library/theme";
+import { attachUpdatedListener, getThemeType, loadTheme, updateBodyTheme } from "../library/theme";
 import {
     changeLanguage,
     initialise as initialiseI18n,
@@ -36,6 +36,7 @@ async function initialiseInternal(rootElement: HTMLElement) {
     ipcRenderer.send("update-vault-windows");
     logInfo("Window opened and initialised");
     attachUpdatedListener();
+    await loadTheme();
     updateBodyTheme(getThemeType());
     await applyCurrentUpdateState();
     await applyReadyUpdateState();

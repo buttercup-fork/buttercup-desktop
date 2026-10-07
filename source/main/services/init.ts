@@ -2,7 +2,7 @@ import { session } from "electron";
 import { attachVaultManagerWatchers, loadVaultsFromDisk, onSourcesUpdated } from "./buttercup";
 import { initialise as initialiseLogging } from "./log";
 import { logErr, logInfo } from "../library/log";
-import { applyCurrentTheme } from "./theme";
+import { applyCurrentTheme, watchThemeChanges } from "./theme";
 import { updateTrayIcon } from "../actions/tray";
 import { updateAppMenu } from "../actions/appMenu";
 import { getConfigValue, initialise as initialiseConfig } from "./config";
@@ -56,6 +56,7 @@ export async function initialise() {
         await updateAppMenu();
         await closeAndReopenMainWindow();
     });
+    watchThemeChanges();
     await applyCurrentTheme();
     if (preferences.fileHostEnabled) {
         try {

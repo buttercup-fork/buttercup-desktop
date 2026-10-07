@@ -1,6 +1,5 @@
 import path from "path";
 import { app } from "electron";
-import { initialize as initialiseElectronRemote } from "@electron/remote/main";
 import "./ipc";
 import { initialise } from "./services/init";
 import { openMainWindow } from "./services/windows";
@@ -152,7 +151,6 @@ if (lock) {
     app.whenReady()
         .then(() => {
             logInfo("Application ready");
-            initialiseElectronRemote();
         })
         .then(() => initialise())
         .then(async () => {
