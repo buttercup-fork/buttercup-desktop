@@ -67,17 +67,14 @@ test.describe("long notes", () => {
         const note = window.getByTestId("note-value");
         await expect(note).toBeVisible();
         expect(await isCut(note)).toBe(true);
-        // Right after saving, the entry's fields are rebuilt with new ids and mount
-        // again (core makes a new id for every field each time), which would undo an
-        // expansion in progress. Retry the whole step until it holds.
-        await expect(async () => {
-            await window.getByRole("button", { name: "Show more" }).click({ timeout: 2000 });
-            await expect(window.getByRole("button", { name: "Show less" })).toBeVisible({ timeout: 2000 });
-            expect(await isCut(note)).toBe(false);
-            await window.getByRole("button", { name: "Show less" }).click({ timeout: 2000 });
-            await expect(window.getByRole("button", { name: "Show more" })).toBeVisible({ timeout: 2000 });
-            expect(await isCut(note)).toBe(true);
-        }).toPass({ timeout: 15000 });
+        // Right after saving, the vault is rebuilt. Fields keep their ids across that
+        // (B-477), so an expansion in progress isn't undone by it.
+        await window.getByRole("button", { name: "Show more" }).click();
+        await expect(window.getByRole("button", { name: "Show less" })).toBeVisible();
+        expect(await isCut(note)).toBe(false);
+        await window.getByRole("button", { name: "Show less" }).click();
+        await expect(window.getByRole("button", { name: "Show more" })).toBeVisible();
+        expect(await isCut(note)).toBe(true);
     });
 
     test("a 5,884-character string without spaces wraps and is collapsed", async () => {

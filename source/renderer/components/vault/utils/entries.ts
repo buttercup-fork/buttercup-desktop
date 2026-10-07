@@ -58,3 +58,59 @@ export function sortEntries(entries: Array<EntryFacade> = [], asc = true) {
         return 0;
     });
 }
+
+const getTitle = (entry: EntryFacade): string =>
+    entry.fields.find(
+        (field) => field.propertyType === EntryPropertyType.Property && field.property === "title"
+    )?.value ?? "";
+
+/**
+ * Give the fields of a rebuilt vault facade the IDs they had before. Core makes
+ * new random field IDs every time it builds an entry facade, and the entry view
+ * keys its rows by field ID, so after a save every row was remounted: a note
+ * you had expanded or a password you had revealed snapped back. Fields are
+ * matched by entry, then by type and name (in order, for repeated names); a field
+ * without a match keeps its new ID. A new entry has no ID until the vault is
+ * rebuilt after its save, so it is matched to the unsaved entry with the same
+ * group and title.
+ * @param previous The vault facade that was showing
+ * @param next The rebuilt vault facade
+ * @returns The rebuilt facade, with the previous field IDs where they match
+ */
+export function keepFieldIDs<T extends { entries: Array<EntryFacade> }>(previous: T, next: T): T {
+    const previousByID = new Map<string, EntryFacade>();
+    const unsaved: Array<EntryFacade> = [];
+    for (const entry of previous.entries) {
+        if (entry.id) previousByID.set(entry.id, entry);
+        else unsaved.push(entry);
+    }
+    return {
+        ...next,
+        entries: next.entries.map((entry) => {
+            let before = entry.id ? previousByID.get(entry.id) : undefined;
+            if (!before && entry.id) {
+                const index = unsaved.findIndex(
+                    (candidate) =>
+                        candidate.parentID === entry.parentID &&
+                        getTitle(candidate) === getTitle(entry)
+                );
+                if (index >= 0) [before] = unsaved.splice(index, 1);
+            }
+            if (!before) return entry;
+            const available = new Map<string, Array<string>>();
+            for (const field of before.fields) {
+                const key = `${field.propertyType}|${field.property}`;
+                const ids = available.get(key) ?? [];
+                ids.push(field.id);
+                available.set(key, ids);
+            }
+            return {
+                ...entry,
+                fields: entry.fields.map((field) => {
+                    const id = available.get(`${field.propertyType}|${field.property}`)?.shift();
+                    return id ? { ...field, id } : field;
+                })
+            };
+        })
+    };
+}

@@ -1,5 +1,6 @@
 import { EntryFacadeField, EntryID, GroupFacade, GroupID, VaultFacade } from "buttercup";
 import { EntriesSortMode, UpdatedEntryFacade } from "../../../types";
+import { keepFieldIDs } from "../utils/entries";
 
 export interface FilterState {
     term: string;
@@ -86,9 +87,8 @@ const FLAG_VAULT_UPDATED = { _tag: null };
 export function vaultReducer(state: VaultState, action: VaultStateAction): VaultState {
     switch (action.type) {
         case VaultStateActionType.Reset:
-            return {
-                ...action.payload
-            };
+            // Rows are keyed by field ID: keep them across the rebuild (B-477)
+            return keepFieldIDs(state, { ...action.payload });
         case VaultStateActionType.SaveEntry: {
             const { entry: baseEntry } = action;
             const { isNew, ...entry } = baseEntry;
