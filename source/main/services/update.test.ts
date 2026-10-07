@@ -4,6 +4,7 @@ import { jest } from "@jest/globals";
 class MockAutoUpdater extends EventEmitter {
     quitAndInstallCalled = false;
     quitAndInstall = jest.fn<() => void>();
+    downloadUpdate = jest.fn<() => Promise<void>>();
 }
 
 const mockApp = new EventEmitter();
@@ -33,9 +34,10 @@ jest.unstable_mockModule("../library/file", () => ({ fileExists: jest.fn() }));
 jest.unstable_mockModule("../../shared/i18n/trans", () => ({ t: (key: string) => key }));
 
 let installUpdate: typeof import("./update").installUpdate;
+let startUpdate: typeof import("./update").startUpdate;
 
 beforeAll(async () => {
-    ({ installUpdate } = await import("./update"));
+    ({ installUpdate, startUpdate } = await import("./update"));
 });
 
 beforeEach(() => {
@@ -43,6 +45,7 @@ beforeEach(() => {
     mockApp.removeAllListeners();
     mockAutoUpdater.quitAndInstallCalled = false;
     mockAutoUpdater.quitAndInstall.mockReset();
+    mockAutoUpdater.downloadUpdate.mockReset();
     mockShowMessageBox.mockReset();
     mockShowMessageBox.mockResolvedValue({ response: 1 });
     mockOpenExternal.mockClear();
@@ -96,8 +99,16 @@ test("opens the download page on request", async () => {
     quit();
     await nextRound();
     expect(mockOpenExternal).toHaveBeenCalledWith(
-        "https://github.com/codekunde/buttercup-desktop/releases/latest"
+        "https://github.com/buttercup-fork/buttercup-desktop/releases/latest"
     );
+});
+
+test("starting an update opens the releases page and downloads nothing (D-017)", async () => {
+    await startUpdate();
+    expect(mockOpenExternal).toHaveBeenCalledWith(
+        "https://github.com/buttercup-fork/buttercup-desktop/releases/latest"
+    );
+    expect(mockAutoUpdater.downloadUpdate).not.toHaveBeenCalled();
 });
 
 test("doesn't watch quits when there was nothing to install", async () => {

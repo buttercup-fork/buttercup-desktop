@@ -328,6 +328,8 @@
         "dialog": {
             "close-button": "Sluiten",
             "close-button-title": "Sluit update-informatie",
+            "download-button": "Downloaden",
+            "download-button-title": "Open de downloadpagina in je browser",
             "title": "Upgrade naar {{version}}",
             "update-button": "Update",
             "update-button-title": "Update de toepassing nu"
