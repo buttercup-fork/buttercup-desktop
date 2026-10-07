@@ -1,6 +1,6 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { app, Menu, shell } from "electron";
+import { app, Menu, shell, type WebContents } from "electron";
 import { buildEditMenuTemplate } from "../library/editMenu";
 import { isAppURL, isSafeExternalURL } from "../library/navigation";
 import { getRootProjectPath } from "../library/paths";
@@ -24,6 +24,19 @@ export function openExternalSafely(url: string): void {
     shell.openExternal(url);
 }
 
+// Sign-in windows (see auth3rdParty) have to follow the provider's pages, and the
+// redirect back to its own address, which is where the token arrives. They have no
+// Node access (sandboxed, no integration), so the guard below leaves them alone.
+const __signInContents = new WeakSet<WebContents>();
+
+/**
+ * Let a sign-in window navigate freely instead of keeping it on the app's page
+ * @param contents The sign-in window's contents
+ */
+export function allowSignInNavigation(contents: WebContents): void {
+    __signInContents.add(contents);
+}
+
 /**
  * Keep every window on the app's own page (#1238). The renderer runs with
  * Node integration, so a remote or local page loaded in it would get full
@@ -33,12 +46,14 @@ export function openExternalSafely(url: string): void {
 export function guardNavigation(): void {
     app.on("web-contents-created", (_, contents) => {
         contents.on("will-navigate", (event) => {
+            if (__signInContents.has(contents)) return;
             if (isAppURL(event.url, getAppPageURL())) return;
             event.preventDefault();
             logWarn(`Blocked navigation away from the app: ${event.url}`);
             openExternalSafely(event.url);
         });
         contents.on("will-redirect", (event) => {
+            if (__signInContents.has(contents)) return;
             if (isAppURL(event.url, getAppPageURL())) return;
             event.preventDefault();
             logWarn(`Blocked redirect away from the app: ${event.url}`);

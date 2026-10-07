@@ -1,5 +1,4 @@
 import { app, BrowserWindow, BrowserWindowConstructorOptions } from "electron";
-import { enable as enableWebContents } from "@electron/remote/main";
 import { VaultSourceID } from "buttercup";
 import debounce from "debounce";
 import { getConfigValue, setConfigValue } from "./config";
@@ -51,7 +50,6 @@ async function createVaultWindow() {
     if (isMaximised) {
         win.maximize();
     }
-    enableWebContents(win.webContents);
     // Moves and resizes are saved 750 ms after the last one. Closing the window
     // saves a pending one right away: once it's destroyed, reading its bounds
     // throws "Object has been destroyed" (#688)

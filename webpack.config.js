@@ -15,7 +15,6 @@ module.exports = [
 
         externals: [
             "@codekunde/conceal-clipboard",
-            "@electron/remote",
             "delayable-setinterval",
             "electron",
             "electron-builder",

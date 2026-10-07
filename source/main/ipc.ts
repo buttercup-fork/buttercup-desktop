@@ -60,7 +60,9 @@ import { clearCode } from "./services/browser/interaction";
 import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
 import { chooseVaultFileForUpload } from "./services/vaultFile";
 import { changeVaultMasterPassword } from "./services/masterPassword";
+import { authenticate as authenticate3rdParty } from "./services/auth3rdParty";
 import { openExternalSafely } from "./services/navigation";
+import { shouldUseDarkColors } from "./services/theme";
 import { getSiteIcon } from "./services/siteIcons";
 import {
     AppEnvironmentFlags,
@@ -204,6 +206,17 @@ ipcMain.handle(
     }
 );
 
+ipcMain.handle(
+    "authenticate-3rd-party",
+    async (event, authURL: string, matchSource: string, matchFlags: string) =>
+        authenticate3rdParty(
+            BrowserWindow.fromWebContents(event.sender),
+            authURL,
+            matchSource,
+            matchFlags
+        )
+);
+
 ipcMain.handle("browser-access-code-clear", async (_) => {
     await clearCode();
 });
@@ -294,6 +307,8 @@ ipcMain.handle("get-vault-settings", async (evt, sourceID: VaultSourceID) => {
     const settings = await getVaultSettings(sourceID);
     return settings;
 });
+
+ipcMain.handle("get-dark-colors", () => shouldUseDarkColors());
 
 ipcMain.handle("google-auth-begin", async () => beginGoogleAuth());
 
