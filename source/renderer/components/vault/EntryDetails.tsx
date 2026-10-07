@@ -8,6 +8,7 @@ import {
     ButtonGroup,
     Card,
     Classes,
+    ContextMenu,
     ControlGroup,
     Dialog,
     Drawer,
@@ -599,6 +600,22 @@ const FieldText = ({ entryFacade, field }) => {
     const [historyDialogVisible, setHistoryDialogVisible] = useState(false);
     const otpRef = useRef(field.value);
     const { onFieldUpdateInPlace } = useCurrentEntry();
+    const copyField = () => {
+        copyText(otpRef.current);
+        notifyCopied(copiedFieldMessage(field));
+        if (onUserCopy) onUserCopy(otpRef.current);
+    };
+    // Right-click a field to copy it, like its clipboard button does (#773)
+    const showFieldMenu = (event: React.MouseEvent) => {
+        if (!field.value) return;
+        event.preventDefault();
+        ContextMenu.show(
+            <Menu>
+                <MenuItem icon="clipboard" onClick={copyField} text={t("vault-ui.entry.copy-field")} />
+            </Menu>,
+            { left: event.clientX, top: event.clientY }
+        );
+    };
     const Element = field.valueType === EntryPropertyValueType.Password ? "code" : "span";
     const { _changes: history = [] } = entryFacade;
     const historyItems = useMemo(() => {
@@ -608,7 +625,7 @@ const FieldText = ({ entryFacade, field }) => {
         return items;
     }, [history]);
     return (
-        <FieldTextWrapper role="content" disabled={!field.value}>
+        <FieldTextWrapper role="content" disabled={!field.value} onContextMenu={showFieldMenu}>
             {field.valueType === EntryPropertyValueType.OTP && (
                 <OTPDigits otpURI={field.value} otpRef={value => (otpRef.current = value)} />
             ) || (!field.value && (
@@ -652,11 +669,7 @@ const FieldText = ({ entryFacade, field }) => {
                 <Button
                     icon="clipboard"
                     small
-                    onClick={() => {
-                        copyText(otpRef.current);
-                        notifyCopied(copiedFieldMessage(field));
-                        if (onUserCopy) onUserCopy(otpRef.current);
-                    }}
+                    onClick={copyField}
                 />
                 <Button
                     icon="history"

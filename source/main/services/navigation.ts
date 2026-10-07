@@ -1,6 +1,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { app, shell } from "electron";
+import { app, Menu, shell } from "electron";
+import { buildEditMenuTemplate } from "../library/editMenu";
 import { isAppURL, isSafeExternalURL } from "../library/navigation";
 import { getRootProjectPath } from "../library/paths";
 import { logInfo, logWarn } from "../library/log";
@@ -49,6 +50,12 @@ export function guardNavigation(): void {
         contents.setWindowOpenHandler(({ url }) => {
             openExternalSafely(url);
             return { action: "deny" };
+        });
+        contents.on("context-menu", (_, params) => {
+            const template = buildEditMenuTemplate(params);
+            if (template.length > 0) {
+                Menu.buildFromTemplate(template).popup();
+            }
         });
     });
 }
