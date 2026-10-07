@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "./ipcRenderer";
 import { serialiseLogItems } from "../../shared/library/log";
 import { LogLevel } from "../types";
 

@@ -140,13 +140,9 @@ module.exports = [
             extensions: [".tsx", ".ts", ".js"]
         },
 
-        // Built for the web, not for Node: the only thing the window still takes from
-        // Electron is its message channel, until that comes through a preload script
-        // (B-475). Every other Node built-in it used has a replacement above.
-        externals: {
-            electron: "commonjs electron"
-        },
-
+        // Built for the web, not for Node (B-475): the window has no Node access, and
+        // reaches the main process only through the preload script's bridge. Every Node
+        // built-in its code used has a replacement above.
         // The size hints are for web pages loaded over a network
         performance: {
             hints: false
@@ -158,5 +154,43 @@ module.exports = [
             poll: 1000,
             ignored: /node_modules/
         }
+    },
+    {
+        devtool: false,
+
+        entry: path.resolve(__dirname, "./source/preload/index.ts"),
+
+        externals: {
+            electron: "commonjs electron"
+        },
+
+        module: {
+            rules: [
+                {
+                    test: /\.ts$/,
+                    use: [
+                        {
+                            loader: "ts-loader",
+                            options: {
+                                configFile: path.resolve(__dirname, "./tsconfig.json")
+                            }
+                        }
+                    ],
+                    exclude: /node_modules/
+                }
+            ]
+        },
+
+        output: {
+            filename: "index.js",
+            libraryTarget: "commonjs2",
+            path: path.resolve(__dirname, "./build/preload")
+        },
+
+        resolve: {
+            extensions: [".ts", ".js"]
+        },
+
+        target: "electron-preload"
     }
 ];

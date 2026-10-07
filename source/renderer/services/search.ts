@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import debounce from "debounce";
 import { VaultSourceID } from "buttercup";
 import { setSearchResults } from "../state/search";

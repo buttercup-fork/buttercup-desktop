@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../../library/ipcRenderer";
 import * as React from "react";
 import { useSingleState } from "react-obstate";
 import styled from "styled-components";

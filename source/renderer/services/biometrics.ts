@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { VaultSourceID } from "buttercup";
 import { setVaultsWithBiometrics } from "../state/biometrics";
 import { VaultSourceDescription } from "../types";

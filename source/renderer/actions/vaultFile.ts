@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 
 export type VaultFileForUpload = { contents: string; name: string } | { error: string };
 

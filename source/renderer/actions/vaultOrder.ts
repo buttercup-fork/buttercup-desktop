@@ -1,5 +1,5 @@
 import { VaultSourceID } from "buttercup";
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 
 export async function setVaultSourceOrder(
     sourceID: VaultSourceID,

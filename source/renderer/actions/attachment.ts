@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { EntryID, VaultSourceID } from "buttercup";
 import { fetchUpdatedFacade } from "./facade";
 

@@ -41,7 +41,7 @@ test.describe("start with session (Windows)", () => {
         const { window } = launched;
         const setStartWithSession = (enabled: boolean) =>
             window.evaluate(async (startWithSession) => {
-                const { ipcRenderer } = require("electron");
+                const ipcRenderer = (window as any).buttercupIPC;
                 const preferences = await new Promise<any>((resolve) => {
                     ipcRenderer.once("get-preferences:reply", (_, payload) =>
                         resolve(JSON.parse(payload))

@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 
 /**
  * Sign in on a provider's page in its own window (opened by the main process)

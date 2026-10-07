@@ -1,3 +1,4 @@
+import path from "node:path";
 import { app, BrowserWindow, BrowserWindowConstructorOptions } from "electron";
 import { VaultSourceID } from "buttercup";
 import debounce from "debounce";
@@ -8,6 +9,7 @@ import { setLastSourceID } from "./lastVault";
 import { logErr, logInfo } from "../library/log";
 import { Preferences } from "../types";
 import { getAppPageURL } from "./navigation";
+import { getRootProjectPath } from "../library/paths";
 import { sleep } from "../../shared/library/promise";
 
 export async function closeAndReopenMainWindow(): Promise<BrowserWindow> {
@@ -34,8 +36,12 @@ async function createVaultWindow() {
         height,
         icon: getWindowIconPath(),
         webPreferences: {
-            contextIsolation: false,
-            nodeIntegration: true,
+            // The window has no Node access and its own isolated world (B-475). Its
+            // only way to the main process is what the preload script exposes.
+            contextIsolation: true,
+            nodeIntegration: false,
+            preload: path.join(getRootProjectPath(), "build/preload/index.js"),
+            sandbox: true,
             spellcheck: false,
             // No developer tools in release builds (#712): they'd give anyone at
             // the keyboard a console with full access to the unlocked vaults.

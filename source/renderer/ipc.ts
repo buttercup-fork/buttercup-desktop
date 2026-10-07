@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "./library/ipcRenderer";
 import { UpdateInfo } from "electron-updater";
 import { VaultSourceID } from "buttercup";
 import { VAULTS_STATE } from "./state/vaults";

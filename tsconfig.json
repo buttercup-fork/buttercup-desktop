@@ -13,6 +13,7 @@
     },
     "include": [
         "./source/main/**/*",
+        "./source/preload/**/*",
         "./source/shared/**/*"
     ],
     "exclude": [

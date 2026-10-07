@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import LANGUAGES from "../../shared/i18n/translations/index";
 import { Language } from "../types";
 

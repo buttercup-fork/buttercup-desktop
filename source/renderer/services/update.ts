@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { UpdateInfo } from "electron-updater";
 import { Intent } from "@blueprintjs/core";
 import { setCurrentUpdate, setShowUpdateDialog } from "../state/update";

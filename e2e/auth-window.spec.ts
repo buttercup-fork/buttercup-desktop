@@ -38,8 +38,7 @@ test.describe("third-party sign-in window", () => {
     const authenticate = (url: string) =>
         launched.window.evaluate(
             ({ url }) => {
-                const { ipcRenderer } = require("electron");
-                return ipcRenderer.invoke(
+                return (window as any).buttercupIPC.invoke(
                     "authenticate-3rd-party",
                     url,
                     "access_token=([^&]*)",

@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 
 export async function readClipboardQRImage(): Promise<string | null> {
     return ipcRenderer.invoke("read-clipboard-qr-image");
