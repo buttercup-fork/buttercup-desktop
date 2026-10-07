@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "./ipcRenderer";
 import { logInfo } from "./log";
 import { Theme } from "../types";
 

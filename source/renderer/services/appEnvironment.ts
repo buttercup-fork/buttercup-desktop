@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { AppEnvironmentFlags } from "../types";
 
 export async function getAppEnvironmentFlags() {

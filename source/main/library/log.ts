@@ -1,6 +1,7 @@
 import debounce from "debounce";
 import { ChannelQueue } from "@buttercup/channel-queue";
 import { writeLines } from "../services/log";
+import StackTracey from "stacktracey";
 import { serialiseLogItems } from "../../shared/library/log";
 import { LogLevel } from "../types";
 
@@ -38,7 +39,11 @@ function generateLogPrefix(level: LogLevel): string {
 }
 
 export function log(level: LogLevel, items: Array<any>) {
-    const serialised = serialiseLogItems(items);
+    const serialised = serialiseLogItems(
+        items,
+        // The main process reads the source files its stack points to (the window can't)
+        (error) => [error.toString(), new StackTracey(error).withSources().asTable()].join("\n")
+    );
     const logLine = `${generateLogPrefix(level)} ${serialised}`;
     console.log(logLine);
     __lines.push(logLine);

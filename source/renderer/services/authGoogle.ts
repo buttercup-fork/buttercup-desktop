@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import type { VaultSourceID } from "buttercup";
 import { logInfo } from "../library/log";
 import { openLinkExternally } from "../actions/link";

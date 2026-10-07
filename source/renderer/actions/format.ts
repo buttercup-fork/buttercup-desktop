@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { VaultFormatID, VaultSourceID } from "buttercup";
 import { setBusy } from "../state/app";
 import { showError, showWarning } from "../services/notifications";

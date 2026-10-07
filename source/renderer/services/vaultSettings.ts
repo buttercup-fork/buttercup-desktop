@@ -1,5 +1,5 @@
 import { VaultSourceID } from "buttercup";
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { ChangeMasterPasswordResult, VaultSettingsLocal } from "../types";
 
 export async function changeMasterPassword(

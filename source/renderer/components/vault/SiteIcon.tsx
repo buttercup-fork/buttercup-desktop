@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../../library/ipcRenderer";
 import styled from "styled-components";
 import { DEFAULT_ENTRY_TYPE, EntryType } from "buttercup";
 import ICON_LOGIN from "../../../../resources/images/login.png";

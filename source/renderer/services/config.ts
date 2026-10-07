@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { VaultSourceID } from "buttercup";
 
 export async function getSelectedSource(): Promise<string> {

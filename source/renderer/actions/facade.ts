@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { VaultFacade, VaultSourceID } from "buttercup";
 import { VAULTS_STATE } from "../state/vaults";
 import { setCurrentFacade } from "../services/facade";

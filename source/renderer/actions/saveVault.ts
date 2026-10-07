@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { Intent } from "@blueprintjs/core";
 import { VaultFacade, VaultSourceID } from "buttercup";
 import { Layerr } from "layerr";

@@ -1,6 +1,6 @@
 import { VaultSourceID } from "buttercup";
 import { useCallback, useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
+import { ipcRenderer } from "../library/ipcRenderer";
 import { logErr } from "../library/log";
 import { showError } from "../services/notifications";
 import { VaultSourceDescription } from "../types";
