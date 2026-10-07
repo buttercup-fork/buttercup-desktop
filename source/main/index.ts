@@ -77,8 +77,12 @@ try {
 
 guardNavigation();
 
+// A second instance hands its command line to the first one ("second-instance") and
+// quits. It must not boot: quit() only starts the shutdown, and initialise() would
+// otherwise run next to the first instance's.
 const lock = app.requestSingleInstanceLock();
 if (!lock) {
+    logInfo("Another instance is running: handing over and quitting");
     app.quit();
 }
 
@@ -144,52 +148,54 @@ app.on("open-url", (e, url) => {
 // ** Boot
 // **
 
-app.whenReady()
-    .then(() => {
-        logInfo("Application ready");
-        initialiseElectronRemote();
-    })
-    .then(() => initialise())
-    .then(async () => {
-        await ensureLinuxProtocolHandler();
-        for (const scheme of ACCEPTED_PROTOCOLS) {
-            const protocol = scheme.replace("://", "");
-            if (!app.isDefaultProtocolClient(protocol)) {
-                logInfo(`Registering protocol: ${protocol}`);
-                if (!app.setAsDefaultProtocolClient(protocol)) {
-                    logErr(`Failed registering protocol: ${protocol}`);
+if (lock) {
+    app.whenReady()
+        .then(() => {
+            logInfo("Application ready");
+            initialiseElectronRemote();
+        })
+        .then(() => initialise())
+        .then(async () => {
+            await ensureLinuxProtocolHandler();
+            for (const scheme of ACCEPTED_PROTOCOLS) {
+                const protocol = scheme.replace("://", "");
+                if (!app.isDefaultProtocolClient(protocol)) {
+                    logInfo(`Registering protocol: ${protocol}`);
+                    if (!app.setAsDefaultProtocolClient(protocol)) {
+                        logErr(`Failed registering protocol: ${protocol}`);
+                    }
+                } else {
+                    logInfo(`Protocol already registered: ${protocol}`);
                 }
-            } else {
-                logInfo(`Protocol already registered: ${protocol}`);
             }
-        }
-    })
-    .then(async () => {
-        const preferences = await getConfigValue("preferences");
-        const autostarted = wasAutostarted();
-        // A launch-time protocol URL (e.g. an auth callback) needs a window to
-        // receive it, so force the window open even for otherwise-hidden starts.
-        if (
-            !initialProtocolURL &&
-            (!shouldShowMainWindow() || preferences.startMode === AppStartMode.HiddenAlways)
-        ) {
-            logInfo("Not opening initial window: disabled by CL or preferences");
-            return;
-        } else if (
-            !initialProtocolURL &&
-            autostarted &&
-            preferences.startMode === AppStartMode.HiddenOnBoot
-        ) {
-            logInfo("Not opening initial window: disabled for autostart");
-            return;
-        }
-        await openMainWindow();
-        if (initialProtocolURL) {
-            logInfo("Handling protocol URL from launch arguments");
-            handleProtocolCall(initialProtocolURL);
-        }
-    })
-    .catch((err) => {
-        logErr(err);
-        app.quit();
-    });
+        })
+        .then(async () => {
+            const preferences = await getConfigValue("preferences");
+            const autostarted = wasAutostarted();
+            // A launch-time protocol URL (e.g. an auth callback) needs a window to
+            // receive it, so force the window open even for otherwise-hidden starts.
+            if (
+                !initialProtocolURL &&
+                (!shouldShowMainWindow() || preferences.startMode === AppStartMode.HiddenAlways)
+            ) {
+                logInfo("Not opening initial window: disabled by CL or preferences");
+                return;
+            } else if (
+                !initialProtocolURL &&
+                autostarted &&
+                preferences.startMode === AppStartMode.HiddenOnBoot
+            ) {
+                logInfo("Not opening initial window: disabled for autostart");
+                return;
+            }
+            await openMainWindow();
+            if (initialProtocolURL) {
+                logInfo("Handling protocol URL from launch arguments");
+                handleProtocolCall(initialProtocolURL);
+            }
+        })
+        .catch((err) => {
+            logErr(err);
+            app.quit();
+        });
+}
