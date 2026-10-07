@@ -127,6 +127,12 @@ module.exports = [
 
         resolve: {
             alias: {
+                // Node's built-ins the window's code reaches, replaced so the bundle needs
+                // no Node access (B-475): the generator's webcrypto, and posix paths for
+                // join-path (it joins URL and WebDAV paths, never file system ones)
+                crypto$: path.resolve(__dirname, "./resources/webpack-shims/crypto.js"),
+                path$: require.resolve("path-posix"),
+                util$: path.resolve(__dirname, "./resources/webpack-shims/util.js"),
                 buttercup: require.resolve("buttercup/web"),
                 "react-dnd": path.resolve("node_modules/react-dnd"),
                 "react/jsx-runtime": "react/jsx-runtime.js"
@@ -134,7 +140,19 @@ module.exports = [
             extensions: [".tsx", ".ts", ".js"]
         },
 
-        target: "electron-renderer",
+        // Built for the web, not for Node: the only thing the window still takes from
+        // Electron is its message channel, until that comes through a preload script
+        // (B-475). Every other Node built-in it used has a replacement above.
+        externals: {
+            electron: "commonjs electron"
+        },
+
+        // The size hints are for web pages loaded over a network
+        performance: {
+            hints: false
+        },
+
+        target: "web",
 
         watchOptions: {
             poll: 1000,
