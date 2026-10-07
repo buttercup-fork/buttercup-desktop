@@ -558,6 +558,7 @@
             "attachments": "Attachments",
             "cancel-edit": "Cancel",
             "click-to-edit": "Click to edit",
+            "copy-field": "Copy",
             "custom-fields": "Custom Fields",
             "duplicate-field-name": "Another field already has this name: rename it to save",
             "edit": "Edit",
