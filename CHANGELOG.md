@@ -39,6 +39,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- A note you had just expanded, or a password you had just revealed, snapped back to hidden when the vault was rebuilt in the background, eg. right after saving. Buttercup's core makes new internal ids for an entry's fields every time, so every row was drawn again; the rows now keep their ids across the rebuild.
 - Starting Buttercup a second time (eg. opening a `codekunde-buttercup://` link while it runs) no longer starts a second copy's start-up before it quits. The second process is refused the single-instance lock and now quits right away, instead of also setting itself up next to the running one.
 - Right-click a field in an entry to copy it, the same as its clipboard button (upstream [#773](https://github.com/buttercup/buttercup-desktop/issues/773)). Text boxes get a right-click menu with Undo, Cut, Copy, Paste and Select All, and selected text can be copied the same way.
 - **Current Vault → Import**, **Export**, **Lock** and **Biometrics** right after switching vaults could act on the previous vault: the menu is rebuilt a moment after the switch, and its items used the vault it was built for. They now act on the vault that is current when you click.
