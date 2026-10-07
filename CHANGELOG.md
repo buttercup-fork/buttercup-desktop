@@ -87,6 +87,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Security
 
+- Updated `proxy-addr` (a web-server library inside the Secure File Host) to 2.0.8, which fixes a critical IP-spoofing advisory (GHSA-jqcg-44mw-7w3h). The Secure File Host doesn't use `trust proxy`, so it wasn't exploitable here.
 - Update release notes are cleaned before they are shown, and the release name is shown as plain text. Before, HTML in a release (scripts, event handlers, `javascript:` links) would have run inside the app window, which has full access to the computer. Only text formatting and http(s)/mailto links are kept.
 - The app window now has a Content Security Policy: no inline or remote scripts, no remote connections, no plugins or frames. To make that possible, `otpauth` (one-time passwords) is updated to 9.x; 7.x used `eval`.
 - On Windows, anything copied from a vault (passwords, usernames, other fields) is marked confidential, so Windows clipboard history (Win+V) and cloud clipboard sync no longer keep it. Pasting works as before, and auto-clear still clears it. This uses a small native module in this repo (`native/conceal-clipboard`), because Electron can't write those clipboard markers itself. On macOS and Linux, copies work as before for now.
