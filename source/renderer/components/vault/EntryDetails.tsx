@@ -1144,6 +1144,14 @@ export const EntryDetails = () => {
         readOnly
     } = useContext(VaultContext);
     const { getInputProps, getRootProps, isDragActive } = useDropzone({
+        // Files straight from the event. The default reader asks the browser for a file
+        // system handle first, and for a dropped file that fails ("Cannot read properties
+        // of undefined (reading 'getFile')"), so nothing was ever added.
+        getFilesFromEvent: async (event) => {
+            const { dataTransfer, target } = event as { dataTransfer?: DataTransfer; target?: EventTarget };
+            const files = dataTransfer ? dataTransfer.files : (target as HTMLInputElement)?.files;
+            return Array.from(files ?? []);
+        },
         maxSize: attachmentsMaxSize,
         noClick: true,
         onDrop: files => {
