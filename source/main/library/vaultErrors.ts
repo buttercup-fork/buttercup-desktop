@@ -5,7 +5,10 @@
 const DAMAGED_VAULT_ERRORS = [
     "Failed deriving key: Salt must be provided",
     "Failed to load vault: Content is empty",
-    "No valid signature in vault"
+    "No valid signature in vault",
+    // What core's own crypto says for a file cut off before the encrypted content ends
+    "Decoding error: Encrypted content corrupt or incomplete",
+    "Decoding error: Encrypted content length is corrupt"
 ];
 
 /**

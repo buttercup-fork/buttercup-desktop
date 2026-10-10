@@ -19,6 +19,23 @@ test("recognises an empty file and a file that isn't a vault", () => {
     ).toBe(true);
 });
 
+test("recognises a vault cut off, as core's own crypto words it", () => {
+    expect(
+        isDamagedVaultError(
+            new Error(
+                "Failed unlocking source: Decoding error: Encrypted content corrupt or incomplete"
+            )
+        )
+    ).toBe(true);
+    expect(
+        isDamagedVaultError(
+            new Error(
+                "Failed unlocking source: Decoding error: Encrypted content length is corrupt"
+            )
+        )
+    ).toBe(true);
+});
+
 test("doesn't mistake a wrong password for damage", () => {
     expect(
         isDamagedVaultError(
