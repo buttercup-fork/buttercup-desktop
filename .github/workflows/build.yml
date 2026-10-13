@@ -60,29 +60,12 @@ jobs:
           } > "dist/build-info-${{ matrix.os }}.txt"
           cat "dist/build-info-${{ matrix.os }}.txt"
 
-      # GitHub has retired upload-artifact v3, and v4+ refuses to run on
-      # non-GitHub servers such as Forgejo, so each server gets its own
+      # Installers are collected on GitHub only: upload-artifact v4+ refuses to
+      # run on non-GitHub servers such as Forgejo, and GitHub refuses a workflow
+      # that mentions the retired v3 even in a skipped step
       - name: Collect installers
         if: github.server_url == 'https://github.com'
         uses: actions/upload-artifact@v4
-        with:
-          name: buttercup-${{ matrix.os }}
-          if-no-files-found: error
-          retention-days: 14
-          path: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.zip
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.7z
-            dist/*.blockmap
-            dist/latest*.yml
-            dist/build-info-*.txt
-
-      - name: Collect installers (Forgejo)
-        if: github.server_url != 'https://github.com'
-        uses: actions/upload-artifact@v3
         with:
           name: buttercup-${{ matrix.os }}
           if-no-files-found: error
