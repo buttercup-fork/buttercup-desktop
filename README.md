@@ -1,7 +1,7 @@
 # Buttercup Desktop
 > Buttercup for Desktop - Mac, Linux and Windows
 
-[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/buttercup-fork/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/codekunde/buttercup-desktop?label=latest)](https://github.com/buttercup-fork/buttercup-desktop/releases/latest)
+[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/buttercup-fork/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/buttercup-fork/buttercup-desktop?label=latest)](https://github.com/buttercup-fork/buttercup-desktop/releases/latest)
 
 <img width="1406" alt="Buttercup Desktop screenshot" src="https://github.com/buttercup/buttercup-desktop/assets/3869469/1320b163-3e5c-4423-a4fd-8de7ffad2a0e">
 
@@ -13,7 +13,7 @@ The original [Buttercup password manager](https://github.com/buttercup/buttercup
 
 This fork is not affiliated with, endorsed by, or supported by the original Buttercup maintainers. It has not yet undergone an independent security audit (this line will be removed once/if one happens).
 
-It depends on the companion fork [`codekunde/buttercup-core`](https://github.com/codekunde/buttercup-core).
+It depends on the companion fork [`buttercup-fork/buttercup-core`](https://github.com/buttercup-fork/buttercup-core).
 
 ---
 
@@ -166,7 +166,7 @@ The `.deb` installs its own menu entry and URL-scheme handler. The AppImage regi
 
 ## Development
 
-You need **Node 20 or greater** with **npm 9 or greater**. No IDE is required — any editor works (VS Code is convenient; see [`e2e/README.md`](e2e/README.md) for its optional Playwright extension).
+You need **Node 22 or greater** with **npm 9 or greater**. No IDE is required — any editor works (VS Code is convenient; see [`e2e/README.md`](e2e/README.md) for its optional Playwright extension).
 
 Once cloned, install dependencies with `npm install`. This also builds the `buttercup-core` fork (pulled straight from git), so the first install takes a little longer.
 
