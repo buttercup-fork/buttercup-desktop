@@ -4,7 +4,7 @@ All notable changes to this fork of Buttercup Desktop are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/codekunde/buttercup-desktop/tags) and the original project's GitHub Releases.
+Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/buttercup-fork/buttercup-desktop/tags) and the original project's GitHub Releases.
 
 ## [Unreleased]
 
@@ -206,8 +206,8 @@ First release of the Codekunde fork. A modernization pass over the archived upst
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/codekunde/buttercup-desktop/compare/v2.31.0...HEAD
-[2.31.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.1...v2.31.0
-[2.30.1]: https://github.com/codekunde/buttercup-desktop/compare/v2.30.0...v2.30.1
-[2.30.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.29.0...v2.30.0
-[2.29.0]: https://github.com/codekunde/buttercup-desktop/compare/v2.28.1...v2.29.0
+[Unreleased]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.31.0...HEAD
+[2.31.0]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.30.1...v2.31.0
+[2.30.1]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.30.0...v2.30.1
+[2.30.0]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.29.0...v2.30.0
+[2.29.0]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.28.1...v2.29.0
