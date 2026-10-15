@@ -8,14 +8,21 @@ import { getAllOTPs } from "./controllers/otp";
 import { getVaults, getVaultsTree, promptVaultLock, promptVaultUnlock } from "./controllers/vaults";
 import { handleError } from "./error";
 import { requireClient, requireKeyAuth } from "./middleware";
+import { isOriginAllowed, requireLocalCaller } from "./network";
 import { saveExistingEntry, saveNewEntry } from "./controllers/save";
 
 export function buildApplication(): express.Application {
     const app = express();
     app.disable("x-powered-by");
+    // Before anything else: only this computer's own names, and no web pages
+    app.use(requireLocalCaller);
     app.use(express.text());
     app.use(express.json());
-    app.use(cors());
+    app.use(
+        cors({
+            origin: (origin, callback) => callback(null, isOriginAllowed(origin))
+        })
+    );
     app.use((req: Request, res: Response, next: NextFunction) => {
         res.set("Server", `ButtercupDesktop/${VERSION}`);
         next();
