@@ -4,7 +4,27 @@ import { AppStartMode, Config } from "../types";
 
 export type ConfigMigration = [name: string, migration: (config: Config) => Config | null];
 
+/**
+ * File host keys made before this version came from `Math.random` (secure-file-host
+ * before its fix, B-546). The key is dropped once, so a new one is generated from
+ * `crypto.randomInt`; browser extensions have to pair again.
+ */
+export const FILE_HOST_KEY_VERSION = 2;
+
 const MIGRATIONS: Array<ConfigMigration> = [
+    [
+        "fileHostKeyRandom",
+        (config: Config) => {
+            if (config.fileHostKeyVersion === FILE_HOST_KEY_VERSION) {
+                return null; //  No change
+            }
+            return {
+                ...config,
+                fileHostKey: null,
+                fileHostKeyVersion: FILE_HOST_KEY_VERSION
+            };
+        }
+    ],
     [
         "startInBackground",
         (config: Config) => {
