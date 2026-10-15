@@ -251,7 +251,7 @@
     "@buttercup/google-oauth2-client": "^2.2.0",
     "@buttercup/googledrive-client": "git+https://github.com/buttercup-fork/googledrive-client.git#master",
     "@buttercup/importer": "git+https://github.com/buttercup-fork/buttercup-importer.git#master",
-    "@buttercup/secure-file-host": "^0.3.0",
+    "@buttercup/secure-file-host": "git+https://github.com/buttercup-fork/secure-file-host.git#master",
     "@codekunde/conceal-clipboard": "file:native/conceal-clipboard",
     "buttercup": "git+https://github.com/buttercup-fork/buttercup-core.git#master",
     "cors": "^2.8.5",

@@ -45,6 +45,8 @@ export interface Config {
     browserPrivateKey: string | null;
     browserPublicKey: string | null;
     fileHostKey: null | string;
+    /** Set by a config migration, never filled in from a default */
+    fileHostKeyVersion?: number;
     isMaximised: boolean;
     preferences: Preferences;
     selectedSource: null | string;
