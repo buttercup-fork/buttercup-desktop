@@ -58,7 +58,8 @@ export interface Config {
 
 export interface DatasourceConfig {
     type: SourceType | null;
-    [key: string]: string | null;
+    // allowInsecure (WebDAV over plain http, B-684) is the only boolean
+    [key: string]: string | boolean | null;
 }
 
 export interface Language {

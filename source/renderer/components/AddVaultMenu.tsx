@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Button, Card, Classes, Dialog, Elevation, FormGroup, InputGroup, Intent, Switch } from "@blueprintjs/core";
+import { Button, Callout, Card, Checkbox, Classes, Dialog, Elevation, FormGroup, InputGroup, Intent, Switch } from "@blueprintjs/core";
 import { useState as useHookState } from "@hookstate/core";
 import path from "path-posix";
 import { FileSystemInterface } from "@buttercup/file-interface";
@@ -18,6 +18,7 @@ import { showWarning } from "../services/notifications";
 import { getIconForProvider } from "../library/icons";
 import { copyText } from "../actions/clipboard";
 import { t } from "../../shared/i18n/trans";
+import { isInsecureWebDAVURL } from "../../shared/library/webdav";
 import { DatasourceConfig, SourceType } from "../types";
 
 interface WebDAVCredentialsState {
@@ -106,6 +107,14 @@ const WideFormGroup = styled(FormGroup)`
         width: 130px !important;
     }
 `;
+// As wide as a label plus its input in the WebDAV form above
+const InsecureCallout = styled(Callout)`
+    max-width: 480px;
+    margin: 0 auto 15px;
+    p {
+        margin-bottom: 10px;
+    }
+`;
 
 export function AddVaultMenu() {
     const showAddVault = useHookState(SHOW_ADD_VAULT);
@@ -118,6 +127,10 @@ export function AddVaultMenu() {
     const [createNew, setCreateNew] = useState(false);
     const [vaultPassword, setVaultPassword] = useState("");
     const [webdavCredentials, setWebDAVCredentials] = useState<WebDAVCredentialsState>({ ...EMPTY_WEBDAV_CREDENTIALS });
+    // B-684: plain http to another computer sends the WebDAV password in clear
+    // text, so it needs the user's explicit OK before anything is sent
+    const [allowInsecureWebDAV, setAllowInsecureWebDAV] = useState(false);
+    const webdavInsecure = isInsecureWebDAVURL(webdavCredentials.url);
     const [authenticatingGoogleDrive, setAuthenticatingGoogleDrive] = useState(false);
     const [vaultFilenameOverride, setVaultFilenameOverride] = useState<string | null>(null);
     useEffect(() => {
@@ -135,6 +148,7 @@ export function AddVaultMenu() {
         setCurrentPage(PAGE_TYPE);
         setDatasourcePayload({ ...EMPTY_DATASOURCE_CONFIG });
         setWebDAVCredentials({ ...EMPTY_WEBDAV_CREDENTIALS });
+        setAllowInsecureWebDAV(false);
         setVaultPassword("");
         setAuthenticatingGoogleDrive(false);
         setVaultFilenameOverride(null);
@@ -222,6 +236,12 @@ export function AddVaultMenu() {
                 setAuthenticatingGoogleDrive(false);
             }
         } else if (selectedType === SourceType.WebDAV) {
+            // Checked before the connection test and the file chooser, which
+            // both send the password
+            if (webdavInsecure && !allowInsecureWebDAV) {
+                showError(t("add-vault-menu.loader.webdav-auth.insecure-blocked"));
+                return;
+            }
             setBusy(true);
             try {
                 await testWebDAV(webdavCredentials.url, webdavCredentials.username, webdavCredentials.password);
@@ -231,9 +251,12 @@ export function AddVaultMenu() {
                 return;
             }
             setBusy(false);
-            const newPayload = {
+            const newPayload: { endpoint: string; allowInsecure?: boolean } = {
                 endpoint: webdavCredentials.url
             };
+            if (webdavInsecure) {
+                newPayload.allowInsecure = true;
+            }
             if (webdavCredentials.username && webdavCredentials.password) {
                 Object.assign(newPayload, {
                     username: webdavCredentials.username,
@@ -247,7 +270,7 @@ export function AddVaultMenu() {
             setFsInstance(getFSInstance(SourceType.WebDAV, newPayload));
             setCurrentPage(PAGE_CHOOSE);
         }
-    }, [selectedType, datasourcePayload, webdavCredentials]);
+    }, [selectedType, datasourcePayload, webdavCredentials, webdavInsecure, allowInsecureWebDAV]);
     const handleAuthURLCopy = useCallback(async () => {
         if (selectedType === SourceType.GoogleDrive) {
             try {
@@ -313,7 +336,7 @@ export function AddVaultMenu() {
         if (selectedType === SourceType.GoogleDrive && selectedRemotePath && datasource.token) {
             const [parentIdentifier, identifier] = JSON.parse(selectedRemotePath);
             datasource.fileID = createNew
-                ? await createEmptyGoogleDriveVault(datasource.token, parentIdentifier, identifier, vaultPassword)
+                ? await createEmptyGoogleDriveVault(datasource.token as string, parentIdentifier, identifier, vaultPassword)
                 : identifier;
         }
         addNewVaultTarget(datasource, vaultPassword, createNew, vaultFilenameOverride);
@@ -360,10 +383,14 @@ export function AddVaultMenu() {
                     >
                         <InputGroup
                             placeholder="https://..."
-                            onChange={evt => setWebDAVCredentials({
-                                ...webdavCredentials,
-                                url: evt.target.value
-                            })}
+                            onChange={evt => {
+                                setWebDAVCredentials({
+                                    ...webdavCredentials,
+                                    url: evt.target.value
+                                });
+                                // An OK given for one address doesn't carry over to another
+                                setAllowInsecureWebDAV(false);
+                            }}
                             onKeyDown={evt => {
                                 if (evt.key === "Enter" && webdavCredentials.url) {
                                     handleAuthSubmit();
@@ -373,6 +400,20 @@ export function AddVaultMenu() {
                             autoFocus
                         />
                     </WideFormGroup>
+                    {webdavInsecure && (
+                        <InsecureCallout
+                            data-testid="webdav-insecure-warning"
+                            intent={Intent.WARNING}
+                            title={t("add-vault-menu.loader.webdav-auth.insecure-title")}
+                        >
+                            <p>{t("add-vault-menu.loader.webdav-auth.insecure-warning")}</p>
+                            <Checkbox
+                                checked={allowInsecureWebDAV}
+                                label={t("add-vault-menu.loader.webdav-auth.insecure-allow")}
+                                onChange={evt => setAllowInsecureWebDAV((evt.target as HTMLInputElement).checked)}
+                            />
+                        </InsecureCallout>
+                    )}
                     <WideFormGroup
                         inline
                         label={t("add-vault-menu.loader.webdav-auth.username-label")}
@@ -485,7 +526,7 @@ export function AddVaultMenu() {
                     )}
                     {currentPage === PAGE_AUTH && selectedType === SourceType.WebDAV && (
                         <Button
-                            disabled={!webdavCredentials.url}
+                            disabled={!webdavCredentials.url || (webdavInsecure && !allowInsecureWebDAV)}
                             intent={Intent.PRIMARY}
                             onClick={handleAuthSubmit}
                             title={t("add-vault-menu.webdav-continue-title")}

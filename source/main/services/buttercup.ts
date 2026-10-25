@@ -30,8 +30,9 @@ import { setAutoLockSuspended, startAutoVaultLockTimer } from "./autoLock";
 import { logErr, logInfo } from "../library/log";
 import { attachSourceEncryptedListeners } from "./backup";
 import { extractVaultOTPItems } from "../library/otp";
-import { isDamagedVaultError } from "../library/vaultErrors";
+import { isDamagedVaultError, isInsecureEndpointError } from "../library/vaultErrors";
 import { offerOfflineCopyRestore } from "./damagedVault";
+import { offerInsecureWebDAVUnlock } from "./insecureWebDAV";
 import { lockVaultSource } from "./lockVault";
 import { t } from "../../shared/i18n/trans";
 import { OTP, SourceType, VaultSourceDescription } from "../types";
@@ -504,7 +505,17 @@ export async function unlockSource(sourceID: VaultSourceID, password: string) {
     const vaultManager = getVaultManager();
     const source = vaultManager.getSourceForID(sourceID);
     try {
-        await source.unlock(Credentials.fromPassword(password));
+        try {
+            await source.unlock(Credentials.fromPassword(password));
+        } catch (err) {
+            // B-684: core refuses a WebDAV address on plain http until the
+            // user allows it once; the choice is then stored with the source
+            if (!isInsecureEndpointError(err)) throw err;
+            if (!(await offerInsecureWebDAVUnlock(source, password))) {
+                throw new Error(t("error.insecure-webdav-declined"));
+            }
+            await vaultManager.dehydrateSource(source);
+        }
     } catch (err) {
         if (!isDamagedVaultError(err)) throw err;
         logErr(`Vault file of '${sourceID}' is damaged`, err);

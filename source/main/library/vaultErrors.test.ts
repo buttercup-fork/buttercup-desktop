@@ -1,4 +1,24 @@
-import { isDamagedVaultError } from "./vaultErrors";
+import { Layerr } from "layerr";
+import { isDamagedVaultError, isInsecureEndpointError } from "./vaultErrors";
+
+describe("isInsecureEndpointError (B-684)", () => {
+    test("recognises core's refusal, also when wrapped by unlock", () => {
+        const refused = new Layerr(
+            { info: { code: "INSECURE_ENDPOINT" } },
+            "WebDAV endpoint uses unencrypted http"
+        );
+        expect(isInsecureEndpointError(refused)).toBe(true);
+        expect(isInsecureEndpointError(new Layerr(refused, "Failed unlocking source"))).toBe(true);
+    });
+
+    test("ignores other errors", () => {
+        expect(
+            isInsecureEndpointError(new Layerr({ info: { code: "DECRYPTION_FAILED" } }, "x"))
+        ).toBe(false);
+        expect(isInsecureEndpointError(new Error("Failed unlocking source"))).toBe(false);
+        expect(isInsecureEndpointError(null)).toBe(false);
+    });
+});
 
 test("recognises a vault cut off before its salt", () => {
     expect(
