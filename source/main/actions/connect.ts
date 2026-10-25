@@ -16,7 +16,7 @@ export async function addVaultFromPayload(payload: AddVaultPayload): Promise<Vau
                 payload.datasourceConfig,
                 payload.masterPassword
             );
-            name = payload.fileNameOverride || payload.datasourceConfig.fileID;
+            name = payload.fileNameOverride || (payload.datasourceConfig.fileID as string);
             break;
         case SourceType.Dropbox:
         /* falls-through */
@@ -27,7 +27,7 @@ export async function addVaultFromPayload(payload: AddVaultPayload): Promise<Vau
                 payload.datasourceConfig,
                 payload.masterPassword
             );
-            name = path.basename(payload.datasourceConfig.path).replace(/\.bcup$/i, "");
+            name = path.basename(payload.datasourceConfig.path as string).replace(/\.bcup$/i, "");
             break;
         }
         default:
