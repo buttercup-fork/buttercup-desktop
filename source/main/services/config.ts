@@ -11,7 +11,6 @@ const DEFAULT_CONFIG: Config = {
     browserClients: {},
     browserPrivateKey: null,
     browserPublicKey: null,
-    fileHostKey: null,
     isMaximised: false,
     preferences: naiveClone(PREFERENCES_DEFAULT),
     selectedSource: null,
@@ -44,6 +43,12 @@ export async function initialise(): Promise<void> {
     if (didMigrate) {
         logInfo("Detected config migration changes");
         await storage.setValues(updatedConfig);
+        // setValues only adds and replaces: remove what a migration dropped
+        for (const key of Object.keys(config)) {
+            if (!Object.prototype.hasOwnProperty.call(updatedConfig, key)) {
+                await storage.removeKey(key);
+            }
+        }
     }
     // Fill empty config values
     for (const key in DEFAULT_CONFIG) {

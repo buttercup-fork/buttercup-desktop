@@ -5,6 +5,8 @@ import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
 
 const BROWSER_API_PORT = 12822;
+/** The removed Secure File Host's port (B-578, D-046) */
+const LEGACY_FILE_HOST_PORT = 12821;
 const EXTENSION_ORIGIN = "chrome-extension://abcdefghijklmnopabcdefghijklmnop";
 const PAIRING_REQUEST = JSON.stringify({ client: "browser", purpose: "vaults-access", rev: 1 });
 const WEB_PAGE = "https://evil.example.com";
@@ -35,9 +37,9 @@ function send(
     });
 }
 
-function canConnect(host: string): Promise<boolean> {
+function canConnect(host: string, port: number = BROWSER_API_PORT): Promise<boolean> {
     return new Promise((resolve) => {
-        const socket = connect({ host, port: BROWSER_API_PORT });
+        const socket = connect({ host, port });
         socket.on("connect", () => {
             socket.destroy();
             resolve(true);
@@ -152,5 +154,11 @@ test.describe("browser API", () => {
         test.skip(!lan, "no network address on this machine");
         expect(await canConnect("127.0.0.1")).toBe(true);
         expect(await canConnect(lan!.address)).toBe(false);
+    });
+
+    test("does not open the old Secure File Host port", async () => {
+        expect(await canConnect("127.0.0.1")).toBe(true);
+        expect(await canConnect("127.0.0.1", LEGACY_FILE_HOST_PORT)).toBe(false);
+        expect(await canConnect("::1", LEGACY_FILE_HOST_PORT)).toBe(false);
     });
 });

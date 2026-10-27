@@ -73,7 +73,7 @@
         "debug": "Debug",
         "devtool": "Devtool",
         "edit": "Edit",
-        "enable-secure-file-host": "Enable browser access",
+        "enable-browser-access": "Enable browser access",
         "export": "Export",
         "import": "Import",
         "lock-all": "Lock All",
@@ -274,18 +274,6 @@
         "vault-restore-failed": "The vault file is damaged, and restoring the last saved copy failed: {{message}}",
         "vault-settings-fetch-failed": "Failed fetching vault settings"
     },
-    "file-host": {
-        "code-copied": "File host code copied",
-        "dialog": {
-            "close-button": "Close",
-            "close-button-title": "Close connection dialog",
-            "instruction": {
-                "new-connection": "A new connection has been made to this application, requesting remote access to the file system.",
-                "use-code": "Use the following code to authorise it."
-            },
-            "title": "Secure File Host Connection"
-        }
-    },
     "input-required": "(required)",
     "notification": {
         "attachment-downloaded": "Attachment saved successfully",
@@ -355,10 +343,10 @@
                 "label": "Enable the pre-release update channel",
                 "title": "Pre-release updates"
             },
-            "secure-file-host": {
-                "description": "The secure file host allows the <strong>Buttercup Browser Extension</strong> to connect to local vaults on this PC via this application.",
-                "label": "Enable secure file host",
-                "title": "Secure file host"
+            "browser-access": {
+                "description": "Browser access lets the <strong>Buttercup Browser Extension</strong> use the vaults in this application. Only programs on this computer can connect, and each browser has to be paired first with a code that this application shows.",
+                "label": "Enable browser access",
+                "title": "Browser access"
             },
             "startup-options": {
                 "background": {

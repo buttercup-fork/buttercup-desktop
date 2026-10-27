@@ -271,13 +271,13 @@ export function PreferencesDialog() {
     );
     const pageConnectivity = () => (
         <>
-            <FormGroup label={t("preferences.item.secure-file-host.title")}>
+            <FormGroup label={t("preferences.item.browser-access.title")}>
                 <Callout icon="info-sign">
-                    <div dangerouslySetInnerHTML={{ __html: t("preferences.item.secure-file-host.description") }} />
+                    <div dangerouslySetInnerHTML={{ __html: t("preferences.item.browser-access.description") }} />
                 </Callout>
                 <Switch
                     checked={preferences.fileHostEnabled}
-                    label={t("preferences.item.secure-file-host.label")}
+                    label={t("preferences.item.browser-access.label")}
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setPreferences({
                         ...naiveClone(preferences),
                         fileHostEnabled: evt.target.checked

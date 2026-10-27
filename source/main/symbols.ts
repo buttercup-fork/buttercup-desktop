@@ -8,4 +8,3 @@ export const BUTTERCUP_PROTOCOL = "codekunde-buttercup://";
 export const LEGACY_BUTTERCUP_PROTOCOL = "buttercup://";
 export const ACCEPTED_PROTOCOLS = [BUTTERCUP_PROTOCOL, LEGACY_BUTTERCUP_PROTOCOL];
 export const PLATFORM_MACOS = "darwin";
-export const SECURE_FILE_HOST_PORT = 12821;

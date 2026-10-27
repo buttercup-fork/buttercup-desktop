@@ -1,38 +1,45 @@
-import { FILE_HOST_KEY_VERSION, runConfigMigrations } from "./migration";
+import { REMOVED_FILE_HOST_KEYS, runConfigMigrations } from "./migration";
 import { Config } from "../types";
 
-function makeConfig(values: Partial<Config>): Config {
-    return values as Config;
+function makeConfig(values: Record<string, unknown>): Config {
+    return values as unknown as Config;
 }
 
-describe("file host key migration", () => {
-    test("drops a key from before the version and marks the config", () => {
+describe("file host removal migration", () => {
+    test("removes the stored file host key and its version marker", () => {
+        const [config, changed] = runConfigMigrations(
+            makeConfig({ fileHostKey: "old-key", fileHostKeyVersion: 2, windowWidth: 800 })
+        );
+        expect(changed).toBe(true);
+        for (const key of REMOVED_FILE_HOST_KEYS) {
+            expect(Object.prototype.hasOwnProperty.call(config, key)).toBe(false);
+        }
+        expect(config.windowWidth).toBe(800);
+    });
+
+    test("removes a key from before the version marker existed", () => {
         const [config, changed] = runConfigMigrations(makeConfig({ fileHostKey: "old-key" }));
         expect(changed).toBe(true);
-        expect(config.fileHostKey).toBeNull();
-        expect(config.fileHostKeyVersion).toBe(FILE_HOST_KEY_VERSION);
+        expect(Object.prototype.hasOwnProperty.call(config, "fileHostKey")).toBe(false);
     });
 
-    test("keeps a key once the config has the version", () => {
-        const [config, changed] = runConfigMigrations(
-            makeConfig({ fileHostKey: "new-key", fileHostKeyVersion: FILE_HOST_KEY_VERSION })
-        );
-        expect(changed).toBe(false);
-        expect(config.fileHostKey).toBe("new-key");
+    test("removes an empty key too", () => {
+        const [config, changed] = runConfigMigrations(makeConfig({ fileHostKey: null }));
+        expect(changed).toBe(true);
+        expect(Object.prototype.hasOwnProperty.call(config, "fileHostKey")).toBe(false);
     });
 
-    test("only drops the key once", () => {
+    test("changes nothing once the keys are gone", () => {
         const [first] = runConfigMigrations(makeConfig({ fileHostKey: "old-key" }));
-        const generated = { ...first, fileHostKey: "generated-key" };
-        const [second, changed] = runConfigMigrations(generated);
+        const [second, changed] = runConfigMigrations(first);
         expect(changed).toBe(false);
-        expect(second.fileHostKey).toBe("generated-key");
+        expect(second).toEqual(first);
     });
 
-    test("marks a fresh config without touching anything else", () => {
-        const [config] = runConfigMigrations(makeConfig({ fileHostKey: null, windowWidth: 800 }));
-        expect(config.fileHostKey).toBeNull();
-        expect(config.windowWidth).toBe(800);
-        expect(config.fileHostKeyVersion).toBe(FILE_HOST_KEY_VERSION);
+    test("leaves the browser access preference alone", () => {
+        const [config] = runConfigMigrations(
+            makeConfig({ fileHostKey: "old-key", preferences: { fileHostEnabled: true } })
+        );
+        expect(config.preferences.fileHostEnabled).toBe(true);
     });
 });

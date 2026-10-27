@@ -14,7 +14,6 @@ import { AddVaultMenu } from "./components/AddVaultMenu";
 import { PreferencesDialog } from "./components/PreferencesDialog";
 import { BrowserAccessDialog } from "./components/standalone/BrowserAccessDialog";
 import { Notifications } from "./components/Notifications";
-import { FileHostConnectionNotice } from "./components/standalone/FileHostConnectionNotice";
 import { CreateNewFilePrompt } from "./components/standalone/CreateNewFilePrompt";
 import { UpdateDialog } from "./components/standalone/UpdateDialog";
 import { UpdateErrorDialog } from "./components/standalone/UpdateErrorDialog";
@@ -55,7 +54,6 @@ export function App() {
                             </Switch>
                             <>
                                 <PasswordPrompt />
-                                <FileHostConnectionNotice />
                                 <BrowserAccessDialog />
                                 <CreateNewFilePrompt />
                                 <AddVaultMenu />

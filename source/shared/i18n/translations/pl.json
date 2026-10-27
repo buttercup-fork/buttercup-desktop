@@ -62,7 +62,7 @@
         "debug": "Debugowanie",
         "devtool": "Narzędzie programistyczne",
         "edit": "Edytuj",
-        "enable-secure-file-host": "Włącz dostęp przeglądarki",
+        "enable-browser-access": "Włącz dostęp przeglądarki",
         "lock-all": "Zablokuj",
         "lock-current-vault": "Zablokuj aktualne archiwum",
         "open": "Otwórz",
@@ -134,18 +134,6 @@
     "error": {
         "fatal-boundary": "Wystąpił błąd krytyczny - przepraszamy za jego wystąpienie. Prosimy zapoznać się z poniższymi szczegółami, w celu pomocy z rozpoznaniem problem:"
     },
-    "file-host": {
-        "code-copied": "Skopiowano kod hosta pliku",
-        "dialog": {
-            "close-button": "Zamknij",
-            "close-button-title": "Zamknij okno połączenia",
-            "instruction": {
-                "new-connection": "Nawiązano nowe połączenie z tą aplikacją, żądając zdalnego dostępu do systemu plików.",
-                "use-code": "Użyj poniższego kodu, aby go autoryzować."
-            },
-            "title": "Bezpieczne połączenie z hostem plików"
-        }
-    },
     "input-required": "(wymagane)",
     "notification": {
         "error": {
@@ -174,10 +162,8 @@
             "lock-vaults-after-time-desc": "Automatyczne zablokowanie archiwów po pewnym okresie bezczynności.",
             "lock-vaults-window-closed": "Zablokuj archiwa po zamknięciu okna archiwum",
             "lock-vaults-window-closed-label": "Zablokuj podczas zamknięcia",
-            "secure-file-host": {
-                "description": "Bezpieczny host plików umożliwia <strong>rozszerzeniu przeglądarki Buttercup</strong> łączenie się z lokalnymi archiwami na tym komputerze za pośrednictwem tej aplikacji.",
-                "label": "Włącz bezpieczny host plików",
-                "title": "Bezpieczny host plików"
+            "browser-access": {
+                "label": "Włącz dostęp przeglądarki"
             },
             "theme": "Motyw"
         },

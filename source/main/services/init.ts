@@ -8,7 +8,6 @@ import { updateAppMenu } from "../actions/appMenu";
 import { getConfigValue, initialise as initialiseConfig } from "./config";
 import { getConfigPath, getVaultSettingsPath, getVaultStoragePath } from "./storage";
 import { getOSLocale } from "./locale";
-import { startFileHost } from "./fileHost";
 import { isPortable } from "../library/portability";
 import { getLogPath } from "./log";
 import { startUpdateWatcher } from "./update";
@@ -60,10 +59,9 @@ export async function initialise() {
     await applyCurrentTheme();
     if (preferences.fileHostEnabled) {
         try {
-            await startFileHost();
             await startBrowserAPI();
         } catch (err) {
-            logErr("Failed starting browser access / file host on launch", err);
+            logErr("Failed starting browser access on launch", err);
         }
     }
     registerGoogleDriveAuthHandlers();

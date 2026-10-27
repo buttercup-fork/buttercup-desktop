@@ -70,7 +70,6 @@ export const IPC_RECEIVE_CHANNELS = [
     "add-vault-config:reply",
     "browser-access-code",
     "browser-access-code-hide",
-    "file-host-code",
     "get-empty-vault:reply",
     "get-preferences:reply",
     "google-reauth",

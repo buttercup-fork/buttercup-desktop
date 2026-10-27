@@ -64,7 +64,7 @@
         "debug": "Debug",
         "devtool": "Devtool",
         "edit": "Editează",
-        "enable-secure-file-host": "Permite accesul browser-ului",
+        "enable-browser-access": "Permite accesul browser-ului",
         "export": "Exportă",
         "import": "Importă",
         "lock-all": "Blochează-le pe Toate",
@@ -173,18 +173,6 @@
         "biometric-unlock-failed": "Deblocarea biometrică a seifului a eșuat",
         "fatal-boundary": "O eroare fatală s-a produs - ne pare rău ca s-a întamplat așa ceva. Te rugăm, verifică detaliile de jos în caz că ajută la diagnosticarea problemei:"
     },
-    "file-host": {
-        "code-copied": "Codul gazdei de fișiere a fost copiat",
-        "dialog": {
-            "close-button": "Închide",
-            "close-button-title": "Închide fereastra de dialog a conexiunii",
-            "instruction": {
-                "new-connection": "O nouă conexiune a fost stabilită pentru aplicație, se cere accesul de la distanță a sistemului de fișiere.",
-                "use-code": "Folosește următorul cod pentru a-l autoriza."
-            },
-            "title": "Conexiunea Gazdei Securizată a Fișierelor"
-        }
-    },
     "input-required": "(necesar)",
     "notification": {
         "attachment-downloaded": "Atașamentul a fost salvat cu succes",
@@ -219,10 +207,8 @@
             "lock-vaults-after-time-desc": "Blochează automatic seifurile după o perioadă de inactivitate.",
             "lock-vaults-window-closed": "Blochează seifurile dacă fereastra se închide",
             "lock-vaults-window-closed-label": "Blochează la închidere",
-            "secure-file-host": {
-                "description": "<strong>Extensia Browser Buttercup</strong> pentru a te conecta la seifurile locale prin această aplicație.",
-                "label": "Activează găzduirea securizată fișierelor",
-                "title": "Găzduirea Securizată a Fișierelor"
+            "browser-access": {
+                "label": "Permite accesul browser-ului"
             },
             "theme": "Temă"
         },

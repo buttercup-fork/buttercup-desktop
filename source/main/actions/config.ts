@@ -3,7 +3,6 @@ import { applyCurrentTheme } from "../services/theme";
 import { getOSLocale } from "../services/locale";
 import { changeLanguage, t } from "../../shared/i18n/trans";
 import { getLanguage } from "../../shared/library/i18n";
-import { startFileHost, stopFileHost } from "../services/fileHost";
 import { setStartWithSession } from "../services/launch";
 import { start as startBrowserAPI, stop as stopBrowserAPI } from "../services/browser/index";
 import { setConfigValue } from "../services/config";
@@ -36,17 +35,16 @@ export async function handleConfigUpdate(preferences: Preferences) {
     await setStartWithSession(preferences.startWithSession);
     // Pick up a changed `lockVaultsAfterTime` immediately.
     await startAutoVaultLockTimer();
-    logInfo(` - File host: ${preferences.fileHostEnabled ? "Enabled" : "Disabled"}`);
+    // `fileHostEnabled` is the browser access switch (it kept the old file host's name)
+    logInfo(` - Browser access: ${preferences.fileHostEnabled ? "Enabled" : "Disabled"}`);
     if (preferences.fileHostEnabled) {
         try {
             await startBrowserAPI();
-            await startFileHost();
         } catch (err) {
-            logErr("Failed enabling browser access / file host", err);
+            logErr("Failed enabling browser access", err);
             // Roll the preference back so the UI doesn't show it as enabled while
             // nothing is listening (e.g. the port is already in use).
             await stopBrowserAPI().catch(() => {});
-            await stopFileHost().catch(() => {});
             preferences.fileHostEnabled = false;
             await setConfigValue("preferences", preferences);
             const window = getMainWindow();
@@ -63,6 +61,5 @@ export async function handleConfigUpdate(preferences: Preferences) {
         }
     } else {
         await stopBrowserAPI();
-        await stopFileHost();
     }
 }
