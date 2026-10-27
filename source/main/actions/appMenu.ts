@@ -205,7 +205,7 @@ async function getContextMenu(): Promise<Menu> {
             label: t("app-menu.connection"),
             submenu: [
                 {
-                    label: t("app-menu.enable-secure-file-host"),
+                    label: t("app-menu.enable-browser-access"),
                     type: "checkbox",
                     checked: preferences.fileHostEnabled,
                     click: async () => {

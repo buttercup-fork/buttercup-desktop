@@ -64,7 +64,7 @@
         "debug": "调试",
         "devtool": "开发工具",
         "edit": "编辑",
-        "enable-secure-file-host": "启用浏览器访问",
+        "enable-browser-access": "启用浏览器访问",
         "export": "导出",
         "import": "导入",
         "lock-all": "锁定全部",
@@ -190,18 +190,6 @@
         "biometric-unlock-failed": "使用生物识别技术解锁保险柜失败",
         "fatal-boundary": "发生了致命错误 - 很抱歉发生了这种情况。 请查看以下详细信息，以帮助诊断问题:"
     },
-    "file-host": {
-        "code-copied": "已复制文件主机代码",
-        "dialog": {
-            "close-button": "关闭",
-            "close-button-title": "关闭连接对话框",
-            "instruction": {
-                "new-connection": "已与此应用程序建立新连接，请求远程访问文件系统。",
-                "use-code": "使用以下代码对其进行授权。"
-            },
-            "title": "安全文件主机连接"
-        }
-    },
     "input-required": "(必需)",
     "notification": {
         "attachment-downloaded": "附件保存成功",
@@ -241,10 +229,8 @@
             "lock-vaults-after-time-desc": "在一段时间不活动后自动锁定保险柜。",
             "lock-vaults-window-closed": "如果保险柜窗口关闭，则锁定保险柜",
             "lock-vaults-window-closed-label": "锁定关闭",
-            "secure-file-host": {
-                "description": "安全文件主机允许 <strong>Buttercup 浏览器扩展</strong> 通过此应用程序连接到此 PC 上的本地保险柜。",
-                "label": "启用安全文件主机",
-                "title": "安全文件主机"
+            "browser-access": {
+                "label": "启用浏览器访问"
             },
             "theme": "主题"
         },

@@ -64,7 +64,7 @@
         "debug": "Debug",
         "devtool": "Devtool",
         "edit": "Bearbeiten",
-        "enable-secure-file-host": "Erlaube Browser Zugriff",
+        "enable-browser-access": "Erlaube Browser Zugriff",
         "export": "Exportieren",
         "import": "Importieren",
         "lock-all": "Sperre Alles",
@@ -190,18 +190,6 @@
         "biometric-unlock-failed": "Das Entsperren des Tresors via Biometrie ist fehlgeschlagen",
         "fatal-boundary": "Leider ist ein kritischer Fehler aufgetreten - wir entschuldigen für die Unannehmlichkeiten. Bitte sichte die Details darunter, da sie für die Fehlerdiagnose hilfreich sein könnten:"
     },
-    "file-host": {
-        "code-copied": "File Host Code wurde kopiert",
-        "dialog": {
-            "close-button": "Schließen",
-            "close-button-title": "Schließe Verbindungs-Dialog",
-            "instruction": {
-                "new-connection": "Eine neue Verbindung wurde zu dieser Applikation hergestellt und Fernzugriff zu dem Dateisystem angefragt.",
-                "use-code": "Nutze für die Authentifizierung folgenden Code."
-            },
-            "title": "Secure File Host Verbindung"
-        }
-    },
     "input-required": "(erforderlich)",
     "notification": {
         "attachment-downloaded": "Anhang wurde erfolgreich gespeichert",
@@ -241,10 +229,8 @@
             "lock-vaults-after-time-desc": "Sperre Tresore nach einer bestimmten Zeit mit Inaktivität automatisch.",
             "lock-vaults-window-closed": "Sperre Tresore sobald das Fenster geschlossen wurde",
             "lock-vaults-window-closed-label": "Sperre nach dem Schließen",
-            "secure-file-host": {
-                "description": "Der Secure File Host erlaubt der <strong>Buttercup Browser Erweiterung</strong> sich zu den lokalen Tresoren auf diesem PC mit dieser Applikation zu verbinden.",
-                "label": "Aktiviere den Secure File Host",
-                "title": "Secure File Host"
+            "browser-access": {
+                "label": "Erlaube Browser Zugriff"
             },
             "theme": "Design"
         },

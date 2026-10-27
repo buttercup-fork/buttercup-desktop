@@ -69,7 +69,7 @@
         "debug": "除錯",
         "devtool": "開發工具",
         "edit": "編輯",
-        "enable-secure-file-host": "啟用瀏覽器存取",
+        "enable-browser-access": "啟用瀏覽器存取",
         "export": "匯出",
         "import": "匯入",
         "lock-all": "全部鎖定",
@@ -216,18 +216,6 @@
         "fatal-boundary": "發生嚴重錯誤 - 我們很抱歉發生了這種情況。請檢視以下詳細資訊，以幫助診斷問題：",
         "vault-settings-fetch-failed": "取得保險箱設定失敗"
     },
-    "file-host": {
-        "code-copied": "檔案主機存取代碼已複製",
-        "dialog": {
-            "close-button": "關閉",
-            "close-button-title": "關閉連線對話框",
-            "instruction": {
-                "new-connection": "已建立與此應用程式的新連線，請求遠端存取檔案系統。",
-                "use-code": "使用以下存取代碼進行授權。"
-            },
-            "title": "安全檔案主機連線"
-        }
-    },
     "input-required": "(必填)",
     "notification": {
         "attachment-downloaded": "附件已成功儲存",
@@ -272,10 +260,8 @@
                 "label": "啟用預覽版發布更新頻道",
                 "title": "預覽版發布更新"
             },
-            "secure-file-host": {
-                "description": "安全檔案主機允許 <strong>Buttercup 瀏覽器擴充套件</strong> 透過此應用程式連線到本機保險箱。",
-                "label": "啟用安全檔案主機",
-                "title": "安全檔案主機"
+            "browser-access": {
+                "label": "啟用瀏覽器存取"
             },
             "startup-options": {
                 "background": {

@@ -5,24 +5,26 @@ import { AppStartMode, Config } from "../types";
 export type ConfigMigration = [name: string, migration: (config: Config) => Config | null];
 
 /**
- * File host keys made before this version came from `Math.random` (secure-file-host
- * before its fix, B-546). The key is dropped once, so a new one is generated from
- * `crypto.randomInt`; browser extensions have to pair again.
+ * Config keys of the Secure File Host (port 12821), removed in B-578 (D-046): its
+ * stored key and the version marker of the earlier key migration (B-546).
  */
-export const FILE_HOST_KEY_VERSION = 2;
+export const REMOVED_FILE_HOST_KEYS = ["fileHostKey", "fileHostKeyVersion"] as const;
 
 const MIGRATIONS: Array<ConfigMigration> = [
     [
-        "fileHostKeyRandom",
+        "removeFileHost",
         (config: Config) => {
-            if (config.fileHostKeyVersion === FILE_HOST_KEY_VERSION) {
+            const present = REMOVED_FILE_HOST_KEYS.filter((key) =>
+                Object.prototype.hasOwnProperty.call(config, key)
+            );
+            if (present.length === 0) {
                 return null; //  No change
             }
-            return {
-                ...config,
-                fileHostKey: null,
-                fileHostKeyVersion: FILE_HOST_KEY_VERSION
-            };
+            const updated: Record<string, unknown> = { ...config };
+            for (const key of present) {
+                delete updated[key];
+            }
+            return updated as unknown as Config;
         }
     ],
     [

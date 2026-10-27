@@ -64,7 +64,7 @@
         "debug": "Vianmääritys",
         "devtool": "Kehitystyökalu",
         "edit": "Muokkaa",
-        "enable-secure-file-host": "Ota selainkäyttöoikeus käyttöön",
+        "enable-browser-access": "Ota selainkäyttöoikeus käyttöön",
         "export": "Vie",
         "import": "Tuo",
         "lock-all": "Lukitse kaikki",
@@ -190,18 +190,6 @@
         "biometric-unlock-failed": "Holvin lukituksen avaaminen biometristen tietojen avulla epäonnistui",
         "fatal-boundary": "Tapahtui kohtalokas virhe - olemme pahoillamme, että näin on tapahtunut. Tarkista alla olevat tiedot, jos ne auttavat diagnosoimaan ongelman:"
     },
-    "file-host": {
-        "code-copied": "Tiedoston isäntäkoodi kopioitu",
-        "dialog": {
-            "close-button": "Sulje",
-            "close-button-title": "Sulje yhteysikkuna",
-            "instruction": {
-                "new-connection": "Tähän sovellukseen on muodostettu uusi yhteys, joka pyytää etäyhteyttä tiedostojärjestelmään.",
-                "use-code": "Käytä seuraavaa koodia valtuuttamaan se."
-            },
-            "title": "Suojattu tiedoston isäntäyhteys"
-        }
-    },
     "input-required": "(required)",
     "notification": {
         "attachment-downloaded": "Liite tallennettu onnistuneesti",
@@ -241,10 +229,8 @@
             "lock-vaults-after-time-desc": "Lukitsee holvit automaattisesti jonkin aikaa käyttämättömänä.",
             "lock-vaults-window-closed": "Lukitse holvit, jos holvin ikkuna suljetaan",
             "lock-vaults-window-closed-label": "Lukitus kiinni",
-            "secure-file-host": {
-                "description": "Suojatun tiedostopalvelimen avulla <strong>Buttercup selainlaajennus</strong> voi muodostaa yhteyden tämän tietokoneen paikallisiin varastoihin tämän sovelluksen kautta.",
-                "label": "Ota suojattu tiedostopalvelin käyttöön",
-                "title": "Suojattu tiedoston isäntä"
+            "browser-access": {
+                "label": "Ota selainkäyttöoikeus käyttöön"
             },
             "theme": "Teema"
         },

@@ -64,7 +64,7 @@
         "debug": "Depurador",
         "devtool": "Devtool",
         "edit": "Editar",
-        "enable-secure-file-host": "Activar acceso por navegador",
+        "enable-browser-access": "Activar acceso por navegador",
         "export": "Exportar",
         "import": "Importar",
         "lock-all": "Bloquear todos",
@@ -169,18 +169,6 @@
         "biometric-unlock-failed": "Error al desbloquear el cofre usando datos biométricos",
         "fatal-boundary": "Se ha producido un error grave. Lamentamos que haya ocurrido. Consulta los detalles para saber que ha pasado:"
     },
-    "file-host": {
-        "code-copied": "Código del servidor de archivos copiado",
-        "dialog": {
-            "close-button": "Cerrar",
-            "close-button-title": "Cerrar ventana de conexión",
-            "instruction": {
-                "new-connection": "Se ha realizado una nueva conexión a esta aplicación, solicitando acceso remoto al sistema de archivos.",
-                "use-code": "Utiliza el siguiente código para autorizarlo."
-            },
-            "title": "Conexión segura al servidor de archivos"
-        }
-    },
     "input-required": "(requerido)",
     "notification": {
         "biometrics-disabled": "Biometría deshabilitada para cofres",
@@ -214,10 +202,8 @@
             "lock-vaults-after-time-desc": "Bloquear cofres automáticamente después de un período de inactividad.",
             "lock-vaults-window-closed": "Bloquear cofres si la ventana está cerrada",
             "lock-vaults-window-closed-label": "Bloquear al cerrar",
-            "secure-file-host": {
-                "description": "El servidor de archivos permite que la <strong>extensión del navegador Buttercup</strong> se conecte a los cofres locales del ordenador a través de esta aplicación.",
-                "label": "Activar el servidor de archivos seguro",
-                "title": "Servidor de archivos seguro"
+            "browser-access": {
+                "label": "Activar acceso por navegador"
             },
             "theme": "Tema"
         },

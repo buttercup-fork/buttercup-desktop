@@ -64,7 +64,7 @@
         "debug": "デバッグ",
         "devtool": "開発者ツール",
         "edit": "編集",
-        "enable-secure-file-host": "ブラウザアクセスを有効化",
+        "enable-browser-access": "ブラウザアクセスを有効化",
         "export": "エクスポート",
         "import": "インポート",
         "lock-all": "すべてロック",
@@ -190,18 +190,6 @@
         "biometric-unlock-failed": "生体認証による保管庫のアンロックに失敗",
         "fatal-boundary": "致命的なエラーが発生しました。以下の詳細を確認してください:"
     },
-    "file-host": {
-        "code-copied": "ファイルのホストコードをコピー",
-        "dialog": {
-            "close-button": "閉じる",
-            "close-button-title": "接続ダイアログを閉じる",
-            "instruction": {
-                "new-connection": "このアプリケーションに新しい接続が確率され、ファイルシステムへのリモートアクセスが要求されました。",
-                "use-code": "以下のコードを使用して承認"
-            },
-            "title": "安全なファイルホスト接続"
-        }
-    },
     "input-required": "(必須)",
     "notification": {
         "attachment-downloaded": "添付ファイルの保存に成功",
@@ -241,10 +229,8 @@
             "lock-vaults-after-time-desc": "一定時間操作がない場合、保管庫を自動的にロックします。",
             "lock-vaults-window-closed": "保管庫のウィンドウが閉じられた場合にロック",
             "lock-vaults-window-closed-label": "閉じた際ににロック",
-            "secure-file-host": {
-                "description": "セキュアファイルホストは、<strong>Buttercup Browser Extension</strong>がこのアプリケーションを介してこのPC上のローカル保管庫に接続することを可能にします。",
-                "label": "安全なファイルホストを有効化",
-                "title": "安全なファイルホスト"
+            "browser-access": {
+                "label": "ブラウザアクセスを有効化"
             },
             "theme": "テーマ"
         },

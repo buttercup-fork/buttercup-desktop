@@ -69,7 +69,7 @@
         "debug": "Debug",
         "devtool": "Ontwikkeltool",
         "edit": "Bewerken",
-        "enable-secure-file-host": "Activeer browsertoegang",
+        "enable-browser-access": "Activeer browsertoegang",
         "export": "Exporteer",
         "import": "Importeer",
         "lock-all": "Vergrendel alle",
@@ -228,18 +228,6 @@
         "fatal-boundary": "Er is een fatale fout opgetreden - het spijt ons dat dit is gebeurd. Controleer alstublieft de details hieronder in geval ze helpen bij het diagnosticeren van het probleem:",
         "vault-settings-fetch-failed": "Ophalen van kluisinstellingen mislukt"
     },
-    "file-host": {
-        "code-copied": "Bestandshostcode gekopieerd",
-        "dialog": {
-            "close-button": "Sluiten",
-            "close-button-title": "Sluit verbinding dialoogvenster",
-            "instruction": {
-                "new-connection": "Er is een nieuwe verbinding tot stand gebracht met deze toepassing, waarbij externe toegang wordt aangevraagd tot het bestandssysteem.",
-                "use-code": "Gebruik de volgende code om te authoriseren."
-            },
-            "title": "Beveiligde bestandshostverbinding"
-        }
-    },
     "input-required": "(vereist)",
     "notification": {
         "attachment-downloaded": "Bijlage succesvol opgeslagen",
@@ -282,10 +270,8 @@
             "lock-vaults-system-lock-label": "Vergrendel bij schermvergrendeling of slaapstand",
             "lock-vaults-window-closed": "Kluizen vergrendelen bij het sluiten van kluisvenster",
             "lock-vaults-window-closed-label": "Vergrendel bij sluiten",
-            "secure-file-host": {
-                "description": "De beveiligde bestandshost maakt verbinding met lokale kluizen op deze pc via de <strong>Buttercup Browser-extensie</strong>.",
-                "label": "Activeer beveiligde bestandshost",
-                "title": "Beveiligde bestandshost"
+            "browser-access": {
+                "label": "Activeer browsertoegang"
             },
             "startup-options": {
                 "background": {

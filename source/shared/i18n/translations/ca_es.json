@@ -64,7 +64,7 @@
         "debug": "Depurador",
         "devtool": "Devtool",
         "edit": "Editar",
-        "enable-secure-file-host": "Activar accés per navegador",
+        "enable-browser-access": "Activar accés per navegador",
         "export": "Exportar",
         "import": "Importar",
         "lock-all": "Bloquejar tots",
@@ -169,18 +169,6 @@
         "biometric-unlock-failed": "Error al desbloquejar el cofre fent servir dades biomètriques",
         "fatal-boundary": "S'ha produït un error greu. Lamentem que hagi passat. Consulta els detalls per a saber que ha passat:"
     },
-    "file-host": {
-        "code-copied": "Codi del servidor d'arxius copiat",
-        "dialog": {
-            "close-button": "Tancar",
-            "close-button-title": "Tancar finestra de connexió",
-            "instruction": {
-                "new-connection": "S'ha realitzat una nova connexió a aquesta aplicació, sol·licitant accés remot al sistema d'arxius.",
-                "use-code": "Utilitza el següent codi per a autoritzar-lo."
-            },
-            "title": "Connexió segura al servidor d'arxius"
-        }
-    },
     "input-required": "(requerit)",
     "notification": {
         "biometrics-disabled": "Biometría deshabilitada per a cofres",
@@ -214,10 +202,8 @@
             "lock-vaults-after-time-desc": "Bloquejar cofres automàticament després d'un període d'inactivitat.",
             "lock-vaults-window-closed": "Bloquejar cofres si la finestra està tancada",
             "lock-vaults-window-closed-label": "Bloquejar al tancar",
-            "secure-file-host": {
-                "description": "El servidor d'arxius permet que l'extensió <strong>del navegador Buttercup</strong> es connecti als cofres locals de l'ordinador a través d'aquesta aplicació.",
-                "label": "Activar el servidor d'arxius segur",
-                "title": "Servidor d'arxius segur"
+            "browser-access": {
+                "label": "Activar accés per navegador"
             },
             "theme": "Tema"
         },

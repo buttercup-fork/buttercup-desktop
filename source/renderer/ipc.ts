@@ -5,7 +5,6 @@ import { VAULTS_STATE } from "./state/vaults";
 import { showAddVaultMenu } from "./state/addVault";
 import { showPreferences } from "./state/preferences";
 import { showAbout } from "./state/about";
-import { setFileHostCode } from "./state/fileHost";
 import { setSearchVisible } from "./state/search";
 import { showRegistrationPrompt } from "./state/biometrics";
 import { setGoogleReAuthSource } from "./state/google";
@@ -34,11 +33,6 @@ ipcRenderer.on("browser-access-code", (evt, payload) => {
 
 ipcRenderer.on("browser-access-code-hide", (evt) => {
     setBrowserAccessCode(null);
-});
-
-ipcRenderer.on("file-host-code", (evt, payload) => {
-    const { code } = JSON.parse(payload);
-    setFileHostCode(code);
 });
 
 ipcRenderer.on("google-reauth", (evt, sourceID: VaultSourceID) => {

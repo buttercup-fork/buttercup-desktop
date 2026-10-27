@@ -64,7 +64,7 @@
         "debug": "Debug",
         "devtool": "Devtool",
         "edit": "Modifier",
-        "enable-secure-file-host": "Activer l’accès par navigateur",
+        "enable-browser-access": "Activer l’accès par navigateur",
         "export": "Exporter",
         "import": "Importer",
         "lock-all": "Tout verrouiller",
@@ -207,18 +207,6 @@
         "fatal-boundary": "Une erreur fatale s’est produite – nous sommes désolés que cela soit arrivé. Veuillez vérifier les détails ci-dessous au cas où ils aideraient à diagnostiquer le problème :",
         "vault-settings-fetch-failed": "Échec du téléchargement des paramètres du coffre-fort"
     },
-    "file-host": {
-        "code-copied": "Code du serveur de fichiers copié",
-        "dialog": {
-            "close-button": "Fermer",
-            "close-button-title": "Fermer la fenêtre de connexion",
-            "instruction": {
-                "new-connection": "Une nouvelle connexion a été établie avec cette application, demandant un accès à distance au serveur de fichiers.",
-                "use-code": "Utilisez le code suivant pour l’autoriser."
-            },
-            "title": "Sécurisation de la connexion au serveur de fichiers"
-        }
-    },
     "input-required": "(requis)",
     "notification": {
         "attachment-downloaded": "La pièce jointe a été enregistrée avec succès",
@@ -258,10 +246,8 @@
             "lock-vaults-after-time-desc": "Verrouiller automatiquement les coffres-forts après une certaine période d’inactivité.",
             "lock-vaults-window-closed": "Verrouiller les coffres-forts si la fenêtre du coffre-fort est fermée",
             "lock-vaults-window-closed-label": "Verrouillage à la fermeture",
-            "secure-file-host": {
-                "description": "Le serveur de fichiers sécurisé permet à l’<strong>extension de navigateur Buttercup</strong> de se connecter aux coffres-forts locaux de cet ordinateur via cette application.",
-                "label": "Activer le serveur de fichiers sécurisé",
-                "title": "Serveur de fichiers sécurisé"
+            "browser-access": {
+                "label": "Activer l’accès par navigateur"
             },
             "startup-options": {
                 "background": {
