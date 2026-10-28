@@ -162,6 +162,12 @@
             "submit-button": "Export",
             "title": "Export vault '{{name}}'"
         },
+        "export-warning": {
+            "cancel": "Cancel",
+            "continue": "Export",
+            "message": "The CSV file will hold every password in this vault as plain, unencrypted text. Anyone who can open the file can read them. Store it somewhere safe and delete it when you no longer need it.",
+            "title": "Export to an unencrypted file"
+        },
         "file-chooser": {
             "add": {
                 "cancel": "Cancel",
@@ -285,6 +291,7 @@
         "copied-username": "Username copied!",
         "error": {
             "biometrics-disable-failed": "Failed disabling biometrics for vault: {{error}}",
+            "export-failed": "Failed exporting: {{error}}",
             "import-failed": "Failed importing: {{error}}",
             "languages-load": "Failed loading languages",
             "preferences-load": "Failed loading preferences",
