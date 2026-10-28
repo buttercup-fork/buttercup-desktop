@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useCallback, useEffect, useMemo, useState } from "react";
+import React, { HTMLAttributes, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { generatePassword, getConfig } from "@buttercup/generator";
 import Popover from "react-popover";
@@ -6,6 +6,7 @@ import { Button, Intent } from "@blueprintjs/core";
 import { COLOURS } from "../../../shared/symbols";
 import { copyToClipboard } from "../../library/clipboard";
 import { selectElementContents } from "../../library/ui";
+import { latestOnly } from "../../library/latestOnly";
 import { t } from "../../../shared/i18n/trans";
 
 interface GeneratorUIProps {
@@ -137,6 +138,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
     const [password, setPassword] = useState("");
     // Why there is no password right now (B-667); null while there is one
     const [problem, setProblem] = useState<string | null>(null);
+    const onlyLatest = useRef(latestOnly<string>());
     const enabledCharacterSets = useMemo(() => config.randomCharacters.enabledCharacterSets, [
         config
     ]);
@@ -188,7 +190,9 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
     );
     const generateNewPassword = useCallback(
         (configOverride = null) => {
-            generatePassword(configOverride || config)
+            // Only the latest request may set the password (B-668: a guard; the
+            // generator is synchronous today, so requests do not overlap)
+            onlyLatest.current(generatePassword(configOverride || config))
                 .then(password => {
                     setPassword(password);
                     setProblem(null);
