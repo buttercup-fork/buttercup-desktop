@@ -61,6 +61,39 @@ test.describe("password generator", () => {
         await expect(window.getByRole("textbox", { name: "Password" })).toHaveValue(chosen);
     });
 
+    test("with no character sets there is no password to use or copy (B-667)", async () => {
+        const { window } = launched;
+        const passwordField = window.getByRole("textbox", { name: "Password" });
+        const before = await passwordField.inputValue();
+        await window.locator("button:has([data-icon=key])").first().click();
+        const popover = window.locator(".Popover-body");
+        const shown = popover.locator("pre");
+        await expect(shown).toHaveText(/^[A-Za-z0-9_-]{20}$/);
+        const setBox = (label: string) =>
+            popover.locator(":has(> input[type=checkbox])", { hasText: label }).locator("input");
+        for (const label of [
+            "Uppercase Letters",
+            "Lowercase Letters",
+            "Digits",
+            "Underscore & Dash"
+        ]) {
+            await setBox(label).uncheck();
+        }
+        // The last password no longer matches the options: it must not stay on offer
+        await expect(shown).toBeHidden();
+        await expect(popover.getByRole("status")).toHaveText("Choose at least one character set.");
+        await expect(popover.getByRole("button", { name: "Use This" })).toBeDisabled();
+        await expect(passwordField).toHaveValue(before);
+        // Positive control: a set ticked again gives a password that can be used
+        await setBox("Digits").check();
+        await expect(shown).toHaveText(/^[0-9]{20}$/);
+        await expect(popover.getByRole("button", { name: "Use This" })).toBeEnabled();
+        const chosen = await shown.textContent();
+        await popover.getByRole("button", { name: "Use This" }).click();
+        await expect(popover).toBeHidden();
+        await expect(passwordField).toHaveValue(chosen);
+    });
+
     test("makes word passwords from the 8,192-word list", async () => {
         const { window } = launched;
         const words = new Set<string>(
