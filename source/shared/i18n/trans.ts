@@ -14,6 +14,11 @@ export async function initialise(lang: string) {
         lng: lang,
         fallbackLng: DEFAULT_LANGUAGE,
         debug: false,
+        // Translations are shown as text (React escapes it, native dialogs and
+        // notifications show it as is), so values must not be HTML-escaped:
+        // an error toast showed &#39; for every quote (B-712). Strings rendered
+        // with dangerouslySetInnerHTML take no values (trans.test.ts checks it)
+        interpolation: { escapeValue: false },
         resources: Object.keys(translations).reduce(
             (output, lang) => ({
                 ...output,
