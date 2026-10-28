@@ -298,7 +298,8 @@
             "vault-save-timeout": "Timed out - the remote did not respond",
             "vault-settings-load": "Failed loading vault settings",
             "vault-settings-save": "Failed saving vault settings",
-            "vault-unlock-failed": "Vault unlock failed"
+            "vault-unlock-failed": "Vault unlock failed",
+            "wrong-password": "Wrong password. Try again."
         },
         "export-success": "Successfully exported vault: {{name}}",
         "import-success": "Successfully imported vault: {{filename}}",

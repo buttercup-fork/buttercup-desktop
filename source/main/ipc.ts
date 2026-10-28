@@ -54,6 +54,7 @@ import { restartAutoClearClipboardTimer } from "./services/autoClearClipboard";
 import { writeClipboardText } from "./services/clipboardWrite";
 import { startAutoVaultLockTimer } from "./services/autoLock";
 import { log as logRaw, logInfo, logErr } from "./library/log";
+import { isWrongPasswordError } from "./library/vaultErrors";
 import { isPortable } from "./library/portability";
 import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
@@ -405,7 +406,15 @@ ipcMain.handle("unlock-source", async (evt, sourceID: VaultSourceID, password: s
     try {
         await unlockSourceWithID(sourceID, password);
         setLastSourceID(sourceID);
+        return { wrongPassword: false };
     } catch (err) {
+        // A wrong password is an answer, not a failure: the window says so in
+        // plain words and asks again (B-117). An error thrown here reaches the
+        // window only as text, wrapped by Electron.
+        if (isWrongPasswordError(err)) {
+            logInfo(`Wrong password for vault source: ${sourceID}`);
+            return { wrongPassword: true };
+        }
         logErr("Failed unlocking vault source", err);
         throw new Layerr(err, "Failed unlocking vault source");
     }

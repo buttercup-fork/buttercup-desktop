@@ -40,6 +40,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- A wrong vault password now says "Wrong password. Try again." and asks again, instead of a long technical error ("Vault unlock failed: Error invoking remote method 'unlock-source': … unable to authenticate data"). A vault file that is damaged or was changed by someone else is not reported as a wrong password. This needs the core update with the error code for a wrong password (core B-117), which desktop takes with the next core update; until then the old message stays (B-117).
 - A note you had just expanded, or a password you had just revealed, snapped back to hidden when the vault was rebuilt in the background, eg. right after saving. Buttercup's core makes new internal ids for an entry's fields every time, so every row was drawn again; the rows now keep their ids across the rebuild.
 - Dropping a file on an entry to attach it did nothing. The file reader the drop zone uses asks the browser for a file system handle, which failed for a dropped file ("Cannot read properties of undefined (reading 'getFile')"). The files now come straight from the drop.
 - Signing in to Dropbox (**Add Vault → Dropbox**) works again. The sign-in window was kept on Buttercup's own page, so Dropbox's own navigation inside it was sent to your browser, and the sign-in carried on there and never reached Buttercup (it ended on an "offline for maintenance" page). The sign-in window now follows the provider's pages. It still has no Node access.
