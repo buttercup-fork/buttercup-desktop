@@ -18,6 +18,14 @@ test.describe("CSV export", () => {
         dir = mkdtempSync(join(tmpdir(), "buttercup-e2e-export-"));
         await launched.app.evaluate(({ dialog }) => {
             const g = globalThis as any;
+            // The "unencrypted file" warning before export (B-682): answer it
+            // with g.__e2eWarningAnswer (0 = Export) and keep what it said
+            g.__e2eWarnings = [];
+            dialog.showMessageBox = (async (...args: Array<any>) => {
+                const options = args.find((arg) => arg && arg.message);
+                g.__e2eWarnings.push(options.message);
+                return { response: g.__e2eWarningAnswer ?? 0 };
+            }) as any;
             dialog.showSaveDialog = (async () => ({
                 canceled: false,
                 filePath: g.__e2eSavePath
@@ -92,6 +100,11 @@ test.describe("CSV export", () => {
         await clickMenu(["Current Vault", "Export"]);
         await expect(window.getByText("Successfully exported vault: accents")).toBeVisible();
         await expect.poll(() => existsSync(exported)).toBe(true);
+        const warnings: Array<string> = await launched.app.evaluate(
+            () => (globalThis as any).__e2eWarnings
+        );
+        expect(warnings).toHaveLength(1);
+        expect(warnings[0]).toContain("unencrypted");
         const bytes = readFileSync(exported);
         expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
         expect(bytes.subarray(3).toString("utf8")).toMatch(/^!type,/);
@@ -143,6 +156,32 @@ test.describe("CSV export", () => {
         const cell = (title: string) => rows.find((row) => row.title === title).toString;
         expect(cell("Router")).toBe("admin-pin");
         expect(cell("Printer")).toBe("");
+    });
+
+    test("Cancel at the unencrypted-file warning exports nothing (B-682)", async () => {
+        const { app, window } = launched;
+        await createVault("cancelled");
+        const exported = join(dir, "cancelled.csv");
+        await setPaths({ save: exported });
+        await app.evaluate(() => {
+            const g = globalThis as any;
+            g.__e2eWarnings = [];
+            g.__e2eWarningAnswer = 1;
+        });
+        try {
+            await clickMenu(["Current Vault", "Export"]);
+            await expect
+                .poll(() => app.evaluate(() => (globalThis as any).__e2eWarnings.length))
+                .toBe(1);
+            // Give a write that should not happen the time to happen
+            await window.waitForTimeout(1000);
+            expect(existsSync(exported)).toBe(false);
+            await expect(window.getByText("Successfully exported vault: cancelled")).toBeHidden();
+        } finally {
+            await app.evaluate(() => {
+                (globalThis as any).__e2eWarningAnswer = 0;
+            });
+        }
     });
 
     test("a menu built for the previous vault acts on the current one (B-454)", async () => {
