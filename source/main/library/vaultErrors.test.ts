@@ -1,5 +1,49 @@
 import { Layerr } from "layerr";
-import { isDamagedVaultError, isInsecureEndpointError } from "./vaultErrors";
+import { isDamagedVaultError, isInsecureEndpointError, isWrongPasswordError } from "./vaultErrors";
+
+describe("isWrongPasswordError (B-117)", () => {
+    // What core (from 3b25f2d) throws: the stored credentials fail to decrypt
+    // with the master password, and VaultSource.unlock wraps that
+    const authFailure = new Error("Unsupported state or unable to authenticate data");
+    const credentialsFailure = new Layerr(
+        { cause: authFailure, info: { code: "DECRYPTION_FAILED" } },
+        "Failed decrypting credentials"
+    );
+
+    test("recognises a wrong master password, also when wrapped by unlock", () => {
+        expect(isWrongPasswordError(credentialsFailure)).toBe(true);
+        expect(
+            isWrongPasswordError(new Layerr(credentialsFailure, "Failed unlocking source"))
+        ).toBe(true);
+    });
+
+    test("does not call a damaged or tampered vault file a wrong password", () => {
+        // The credentials opened (right password) but the file did not
+        const fileFailure = new Layerr(
+            { cause: authFailure, info: { code: "DECRYPTION_FAILED" } },
+            "Failed decrypting vault"
+        );
+        expect(isWrongPasswordError(new Layerr(fileFailure, "Failed unlocking source"))).toBe(
+            false
+        );
+    });
+
+    test("does not guess from an untagged error (core before the B-117 change)", () => {
+        expect(
+            isWrongPasswordError(
+                new Error(
+                    "Failed unlocking source: Unsupported state or unable to authenticate data"
+                )
+            )
+        ).toBe(false);
+        expect(
+            isWrongPasswordError(
+                new Layerr({ info: { code: "INSECURE_ENDPOINT" } }, "Failed decrypting credentials")
+            )
+        ).toBe(false);
+        expect(isWrongPasswordError(null)).toBe(false);
+    });
+});
 
 describe("isInsecureEndpointError (B-684)", () => {
     test("recognises core's refusal, also when wrapped by unlock", () => {

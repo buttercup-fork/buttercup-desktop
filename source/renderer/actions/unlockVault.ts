@@ -13,7 +13,13 @@ export async function unlockVaultSource(sourceID: VaultSourceID): Promise<boolea
     setBusy(true);
     logInfo(`Unlocking source: ${sourceID}`);
     try {
-        await ipcRenderer.invoke("unlock-source", sourceID, password);
+        const result = await ipcRenderer.invoke("unlock-source", sourceID, password);
+        if (result?.wrongPassword) {
+            // Plain words, then ask again (B-117)
+            showError(t("notification.error.wrong-password"));
+            setBusy(false);
+            return await unlockVaultSource(sourceID);
+        }
     } catch (err) {
         showError(
             `${t("notification.error.vault-unlock-failed")}: ${
