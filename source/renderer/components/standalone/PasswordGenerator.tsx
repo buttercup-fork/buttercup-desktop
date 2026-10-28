@@ -69,6 +69,13 @@ const PasswordContainer = styled.pre`
     font-weight: 400;
     cursor: copy;
 `;
+// Shown instead of a password when none could be made (B-667); same box size, plain text
+const GenerationProblem = styled.div`
+    font-size: 0.9rem;
+    padding: 6px;
+    background-color: ${COLOURS.BLACK_25};
+    border-radius: 3px;
+`;
 const GenerationTypes = styled.div`
     margin: 12px 0;
     font-size: 0.9rem;
@@ -128,6 +135,8 @@ const GeneratorControls = styled.div`
 function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError = NOOP, onGenerate = NOOP }: GeneratorUIProps) {
     const [config, setConfig] = useState(getConfig);
     const [password, setPassword] = useState("");
+    // Why there is no password right now (B-667); null while there is one
+    const [problem, setProblem] = useState<string | null>(null);
     const enabledCharacterSets = useMemo(() => config.randomCharacters.enabledCharacterSets, [
         config
     ]);
@@ -182,11 +191,20 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
             generatePassword(configOverride || config)
                 .then(password => {
                     setPassword(password);
+                    setProblem(null);
                 })
                 .catch(err => {
-                    // Errors for no selected character sets and max retries exceeded occur
-                    // when the user selects too-restrictive options - we don't really care
-                    // about the error, we just don't generate a password:
+                    // No password for these options: drop the last one, which no longer
+                    // matches them, so Use and Copy cannot hand it out (B-667)
+                    setPassword("");
+                    if (err.code === "NO_CHARSETS") {
+                        setProblem(t("password-generator.no-character-sets"));
+                    } else if (err.code === "MAX_RETRIES") {
+                        setProblem(t("password-generator.too-limited"));
+                    } else {
+                        setProblem(t("password-generator.failed"));
+                    }
+                    // Too-restrictive options are expected; anything else is passed out
                     if (err.code !== "NO_CHARSETS" && err.code !== "MAX_RETRIES") {
                         // If it's some other error, pass it out
                         console.log(err);
@@ -201,9 +219,15 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
     }, []);
     return (
         <Body>
-            <PasswordContainer role="content" onClick={e => selectElementContents(e.target as HTMLElement)}>
-                <Password value={password} className="generated-password" />
-            </PasswordContainer>
+            {problem ? (
+                <GenerationProblem role="status" className="generation-problem">
+                    {problem}
+                </GenerationProblem>
+            ) : (
+                <PasswordContainer role="content" onClick={e => selectElementContents(e.target as HTMLElement)}>
+                    <Password value={password} className="generated-password" />
+                </PasswordContainer>
+            )}
             <GenerationTypes>
                 <GeneratorLabel>
                     <input
@@ -291,6 +315,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                 </Button>
                 {copyMode && (
                     <Button
+                        disabled={!password}
                         onClick={() => {
                             copyToClipboard(password);
                             onGenerate(password);
@@ -299,7 +324,7 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
                         {t("password-generator.copy")}
                     </Button>
                 ) || (
-                    <Button onClick={() => onGenerate(password)}>
+                    <Button disabled={!password} onClick={() => onGenerate(password)}>
                         {t("password-generator.use")}
                     </Button>
                 )}
