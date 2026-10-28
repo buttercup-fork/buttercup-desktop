@@ -190,8 +190,9 @@ function GeneratorUserInterface({ autoGenerate = true, copyMode = false, onError
     );
     const generateNewPassword = useCallback(
         (configOverride = null) => {
-            // Only the latest request may set the password (B-668: a guard; the
-            // generator is synchronous today, so requests do not overlap)
+            // Only the latest request may set the password (B-668). Since B-666 the
+            // generator redraws clashing characters one async step at a time, so an
+            // earlier request can finish after a later one
             onlyLatest.current(generatePassword(configOverride || config))
                 .then(password => {
                     setPassword(password);
