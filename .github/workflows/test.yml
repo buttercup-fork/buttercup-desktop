@@ -8,9 +8,34 @@ on:
 # A pull request from a branch in this repo already gets a run from its push,
 # so each job's `if` only runs it again for pull requests from forks.
 jobs:
+  # Merging a pull request pushes a merge commit. When its code is exactly the branch
+  # head's (master had not moved on), the branch push already ran these tests on it:
+  # skip the repeat. If master had moved on, the merged code is new and is tested.
+  already-tested:
+    name: Already tested?
+    runs-on: ubuntu-latest
+    outputs:
+      tested: ${{ steps.check.outputs.tested }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # the merge commit and both parents
+          fetch-depth: 2
+      - id: check
+        shell: bash
+        run: |
+          tested=false
+          if [ "$GITHUB_EVENT_NAME" = push ] && git rev-parse -q --verify 'HEAD^2' >/dev/null &&
+            [ "$(git rev-parse 'HEAD^{tree}')" = "$(git rev-parse 'HEAD^2^{tree}')" ]; then
+            tested=true
+            echo "Same code as $(git rev-parse --short 'HEAD^2'), tested by its own push: skipping"
+          fi
+          echo "tested=$tested" >> "$GITHUB_OUTPUT"
+
   unit:
     name: Build & unit (${{ matrix.os }})
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: already-tested
+    if: needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -30,7 +55,8 @@ jobs:
 
   e2e:
     name: Playwright e2e
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: already-tested
+    if: needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
