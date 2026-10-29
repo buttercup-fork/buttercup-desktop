@@ -11,8 +11,10 @@ jobs:
   # Merging a pull request pushes a merge commit. When its code is exactly the branch
   # head's (master had not moved on), the branch push already ran these tests on it:
   # skip the repeat. If master had moved on, the merged code is new and is tested.
+  # Pushes only: a pull request event needs no check, so it takes no runner.
   already-tested:
     name: Already tested?
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       tested: ${{ steps.check.outputs.tested }}
@@ -25,7 +27,7 @@ jobs:
         shell: bash
         run: |
           tested=false
-          if [ "$GITHUB_EVENT_NAME" = push ] && git rev-parse -q --verify 'HEAD^2' >/dev/null &&
+          if git rev-parse -q --verify 'HEAD^2' >/dev/null &&
             [ "$(git rev-parse 'HEAD^{tree}')" = "$(git rev-parse 'HEAD^2^{tree}')" ]; then
             tested=true
             echo "Same code as $(git rev-parse --short 'HEAD^2'), tested by its own push: skipping"
@@ -35,7 +37,8 @@ jobs:
   unit:
     name: Build & unit (${{ matrix.os }})
     needs: already-tested
-    if: needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
+    # !cancelled(): still run when the check above was skipped (pull requests from forks)
+    if: ${{ !cancelled() && needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository) }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -56,7 +59,7 @@ jobs:
   e2e:
     name: Playwright e2e
     needs: already-tested
-    if: needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
+    if: ${{ !cancelled() && needs.already-tested.outputs.tested != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
