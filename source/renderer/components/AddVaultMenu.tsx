@@ -16,6 +16,7 @@ import { authenticateGoogleDrive, getGoogleDriveAuthURL, waitForGoogleAuthCode }
 import { createEmptyVault as createEmptyGoogleDriveVault } from "../services/googleDrive";
 import { showWarning } from "../services/notifications";
 import { getIconForProvider } from "../library/icons";
+import { getThemeProp } from "./vault/utils/theme";
 import { copyText } from "../actions/clipboard";
 import { t } from "../../shared/i18n/trans";
 import { isInsecureWebDAVURL } from "../../shared/library/webdav";
@@ -55,7 +56,9 @@ const VAULT_TYPES = [
     {
         i18n: "source-type.webdav",
         type: SourceType.WebDAV,
-        icon: getIconForProvider(SourceType.WebDAV)
+        icon: getIconForProvider(SourceType.WebDAV),
+        // A black logo on transparent: drawn in the theme's colour (B-717)
+        monochrome: true
     }
 ];
 
@@ -90,6 +93,13 @@ const TypeIcon = styled(Card)`
 const TypeIconImage = styled.img`
     width: 80%;
     height: auto;
+`;
+// The logo's shape as a mask, filled with the theme colour
+const TypeIconMask = styled.div<{ $src: string }>`
+    width: 80%;
+    aspect-ratio: 1;
+    background-color: ${p => getThemeProp(p, "addVault.webdavLogo")};
+    mask: url("${p => p.$src}") center / contain no-repeat;
 `;
 const TypeText = styled.div`
     margin-top: 3px;
@@ -349,7 +359,11 @@ export function AddVaultMenu() {
             <TypeIcons>
                 {VAULT_TYPES.map(vaultType => (
                     <TypeIcon key={vaultType.type} interactive elevation={Elevation.TWO} onClick={() => handleVaultTypeClick(vaultType.type)}>
-                        <TypeIconImage src={vaultType.icon} />
+                        {vaultType.monochrome ? (
+                            <TypeIconMask $src={vaultType.icon} aria-hidden="true" />
+                        ) : (
+                            <TypeIconImage src={vaultType.icon} />
+                        )}
                         <TypeText>{t(vaultType.i18n)}</TypeText>
                     </TypeIcon>
                 ))}

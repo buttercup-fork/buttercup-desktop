@@ -54,6 +54,10 @@ interface AppTheme {
             closeBackgroundHover: string;
             dropBorder: string;
         };
+        addVault: {
+            // Colour of the one-colour WebDAV (DAV) logo in the Add Vault menu
+            webdavLogo: string;
+        };
     };
     vaultChooser: {
         selectVaultAnchor: {
@@ -116,6 +120,10 @@ export const THEME_DARK: AppTheme = {
             close: Colors.GRAY3,
             closeBackgroundHover: Colors.DARK_GRAY5,
             dropBorder: Colors.GRAY1
+        },
+        addVault: {
+            // Ash grey on the card's DARK_GRAY3
+            webdavLogo: Colors.GRAY4
         }
     },
     vaultChooser: {
@@ -179,6 +187,10 @@ export const THEME_LIGHT: AppTheme = {
             close: Colors.GRAY1,
             closeBackgroundHover: Colors.LIGHT_GRAY1,
             dropBorder: Colors.GRAY5
+        },
+        addVault: {
+            // Dark charcoal on the white card
+            webdavLogo: Colors.DARK_GRAY5
         }
     },
     vaultChooser: {
