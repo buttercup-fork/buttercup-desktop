@@ -3,6 +3,8 @@ import { OTP } from "../types";
 
 export function extractVaultOTPItems(source: VaultSource): Array<OTP> {
     return source.vault.getAllEntries().reduce((output: Array<OTP>, entry: Entry) => {
+        // Deleted entries keep their OTPs in the Trash, but the browser must not offer them (B-727)
+        if (entry.isInTrash()) return output;
         const properties = entry.getProperties();
         const loginURLs = getEntryURLs(properties, EntryURLType.Login);
         for (const key in properties) {
