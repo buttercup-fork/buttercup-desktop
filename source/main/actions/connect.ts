@@ -6,9 +6,24 @@ import { logInfo, logWarn } from "../library/log";
 import { isVaultFile } from "../services/vaultFile";
 import { getVaultLocationKey } from "../library/vaultLocation";
 import { t } from "../../shared/i18n/trans";
+import {
+    checkNewMasterPassword,
+    MASTER_PASSWORD_MIN_LENGTH
+} from "../../shared/library/masterPasswordPolicy";
 import { AddVaultPayload, SourceType } from "../types";
 
 export async function addVaultFromPayload(payload: AddVaultPayload): Promise<VaultSourceID> {
+    // A new vault gets its password here: check it in main, not only in the dialog (B-758).
+    // An existing vault keeps the password it already has
+    if (payload.createNew) {
+        const problem = checkNewMasterPassword(payload.masterPassword ?? "");
+        if (problem) {
+            logWarn(`Not creating vault: master password refused (${problem})`);
+            throw new Error(
+                t(`master-password-policy.${problem}`, { min: MASTER_PASSWORD_MIN_LENGTH })
+            );
+        }
+    }
     let credentials: Credentials, name: string;
     switch (payload.datasourceConfig.type) {
         case SourceType.GoogleDrive:

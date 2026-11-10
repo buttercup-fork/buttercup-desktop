@@ -4,7 +4,7 @@ import { tmpdir } from "os";
 import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
 
-const PASSWORD = "pass";
+const PASSWORD = "pass-e2e-vault";
 
 async function readEntryTitles(vaultPath: string): Promise<Array<string>> {
     const { Credentials, FileDatasource, Vault, init } = await import("buttercup");

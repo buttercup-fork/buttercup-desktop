@@ -20,6 +20,11 @@ import { getThemeProp } from "./vault/utils/theme";
 import { copyText } from "../actions/clipboard";
 import { t } from "../../shared/i18n/trans";
 import { isInsecureWebDAVURL } from "../../shared/library/webdav";
+import {
+    checkNewMasterPassword,
+    MASTER_PASSWORD_MIN_LENGTH,
+    MASTER_PASSWORD_RECOMMENDED_LENGTH
+} from "../../shared/library/masterPasswordPolicy";
 import { DatasourceConfig, SourceType } from "../types";
 
 interface WebDAVCredentialsState {
@@ -106,6 +111,10 @@ const TypeText = styled.div`
     width: 100%;
     text-align: center;
     color: grey;
+`;
+// Fixed width: the dialog sizes to its content, so a changing rule message would resize it
+const PasswordFormGroup = styled(FormGroup)`
+    width: 320px;
 `;
 const WideFormGroup = styled(FormGroup)`
     display: flex;
@@ -341,7 +350,12 @@ export function AddVaultMenu() {
             setCurrentPage(PAGE_CONFIRM);
         }
     }, [selectedRemotePath, selectedType, datasourcePayload]);
+    // Rules for a new vault's password (B-758); an existing vault keeps its own
+    const newPasswordProblem = createNew ? checkNewMasterPassword(vaultPassword) : null;
+    const canConfirm = vaultPassword.length > 0 && !newPasswordProblem;
     const handleFinalConfirm = useCallback(async () => {
+        // Before anything is created: a new Google Drive vault is written from here
+        if (vaultPassword.length === 0 || (createNew && checkNewMasterPassword(vaultPassword))) return;
         const datasource = { ...datasourcePayload };
         if (selectedType === SourceType.GoogleDrive && selectedRemotePath && datasource.token) {
             const [parentIdentifier, identifier] = JSON.parse(selectedRemotePath);
@@ -482,19 +496,37 @@ export function AddVaultMenu() {
             {!createNew && (
                 <p>{t("add-vault-menu.confirm.existing-password")}</p>
             )}
-            <InputGroup
-                id="password"
-                placeholder={t("add-vault-menu.confirm.password-placeholder")}
-                type="password"
-                value={vaultPassword}
-                onChange={evt => setVaultPassword(evt.target.value)}
-                onKeyDown={evt => {
-                    if (evt.key === "Enter" && vaultPassword.length > 0) {
-                        handleFinalConfirm();
-                    }
-                }}
-                autoFocus
-            />
+            <PasswordFormGroup
+                helperText={
+                    createNew ? (
+                        <span id="new-password-rules" data-testid="new-password-rules">
+                            {newPasswordProblem === "common" && vaultPassword.length > 0
+                                ? t("master-password-policy.common")
+                                : t("master-password-policy.hint", {
+                                      min: MASTER_PASSWORD_MIN_LENGTH,
+                                      recommended: MASTER_PASSWORD_RECOMMENDED_LENGTH
+                                  })}
+                        </span>
+                    ) : undefined
+                }
+                intent={newPasswordProblem === "common" ? Intent.DANGER : Intent.NONE}
+            >
+                <InputGroup
+                    id="password"
+                    aria-describedby={createNew ? "new-password-rules" : undefined}
+                    intent={newPasswordProblem === "common" ? Intent.DANGER : Intent.NONE}
+                    placeholder={t("add-vault-menu.confirm.password-placeholder")}
+                    type="password"
+                    value={vaultPassword}
+                    onChange={evt => setVaultPassword(evt.target.value)}
+                    onKeyDown={evt => {
+                        if (evt.key === "Enter" && canConfirm) {
+                            handleFinalConfirm();
+                        }
+                    }}
+                    autoFocus
+                />
+            </PasswordFormGroup>
         </>
     );
     // Output
@@ -550,7 +582,7 @@ export function AddVaultMenu() {
                     )}
                     {currentPage === PAGE_CONFIRM && (
                         <Button
-                            disabled={vaultPassword.length === 0}
+                            disabled={!canConfirm}
                             intent={Intent.PRIMARY}
                             onClick={handleFinalConfirm}
                             title={t("add-vault-menu.page-confirm-finish-title")}

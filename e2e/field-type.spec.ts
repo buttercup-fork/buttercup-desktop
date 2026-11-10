@@ -63,7 +63,7 @@ test.describe("field type changes", () => {
         await window.getByRole("button", { name: "Add Vault" }).click();
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: "Create New" }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await window.getByRole("button", { name: "New Entry" }).click();
         await expect(window.getByPlaceholder("Title")).toBeFocused();
@@ -83,7 +83,7 @@ test.describe("field type changes", () => {
         await window.getByRole("menuitem", { name: "Lock vault", exact: true }).click();
         await vaultTab.click({ button: "right" });
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(passwordPrompt).toBeHidden();
         await expectFieldType(window, "Note");

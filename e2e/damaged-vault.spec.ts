@@ -44,7 +44,7 @@ test.describe("damaged vault file", () => {
         await window.getByRole("button", { name: "Add Vault" }).click();
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: "Create New" }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         await vaultTab.click({ button: "right" });
@@ -52,7 +52,7 @@ test.describe("damaged vault file", () => {
         // Opening it once stores the copy (a just-created vault has none yet)
         await vaultTab.click({ button: "right" });
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         await vaultTab.click({ button: "right" });
@@ -63,7 +63,7 @@ test.describe("damaged vault file", () => {
         writeFileSync(vaultPath, damagedContent);
         await vaultTab.click({ button: "right" });
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByText(/The vault file is incomplete or damaged/)).toBeVisible();
         await expect(window.getByText(/Salt must be provided/)).toHaveCount(0);
@@ -81,7 +81,7 @@ test.describe("damaged vault file", () => {
         await app.evaluate(() => {
             (globalThis as any).__messageBoxResponse = 0;
         });
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         // The damaged file was kept in the backup folder before it was replaced
@@ -95,7 +95,7 @@ test.describe("damaged vault file", () => {
         await window.getByRole("menuitem", { name: "Lock vault", exact: true }).click();
         await vaultTab.click({ button: "right" });
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         expect(await app.evaluate(() => (globalThis as any).__messageBoxes)).toHaveLength(2);

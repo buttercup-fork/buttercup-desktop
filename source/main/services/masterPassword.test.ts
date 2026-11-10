@@ -1,5 +1,7 @@
 import { jest } from "@jest/globals";
 
+// Passes the new-password rules (B-758)
+const NEW = "Zq8#vLm2 new";
 const calls: Array<string> = [];
 let mockStatus = "unlocked";
 let mockPasswordMatches = true;
@@ -50,7 +52,7 @@ beforeEach(() => {
 });
 
 test("writes the backup with the current password before changing it", async () => {
-    const result = await changeVaultMasterPassword("source-1", "old", "new");
+    const result = await changeVaultMasterPassword("source-1", "old", NEW);
     expect(result).toEqual({
         ok: true,
         backupPath: "/backup/source-1/password-change.bcup",
@@ -59,19 +61,19 @@ test("writes the backup with the current password before changing it", async () 
     expect(calls).toEqual(["export", "backup", "change"]);
     expect(mockExport).toHaveBeenCalledWith("source-1", "old");
     expect(mockBackup).toHaveBeenCalledWith("source-1", "encrypted-vault");
-    expect(mockChange).toHaveBeenCalledWith("source-1", "old", "new");
+    expect(mockChange).toHaveBeenCalledWith("source-1", "old", NEW);
 });
 
 test("refuses a locked vault", async () => {
     mockStatus = "locked";
-    const result = await changeVaultMasterPassword("source-1", "old", "new");
+    const result = await changeVaultMasterPassword("source-1", "old", NEW);
     expect(result).toEqual({ ok: false, reason: "not-unlocked" });
     expect(calls).toEqual([]);
 });
 
 test("refuses a wrong current password", async () => {
     mockPasswordMatches = false;
-    const result = await changeVaultMasterPassword("source-1", "wrong", "new");
+    const result = await changeVaultMasterPassword("source-1", "wrong", NEW);
     expect(result).toEqual({ ok: false, reason: "invalid-password" });
     expect(calls).toEqual([]);
 });
@@ -88,26 +90,46 @@ test("refuses a new password that is empty or the same", async () => {
     expect(calls).toEqual([]);
 });
 
+test("refuses a new password shorter than 8 characters (B-758)", async () => {
+    expect(await changeVaultMasterPassword("source-1", "old", "Zq8#vLm")).toEqual({
+        ok: false,
+        reason: "too-short"
+    });
+    expect(calls).toEqual([]);
+});
+
+test("refuses a common new password in any case (B-758)", async () => {
+    expect(await changeVaultMasterPassword("source-1", "old", "Password1")).toEqual({
+        ok: false,
+        reason: "common-password"
+    });
+    expect(await changeVaultMasterPassword("source-1", "old", "ILOVEYOU")).toEqual({
+        ok: false,
+        reason: "common-password"
+    });
+    expect(calls).toEqual([]);
+});
+
 test("does not change the password when the backup fails", async () => {
     mockBackup.mockImplementationOnce(async () => {
         throw new Error("disk full");
     });
-    await expect(changeVaultMasterPassword("source-1", "old", "new")).rejects.toThrow("disk full");
+    await expect(changeVaultMasterPassword("source-1", "old", NEW)).rejects.toThrow("disk full");
     expect(mockChange).not.toHaveBeenCalled();
 });
 
 test("stores the new password for biometric unlock", async () => {
     mockReplaceBiometric.mockImplementation(async () => true);
-    const result = await changeVaultMasterPassword("source-1", "old", "new");
+    const result = await changeVaultMasterPassword("source-1", "old", NEW);
     expect(result).toMatchObject({ ok: true, biometrics: "updated" });
-    expect(mockReplaceBiometric).toHaveBeenCalledWith("source-1", "new");
+    expect(mockReplaceBiometric).toHaveBeenCalledWith("source-1", NEW);
 });
 
 test("turns biometric unlock off when the keychain can't be updated", async () => {
     mockReplaceBiometric.mockImplementation(async () => {
         throw new Error("keychain locked");
     });
-    const result = await changeVaultMasterPassword("source-1", "old", "new");
+    const result = await changeVaultMasterPassword("source-1", "old", NEW);
     expect(result).toMatchObject({ ok: true, biometrics: "removed" });
     expect(mockDisableBiometric).toHaveBeenCalledWith("source-1");
 });
