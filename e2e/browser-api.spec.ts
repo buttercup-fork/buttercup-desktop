@@ -1,6 +1,8 @@
+import { webcrypto } from "crypto";
 import { request } from "http";
 import { connect } from "net";
 import { networkInterfaces } from "os";
+import { EncryptionAlgorithm, createAdapter } from "iocane";
 import { test, expect } from "@playwright/test";
 import { launchApp, type LaunchedApp } from "./helpers";
 
@@ -14,6 +16,7 @@ const WEB_PAGE = "https://evil.example.com";
 interface Reply {
     status: number;
     headers: Record<string, string | string[] | undefined>;
+    body: string;
 }
 
 /** `fetch` cannot set the Host header, so use the http module */
@@ -27,8 +30,15 @@ function send(
         const req = request(
             { host: "127.0.0.1", port: BROWSER_API_PORT, path, method, headers },
             (res) => {
-                res.resume();
-                res.on("end", () => resolve({ status: res.statusCode ?? 0, headers: res.headers }));
+                const chunks: Array<Buffer> = [];
+                res.on("data", (chunk: Buffer) => chunks.push(chunk));
+                res.on("end", () =>
+                    resolve({
+                        status: res.statusCode ?? 0,
+                        headers: res.headers,
+                        body: Buffer.concat(chunks).toString("utf8")
+                    })
+                );
             }
         );
         req.on("error", reject);
@@ -145,6 +155,66 @@ test.describe("browser API", () => {
         );
         expect(reply.status).toBe(200);
         await expect.poll(pairingCodeShown).toBe(true);
+    });
+
+    test("pairs, then accepts only AES-GCM request bodies (B-759)", async () => {
+        // Pair as the extension does: the code shown on screen, an ECDH P-256 public key
+        const code = await launched.window.evaluate(
+            () => document.body.innerText.match(/\b[A-Z0-9]{12}\b/)![0]
+        );
+        const algo = { name: "ECDH", namedCurve: "P-256" };
+        const keys = await webcrypto.subtle.generateKey(algo, true, ["deriveKey"]);
+        const clientID = "01jc000000000000000000b759";
+        const paired = await send(
+            "POST",
+            "/v1/auth/response",
+            { Origin: EXTENSION_ORIGIN, "Content-Type": "application/json" },
+            JSON.stringify({
+                code,
+                id: clientID,
+                publicKey: JSON.stringify(await webcrypto.subtle.exportKey("jwk", keys.publicKey))
+            })
+        );
+        expect(paired.status).toBe(200);
+        const serverKey = await webcrypto.subtle.importKey(
+            "jwk",
+            JSON.parse(JSON.parse(paired.body).publicKey),
+            algo,
+            true,
+            []
+        );
+        const aesKey = await webcrypto.subtle.deriveKey(
+            { name: "ECDH", public: serverKey },
+            keys.privateKey,
+            { name: "AES-GCM", length: 256 },
+            true,
+            ["encrypt", "decrypt"]
+        );
+        const secret = Buffer.from(await webcrypto.subtle.exportKey("raw", aesKey)).toString("hex");
+        const ping = async (algorithm: EncryptionAlgorithm, dropMethod = false) => {
+            let body = (await createAdapter()
+                .setAlgorithm(algorithm)
+                .setDerivationRounds(100000)
+                .encrypt("ping", secret)) as string;
+            if (dropMethod) body = body.split("$").slice(0, 5).join("$");
+            return send(
+                "POST",
+                "/v1/auth/test",
+                {
+                    Authorization: `Client ${clientID}`,
+                    "Content-Type": "text/plain",
+                    Origin: EXTENSION_ORIGIN
+                },
+                body
+            );
+        };
+        const gcm = await ping(EncryptionAlgorithm.GCM);
+        expect(gcm.status).toBe(200);
+        expect(gcm.body).toBe("OK");
+        // The same key, but CBC: refused like any body that fails to decrypt
+        expect((await ping(EncryptionAlgorithm.CBC)).status).toBe(500);
+        // No method field: iocane would read it as CBC
+        expect((await ping(EncryptionAlgorithm.CBC, true)).status).toBe(500);
     });
 
     test("is not reachable from other machines", async () => {

@@ -8,10 +8,17 @@ export async function decryptPayload(
     sourcePublicKey: string,
     targetPrivateKey: string
 ): Promise<string> {
+    // iocane decrypts with whatever mode the payload names, and reads a payload
+    // without one as CBC. Every client of this API encrypts with GCM, so accept
+    // nothing else (B-759, core C-076, ASVS v5.0.0-11.3.2)
+    const adapter = createAdapter();
+    if (adapter.unpackText(payload).method !== EncryptionAlgorithm.GCM) {
+        throw new Error("Browser API payload is not AES-GCM encrypted");
+    }
     const privateKey = await importECDHKey(targetPrivateKey);
     const publicKey = await importECDHKey(sourcePublicKey);
     const secret = await deriveSecretKey(privateKey, publicKey);
-    return createAdapter().decrypt(payload, secret) as Promise<string>;
+    return adapter.decrypt(payload, secret) as Promise<string>;
 }
 
 export async function deriveSecretKey(
