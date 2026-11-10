@@ -29,6 +29,11 @@ import { logErr, logInfo, logWarn } from "../library/log";
 import { VaultSettingsLocal } from "../types";
 import { showError, showSuccess, showWarning } from "../services/notifications";
 import { convertVaultToFormat } from "../actions/format";
+import {
+    checkNewMasterPassword,
+    MASTER_PASSWORD_MIN_LENGTH,
+    MASTER_PASSWORD_RECOMMENDED_LENGTH
+} from "../../shared/library/masterPasswordPolicy";
 
 const PAGE_BACKUP = "backup";
 const PAGE_FORMAT = "format";
@@ -181,7 +186,10 @@ export function VaultSettingsDialog() {
             });
     }, [clearPasswords, currentPassword, newPassword, sourceID]);
     const passwordsMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
-    const canChangePassword = currentPassword.length > 0 && newPassword.length > 0 && newPassword === confirmPassword;
+    // Same rules as a new vault (B-758); main checks them again
+    const newPasswordProblem = checkNewMasterPassword(newPassword);
+    const canChangePassword =
+        currentPassword.length > 0 && !newPasswordProblem && newPassword === confirmPassword;
     useEffect(() => {
         if (!sourceID) return;
         getVaultSettings(sourceID)
@@ -321,9 +329,24 @@ export function VaultSettingsDialog() {
                             value={currentPassword}
                         />
                     </FormGroup>
-                    <FormGroup label={t("vault-settings.password.new")}>
+                    <FormGroup
+                        helperText={
+                            <span id="new-master-password-rules" data-testid="new-password-rules">
+                                {newPasswordProblem === "common" && newPassword.length > 0
+                                    ? t("master-password-policy.common")
+                                    : t("master-password-policy.hint", {
+                                          min: MASTER_PASSWORD_MIN_LENGTH,
+                                          recommended: MASTER_PASSWORD_RECOMMENDED_LENGTH
+                                      })}
+                            </span>
+                        }
+                        intent={newPasswordProblem === "common" ? Intent.DANGER : Intent.NONE}
+                        label={t("vault-settings.password.new")}
+                    >
                         <InputGroup
+                            aria-describedby="new-master-password-rules"
                             autoComplete="new-password"
+                            intent={newPasswordProblem === "common" ? Intent.DANGER : Intent.NONE}
                             onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setNewPassword(evt.target.value)}
                             type="password"
                             value={newPassword}

@@ -71,7 +71,7 @@ test.describe("adding a vault twice", () => {
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: button }).click();
         const passwordPrompt = window.getByPlaceholder("Vault password...");
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
     };
 
@@ -124,7 +124,7 @@ test.describe("adding a vault twice", () => {
         await vaultTab.click({ button: "right" });
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
         const passwordPrompt = window.getByPlaceholder("Vault password...");
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         await expect.poll(() => readFileSync(vaultsJSON, "utf8")).toMatch(/locationKey/);

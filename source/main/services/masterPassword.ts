@@ -9,6 +9,7 @@ import { writePasswordChangeBackup } from "./backup";
 import { disableSourceBiometricUnlock, replaceSourceBiometricPassword } from "./biometrics";
 import { logErr, logInfo } from "../library/log";
 import { ChangeMasterPasswordResult } from "../types";
+import { checkNewMasterPassword } from "../../shared/library/masterPasswordPolicy";
 
 /**
  * Change a vault's master password (#1046). Writes a backup of the vault, still
@@ -27,6 +28,11 @@ export async function changeVaultMasterPassword(
     }
     if (!newPassword || newPassword === currentPassword) {
         return { ok: false, reason: "same-password" };
+    }
+    // Checked here as well as in the dialog: the renderer is not the place to enforce it (B-758)
+    const problem = checkNewMasterPassword(newPassword);
+    if (problem) {
+        return { ok: false, reason: problem === "common" ? "common-password" : "too-short" };
     }
     const backup = await exportSourceEncrypted(sourceID, currentPassword);
     const backupPath = await writePasswordChangeBackup(sourceID, backup);

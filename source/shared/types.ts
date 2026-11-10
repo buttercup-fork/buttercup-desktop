@@ -32,7 +32,12 @@ export type ChangeMasterPasswordResult =
       }
     | {
           ok: false;
-          reason: "invalid-password" | "not-unlocked" | "same-password";
+          reason:
+              | "common-password"
+              | "invalid-password"
+              | "not-unlocked"
+              | "same-password"
+              | "too-short";
       };
 
 export interface Config {

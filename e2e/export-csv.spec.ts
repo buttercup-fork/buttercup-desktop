@@ -66,7 +66,7 @@ test.describe("CSV export", () => {
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: "Create New" }).click();
         const passwordPrompt = window.getByPlaceholder("Vault password...");
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(passwordPrompt).toBeHidden();
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();

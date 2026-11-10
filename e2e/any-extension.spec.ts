@@ -58,7 +58,7 @@ test.describe("vault files with any extension", () => {
         await openAddVault();
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: "Create New" }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();
         copyFileSync(join(dir, "original.bcup"), join(dir, "my-vault"));
@@ -67,7 +67,7 @@ test.describe("vault files with any extension", () => {
         await openAddVault();
         await window.getByText("File", { exact: true }).click();
         await window.getByRole("button", { name: "Load Existing" }).click();
-        await passwordPrompt.fill("pass");
+        await passwordPrompt.fill("pass-e2e-vault");
         await passwordPrompt.press("Enter");
         await expect(window.getByText("my-vault", { exact: true }).first()).toBeVisible();
         await expect(window.getByRole("button", { name: "New Entry" })).toBeVisible();

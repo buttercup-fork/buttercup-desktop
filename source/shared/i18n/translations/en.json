@@ -281,6 +281,11 @@
         "vault-settings-fetch-failed": "Failed fetching vault settings"
     },
     "input-required": "(required)",
+    "master-password-policy": {
+        "common": "This is a common password. Choose another.",
+        "hint": "At least {{min}} characters, any you like. {{recommended}} or more is better.",
+        "too-short": "Use at least {{min}} characters."
+    },
     "notification": {
         "attachment-downloaded": "Attachment saved successfully",
         "biometrics-disabled": "Biometrics disabled for vault",
@@ -494,8 +499,10 @@
             "description": "Change the master password of this vault. <strong>Every other app or device that opens this vault</strong> (browser extension, mobile, other computers) will need the new password. Existing backups stay locked with the old password.",
             "error": {
                 "failed": "Failed changing the master password",
+                "common-password": "The new password is a common password. Choose another.",
                 "invalid-password": "The current password is not correct",
-                "same-password": "The new password must be different from the current one"
+                "same-password": "The new password must be different from the current one",
+                "too-short": "The new password is too short. Use at least 8 characters."
             },
             "mismatch": "The passwords do not match",
             "new": "New password",
