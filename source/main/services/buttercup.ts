@@ -105,6 +105,11 @@ export async function attachVaultManagerWatchers() {
             try {
                 if (!__watchedVaultSources.includes(source.id)) {
                     source.on("updated", () => onVaultSourceUpdated(source));
+                    // Core emits only these on lock and unlock, not "updated":
+                    // drop the decrypted facade, and never reuse one from before
+                    // a lock (B-746)
+                    source.on("locked", () => clearFacadeCache(source.id));
+                    source.on("unlocked", () => clearFacadeCache(source.id));
                     __watchedVaultSources.push(source.id);
                 }
                 attachSourceEncryptedListeners(source);
@@ -314,6 +319,11 @@ export function getUnlockedSourceIDs(): Array<VaultSourceID> {
 export function getUnlockedSourcesCount(): number {
     const mgr = getVaultManager();
     return mgr.unlockedSources.length;
+}
+
+export function isSourceUnlocked(sourceID: VaultSourceID): boolean {
+    const source = getVaultManager().getSourceForID(sourceID);
+    return !!source && source.status === VaultSourceStatus.Unlocked;
 }
 
 export function getVaultFacadeBySource(sourceID: VaultSourceID): VaultFacade {
