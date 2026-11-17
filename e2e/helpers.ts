@@ -26,9 +26,15 @@ export interface LaunchedApp {
  * Requires `npm run build` to have been run first (the `test:e2e` script does
  * this for you).
  */
-export async function launchApp(): Promise<LaunchedApp> {
+export async function launchApp(
+    options: {
+        /** Runs before the app starts, to place files (an older config) in the sandbox. */
+        prepare?: (homeDir: string) => void;
+    } = {}
+): Promise<LaunchedApp> {
     const sandboxDir = mkdtempSync(join(tmpdir(), "buttercup-e2e-"));
     const userDataDir = join(sandboxDir, "electron");
+    options.prepare?.(sandboxDir);
 
     // Extra flags that make Electron reliable in headless / CI / VM environments
     // where there is no real GPU. Harmless on a normal desktop.

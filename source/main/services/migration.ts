@@ -10,7 +10,28 @@ export type ConfigMigration = [name: string, migration: (config: Config) => Conf
  */
 export const REMOVED_FILE_HOST_KEYS = ["fileHostKey", "fileHostKeyVersion"] as const;
 
+/**
+ * Marker for the one-time reset of paired browsers (B-800). 3.0.0 shares the settings
+ * folder with earlier versions, whose browser connection could be paired from the
+ * network or a web page (B-569 to B-571), and nothing else ever removes a pairing.
+ */
+export const BROWSER_PAIRINGS_RESET_KEY = "browserPairingsReset" as const;
+const BROWSER_PAIRINGS_RESET_VERSION = 1;
+
 const MIGRATIONS: Array<ConfigMigration> = [
+    [
+        "forgetEarlierBrowserPairings",
+        (config: Config) => {
+            if (config[BROWSER_PAIRINGS_RESET_KEY] === BROWSER_PAIRINGS_RESET_VERSION) {
+                return null; //  No change
+            }
+            return {
+                ...config,
+                browserClients: {},
+                [BROWSER_PAIRINGS_RESET_KEY]: BROWSER_PAIRINGS_RESET_VERSION
+            };
+        }
+    ],
     [
         "removeFileHost",
         (config: Config) => {
