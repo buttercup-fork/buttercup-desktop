@@ -47,6 +47,8 @@ export interface Config {
             publicKey: string;
         }
     >;
+    // Set once the pairings of earlier versions were forgotten (B-800)
+    browserPairingsReset?: number;
     browserPrivateKey: string | null;
     browserPublicKey: string | null;
     isMaximised: boolean;
