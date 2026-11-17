@@ -80,7 +80,19 @@ export async function addVault(
     });
     await vaultManager.interruptAutoUpdate(async () => {
         await vaultManager.addSource(source);
-        await source.unlock(passCredentials, { initialiseRemote: createNew });
+        try {
+            await source.unlock(passCredentials, { initialiseRemote: createNew });
+        } catch (err) {
+            // B-798: the stored credentials are encrypted with the password just
+            // typed, so a vault that failed to unlock here could never unlock
+            // later, and it blocked adding the same file again
+            try {
+                await removeSource(source.id);
+            } catch (removeErr) {
+                logErr(`Failed removing vault "${name}" after it failed to add`, removeErr);
+            }
+            throw err;
+        }
         await vaultManager.dehydrateSource(source);
     });
     void startAutoVaultLockTimer();
