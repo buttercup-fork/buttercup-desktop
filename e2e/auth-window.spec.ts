@@ -11,8 +11,23 @@ test.describe("third-party sign-in window", () => {
     let launched: LaunchedApp;
     let server: Server;
     let base: string;
+    // The redirect address on another site, like the provider's registered
+    // redirect page: it must never be loaded, because the token is in its address
+    let landing: Server;
+    let landingBase: string;
+    let landingRequests: string[] = [];
 
     test.beforeAll(async () => {
+        landing = createServer((req, res) => {
+            landingRequests.push(req.url ?? "");
+            // A page that reads the token from its own address and sends it home
+            res.writeHead(200, { "Content-Type": "text/html" });
+            res.end(
+                "<script>new Image().src = '/leak?' + encodeURIComponent(location.hash);</script>"
+            );
+        });
+        await new Promise<void>((resolve) => landing.listen(0, "127.0.0.1", resolve));
+        landingBase = `http://127.0.0.1:${(landing.address() as AddressInfo).port}`;
         server = createServer((req, res) => {
             if (req.url === "/start") {
                 res.writeHead(302, { Location: "/done?access_token=tok123&state=x" });
@@ -21,6 +36,17 @@ test.describe("third-party sign-in window", () => {
                 // A page with a link on to the redirect address, like the provider's last step
                 res.writeHead(200, { "Content-Type": "text/html" });
                 res.end('<a id="go" href="/done#access_token=tok456">Continue</a>');
+            } else if (req.url === "/start-elsewhere") {
+                res.writeHead(302, {
+                    Location: `${landingBase}/landing#access_token=tok-redirect`
+                });
+                res.end();
+            } else if (req.url === "/start-elsewhere-script") {
+                // The provider's page sends the browser on with a script
+                res.writeHead(200, { "Content-Type": "text/html" });
+                res.end(
+                    `<script>location.href = ${JSON.stringify(`${landingBase}/landing#access_token=tok-script`)};</script>`
+                );
             } else {
                 res.writeHead(200).end("ok");
             }
@@ -33,6 +59,11 @@ test.describe("third-party sign-in window", () => {
     test.afterAll(async () => {
         await launched?.close();
         server.close();
+        landing.close();
+    });
+
+    test.beforeEach(() => {
+        landingRequests = [];
     });
 
     const authenticate = (url: string) =>
@@ -93,6 +124,21 @@ test.describe("third-party sign-in window", () => {
         expect(await pending).toBe("tok456");
         // Nothing was sent to the user's browser on the way
         expect(await launched.app.evaluate(() => (globalThis as any).__opened)).toEqual([]);
+    });
+
+    test("does not load the redirect page that carries the token (server redirect)", async () => {
+        const token = await authenticate(`${base}/start-elsewhere`);
+        expect(token).toBe("tok-redirect");
+        // Give a page that did start loading time to arrive and report back
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        expect(landingRequests).toEqual([]);
+    });
+
+    test("does not load the redirect page that carries the token (script)", async () => {
+        const token = await authenticate(`${base}/start-elsewhere-script`);
+        expect(token).toBe("tok-script");
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        expect(landingRequests).toEqual([]);
     });
 
     test("only opens http and https pages", async () => {

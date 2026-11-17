@@ -65,9 +65,14 @@ export async function authenticate(
         authWin.loadURL(authURL);
         authWin.show();
 
-        const navigateCB = (url: string) => {
+        // The redirect address carries the token and is often not ours (Dropbox
+        // still sends it to the original project's site), so once it matches, the
+        // window must not go on to load it: take the token, stop the navigation
+        // where the event allows it, and close
+        const navigateCB = (url: string, event?: { preventDefault: () => void }) => {
             const match = url.match(matchRegex);
             if (match !== null && match.length > 0) {
+                event?.preventDefault();
                 foundToken = match[1];
                 authWin.close();
             }
@@ -83,10 +88,11 @@ export async function authenticate(
             resolve(null);
         };
 
+        // Cannot be stopped; the two events below come first for redirects and page navigations
         authWin.webContents.on("did-start-navigation", (e, url) => navigateCB(url));
-        authWin.webContents.on("will-redirect", (e, url) => navigateCB(url));
-        // A link or button on the page that leads to the redirect address
-        authWin.webContents.on("will-navigate", (e, url) => navigateCB(url));
+        authWin.webContents.on("will-redirect", (e, url) => navigateCB(url, e));
+        // A link, button or script on the page that leads to the redirect address
+        authWin.webContents.on("will-navigate", (e, url) => navigateCB(url, e));
         authWin.on("close", () => {
             // Wipe the throwaway session so no auth cookies / tokens linger.
             try {
