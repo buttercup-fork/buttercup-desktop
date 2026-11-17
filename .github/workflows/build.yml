@@ -17,10 +17,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macOS and Windows need runners on those systems: GitHub has them,
-        # the Forgejo instance only has a Linux runner
+        # Windows needs a Windows runner: GitHub has one, the Forgejo instance
+        # only has a Linux runner. No macOS build until macOS releases are
+        # tested again: the release job needs every build, so a failing macOS
+        # build would stop the release, and a passing one would put an
+        # untested app in it
         include: >-
-          ${{ fromJSON(github.server_url == 'https://github.com' && '[{"os": "windows-latest", "package": "package:win"}, {"os": "macos-latest", "package": "package:mac"}, {"os": "ubuntu-latest", "package": "package:linux"}]' || '[{"os": "ubuntu-latest", "package": "package:linux"}]') }}
+          ${{ fromJSON(github.server_url == 'https://github.com' && '[{"os": "windows-latest", "package": "package:win"}, {"os": "ubuntu-latest", "package": "package:linux"}]' || '[{"os": "ubuntu-latest", "package": "package:linux"}]') }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
