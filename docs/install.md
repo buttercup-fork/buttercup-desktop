@@ -8,7 +8,6 @@ Downloads are on the [releases page](https://github.com/buttercup-fork/buttercup
 | | `Buttercup-win-x64-<version>-portable.exe` | Runs without installing; keeps its data in a `Buttercup-data` folder next to the `.exe`. |
 | Linux x64 | `Buttercup-linux-amd64.deb` | Debian, Ubuntu and derivatives. Recommended on Ubuntu 24.04 and later (see below). |
 | | `Buttercup-linux-x86_64.AppImage` | Runs on most distributions. |
-| Linux arm64 | `Buttercup-linux-arm64.deb`, `Buttercup-linux-arm64.AppImage` | Same as x64. |
 
 ## Check the download first
 
