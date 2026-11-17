@@ -42,6 +42,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Fixed
 
+- A vault added with a wrong password stayed in the vault list, locked, and could never be unlocked, even with the right password; adding the same file again was refused because it was already in the list. A vault that fails to open while it is being added is now left out of the list, so you can try again (B-798).
 - The browser extension's OTP list showed the codes of deleted entries: entries in the Trash, including those inside a deleted group, kept offering their OTP codes in the extension. They are now left out, as the extension's entry search already did (B-727).
 - Error messages showed HTML codes instead of quotes and other characters: a failed export or import read `open &#39;C:\…\x.csv&#39;` instead of `open 'C:\…\x.csv'`. Values in messages are no longer HTML-escaped, since every message is shown as text; a test checks that the few texts shown as HTML take no values (B-712).
 - A wrong vault password now says "Wrong password. Try again." and asks again, instead of a long technical error ("Vault unlock failed: Error invoking remote method 'unlock-source': … unable to authenticate data"). A vault file that is damaged or was changed by someone else is not reported as a wrong password. This needs the core update with the error code for a wrong password (core B-117), which desktop takes with the next core update; until then the old message stays (B-117).
