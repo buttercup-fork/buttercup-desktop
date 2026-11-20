@@ -5,6 +5,10 @@ class MockAutoUpdater extends EventEmitter {
     quitAndInstallCalled = false;
     quitAndInstall = jest.fn<() => void>();
     downloadUpdate = jest.fn<() => Promise<void>>();
+    checkForUpdates = jest.fn<() => Promise<unknown>>();
+    setFeedURL = jest.fn();
+    allowPrerelease = false;
+    autoDownload = false;
 }
 
 const mockApp = new EventEmitter();
@@ -23,7 +27,11 @@ jest.unstable_mockModule("delayable-setinterval", () => ({
     setDelayedInterval: jest.fn()
 }));
 jest.unstable_mockModule("./windows", () => ({ getMainWindow: () => null }));
-jest.unstable_mockModule("./config", () => ({ getConfigValue: jest.fn() }));
+jest.unstable_mockModule("./config", () => ({
+    getConfigValue: jest.fn(async () => ({ prereleaseUpdates: false }))
+}));
+// Checks run at once in these tests, not 2.5 s after the last call
+jest.unstable_mockModule("debounce-promise", () => ({ default: (fn: unknown) => fn }));
 jest.unstable_mockModule("./navigation", () => ({ openExternalSafely: mockOpenExternal }));
 jest.unstable_mockModule("../library/log", () => ({
     logErr: jest.fn(),
@@ -35,9 +43,13 @@ jest.unstable_mockModule("../../shared/i18n/trans", () => ({ t: (key: string) =>
 
 let installUpdate: typeof import("./update").installUpdate;
 let startUpdate: typeof import("./update").startUpdate;
+let checkForUpdate: typeof import("./update").checkForUpdate;
+let disableUpdates: typeof import("./update").disableUpdates;
+let getUpdateStatus: typeof import("./update").getUpdateStatus;
 
 beforeAll(async () => {
-    ({ installUpdate, startUpdate } = await import("./update"));
+    ({ installUpdate, startUpdate, checkForUpdate, disableUpdates, getUpdateStatus } =
+        await import("./update"));
 });
 
 beforeEach(() => {
@@ -119,4 +131,58 @@ test("doesn't watch quits when there was nothing to install", async () => {
     await nextRound();
     expect(quit().prevented).toBe(false);
     expect(mockAutoUpdater.listenerCount("error")).toBe(0);
+});
+
+// The About dialog shows the result of the last check (B-810). The updater's
+// listeners are attached once, at the first check, so one test follows them.
+describe("update status", () => {
+    test("follows each check", async () => {
+        expect(getUpdateStatus()).toEqual({ state: "not-checked" });
+
+        let finish: (value: unknown) => void;
+        mockAutoUpdater.checkForUpdates.mockImplementation(
+            () => new Promise((resolve) => (finish = resolve))
+        );
+        const running = checkForUpdate();
+        await nextRound();
+        expect(getUpdateStatus()).toEqual({ state: "checking" });
+        mockAutoUpdater.emit("update-not-available");
+        finish(null);
+        await running;
+        expect(getUpdateStatus()).toEqual({ state: "up-to-date", checkedAt: expect.any(Number) });
+
+        mockAutoUpdater.checkForUpdates.mockImplementation(async () => {
+            mockAutoUpdater.emit("update-available", { version: "3.0.1", releaseDate: "" });
+        });
+        await checkForUpdate();
+        expect(getUpdateStatus()).toEqual({
+            state: "available",
+            version: "3.0.1",
+            checkedAt: expect.any(Number)
+        });
+
+        mockAutoUpdater.checkForUpdates.mockImplementation(async () => {
+            mockAutoUpdater.emit("error", new Error("net::ERR_INTERNET_DISCONNECTED"));
+        });
+        await checkForUpdate();
+        expect(getUpdateStatus()).toEqual({ state: "failed", checkedAt: expect.any(Number) });
+
+        mockAutoUpdater.checkForUpdates.mockRejectedValue(new Error("feed broke"));
+        await checkForUpdate();
+        expect(getUpdateStatus()).toEqual({ state: "failed", checkedAt: expect.any(Number) });
+
+        // An error outside a check (a failed install) leaves the last result
+        mockAutoUpdater.checkForUpdates.mockImplementation(async () => {
+            mockAutoUpdater.emit("update-not-available");
+        });
+        await checkForUpdate();
+        mockAutoUpdater.emit("error", new Error("spawn EACCES"));
+        expect(getUpdateStatus().state).toBe("up-to-date");
+    });
+
+    // Last: disabling can't be undone in a run
+    test("reports checks as off after --no-update", () => {
+        disableUpdates();
+        expect(getUpdateStatus()).toEqual({ state: "off" });
+    });
 });

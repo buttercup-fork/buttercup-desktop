@@ -13,9 +13,20 @@ export interface AddVaultPayload {
     fileNameOverride?: string;
 }
 
-export interface AppEnvironmentFlags {
-    portable: boolean;
+export interface AboutInfo {
+    version: string;
+    electron: string;
+    chrome: string;
+    node: string;
+    /** "Windows", "macOS", "Linux" (other platforms by Node's name) */
+    platform: string;
+    arch: string;
+    install: "installed" | "portable" | "AppImage";
+    update: UpdateStatus;
 }
+
+/** The About dialog's links, opened by the main process by name (B-810) */
+export type AboutLinkID = "website" | "releases" | "issues" | "security" | "licence";
 
 export enum AppStartMode {
     HiddenOnBoot = "hiddenOnBoot",
@@ -110,6 +121,15 @@ export enum ThemeSource {
 
 export interface UpdatedEntryFacade extends EntryFacade {
     isNew?: boolean;
+}
+
+/** The result of the last update check (B-810) */
+export interface UpdateStatus {
+    state: "not-checked" | "checking" | "up-to-date" | "available" | "failed" | "off";
+    /** The newer version, when one is available */
+    version?: string;
+    /** When the check finished (ms since the epoch) */
+    checkedAt?: number;
 }
 
 export interface UpdateProgressInfo {

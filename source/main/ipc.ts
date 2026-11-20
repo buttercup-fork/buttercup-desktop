@@ -55,7 +55,6 @@ import { writeClipboardText } from "./services/clipboardWrite";
 import { startAutoVaultLockTimer } from "./services/autoLock";
 import { log as logRaw, logInfo, logErr } from "./library/log";
 import { isWrongPasswordError } from "./library/vaultErrors";
-import { isPortable } from "./library/portability";
 import { convertVaultFormat } from "./services/format";
 import { clearCode } from "./services/browser/interaction";
 import { chooseQRImageFile, readClipboardQRImage } from "./services/qr";
@@ -63,10 +62,11 @@ import { chooseVaultFileForUpload } from "./services/vaultFile";
 import { changeVaultMasterPassword } from "./services/masterPassword";
 import { authenticate as authenticate3rdParty } from "./services/auth3rdParty";
 import { openExternalSafely } from "./services/navigation";
+import { copyAboutDetails, getAboutInfo, openAboutLink } from "./services/about";
 import { shouldUseDarkColors } from "./services/theme";
 import { getSiteIcon } from "./services/siteIcons";
 import {
-    AppEnvironmentFlags,
+    AboutInfo,
     AddVaultPayload,
     ChangeMasterPasswordResult,
     LogLevel,
@@ -251,9 +251,15 @@ ipcMain.handle("copied-into-clipboard", (_, text: string) => {
     restartAutoClearClipboardTimer(text);
 });
 
-ipcMain.handle("get-app-environment", async (): Promise<AppEnvironmentFlags> => ({
-    portable: isPortable()
-}));
+ipcMain.handle("get-about-info", (): AboutInfo => getAboutInfo());
+
+ipcMain.handle("open-about-link", (_, id: unknown) => {
+    openAboutLink(id);
+});
+
+ipcMain.handle("copy-about-details", (_, coreVersion: unknown) => {
+    copyAboutDetails(coreVersion);
+});
 
 ipcMain.handle("get-biometric-source-password", async (_, sourceID: VaultSourceID) => {
     return getSourcePasswordViaBiometrics(sourceID);
