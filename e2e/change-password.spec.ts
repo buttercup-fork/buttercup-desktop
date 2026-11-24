@@ -82,7 +82,7 @@ test.describe("change master password", () => {
         await window.getByRole("menuitem", { name: "Unlock vault", exact: true }).click();
         await passwordPrompt.fill("old-pass");
         await passwordPrompt.press("Enter");
-        await expect(window.getByText(/Vault unlock failed/)).toBeVisible();
+        await expect(window.getByText("Wrong password. Try again.")).toBeVisible();
         await expect(window.getByRole("button", { name: "New Entry" })).toBeHidden();
         // The prompt stays open after a failed attempt
         await passwordPrompt.fill("new-pass");

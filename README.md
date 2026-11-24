@@ -1,15 +1,17 @@
 # Buttercup Desktop
-> Buttercup for Desktop - Mac, Linux and Windows
+> Buttercup for Desktop - Windows and Linux
 
-[![Buttercup - Codekunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/buttercup-fork/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/buttercup-fork/buttercup-desktop?label=latest)](https://github.com/buttercup-fork/buttercup-desktop/releases/latest)
+**3.0.0 / 4.0.0 (2026-11-24) fix security problems in the original Buttercup apps.** What to do: [release notes](https://github.com/buttercup-fork/buttercup-desktop/releases/tag/v3.0.0).
 
-<img width="1406" alt="Buttercup Desktop screenshot" src="https://github.com/buttercup/buttercup-desktop/assets/3869469/1320b163-3e5c-4423-a4fd-8de7ffad2a0e">
+[![Buttercup - CodeKunde fork](resources/badge/buttercup-codekunde.svg)](https://github.com/buttercup-fork/buttercup-desktop) [![Latest release](https://img.shields.io/github/v/release/buttercup-fork/buttercup-desktop?label=latest)](https://github.com/buttercup-fork/buttercup-desktop/releases/latest)
+
+<img width="1406" alt="Buttercup Desktop screenshot" src="preview.png">
 
 ---
 
 ℹ️ **About this fork**
 
-The original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop) was closed by its maintainers and its repositories archived. This is an independent fork, maintained by **Codekunde** to keep the app working and secure (bug fixes, dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed. In-app update checks read this repository's releases.
+The original [Buttercup password manager](https://github.com/buttercup/buttercup-desktop) was closed by its maintainers and its repositories archived. This is an independent fork, maintained by **CodeKunde** to keep the app working and secure (bug fixes, dependency upgrades, Electron modernization, tooling). See [`CHANGELOG.md`](CHANGELOG.md) for what has changed. In-app update checks read this repository's releases.
 
 This fork is not affiliated with, endorsed by, or supported by the original Buttercup maintainers. It has not yet undergone an independent security audit (this line will be removed once/if one happens).
 
@@ -23,7 +25,16 @@ It depends on the companion fork [`buttercup-fork/buttercup-core`](https://githu
 
 Buttercup is a free, open-source and cross-platform **password manager**, built on NodeJS with Typescript. It uses strong industry-standard encryption to protect your passwords and credentials (among other data you store in Buttercup vaults) at rest, within vault files (`.bcup`). Vaults can be loaded from and saved to a number of sources, such as the **local filesystem**, **Dropbox**, **Google Drive** or any **WebDAV**-enabled service (like _ownCloud_ or _Nextcloud_ ¹).
 
-> **Known issue:** **Google Drive** sign-in works, but this fork's Google sign-in app is still in Google's *Testing* mode until Google approves it. Until then, only Google accounts added as test users can sign in, and they have to sign in again every 7 days. Google Drive vaults added with a version before the new sign-in ask to sign in once more. Buttercup can only see Drive files it created itself: to open a vault made elsewhere, download it and use **Upload Vault** when adding the Google Drive vault. Local files, Dropbox and WebDAV are unaffected.
+### Known issues
+
+None of these leaks a password to a web page.
+
+ * **Google Drive:** any Google account can sign in. While this fork's Google sign-in app was in Google's *Testing* mode, a sign-in had to be repeated every 7 days; we are still checking that this has stopped, so if Google Drive asks you to sign in again, do so. Google Drive vaults added with a version before the new sign-in ask to sign in once more. Buttercup can only see Drive files it created itself: to open a vault made elsewhere, download it and use **Upload Vault** when adding the Google Drive vault. Local files, Dropbox and WebDAV are unaffected.
+ * **Dropbox** sign-in still goes through the original Buttercup project's Dropbox app, and requests to cloud and WebDAV services still name the original project's website as their origin. Both move to this fork's own setup in a later release.
+ * **Browser extension:** the in-page menu shows only entries for the site you're on and has no search; search and copy work from the extension's toolbar button. Passwords copied from the extension's popup are not cleared from the clipboard and can end up in clipboard history (copies from this app can be cleared automatically, see [Precautions](#precautions)).
+ * An entry for a **shared hosting name** (for example `example-host.org`) is also offered on its users' subdomains (`someone.example-host.org`).
+ * **Attachments:** two devices that each add a vault's first attachment before either has synced can leave one device's attachments unreadable. Until this is fixed, add the first attachment on one device and let it sync before adding attachments elsewhere.
+ * **Linux:** locking vaults when the screen locks needs the system's `dbus-monitor` (package `dbus-bin`, installed on most desktops). Without it, vaults lock on sleep only, and a warning is logged.
 
 ### Why you need a password manager
 
@@ -47,7 +58,7 @@ _It is very important to note that no one associated with Buttercup will ever re
 
 ### Versions
 
-The current stable version is **2**. If you're still on v1, upgrade: it is no longer maintained. You can still browse the v1 source and documentation [here](https://github.com/buttercup/buttercup-desktop/tree/v1).
+The current stable version is **3**, the first release of this fork. If you're still on v1 or v2, upgrade: they are no longer maintained. You can still browse the v1 source and documentation [here](https://github.com/buttercup/buttercup-desktop/tree/v1).
 
 The app is built on [Electron](https://www.electronjs.org/) (see `package.json` for the current version) and is built in CI with Node 22 LTS.
 
@@ -56,10 +67,9 @@ The app is built on [Electron](https://www.electronjs.org/) (see `package.json` 
 Builds are provided for:
 
  * Linux: x64, as an AppImage (runs on most distributions, such as Ubuntu) and a `.deb` package (Debian/Ubuntu)
- * macOS: Intel (x64) and Apple Silicon (arm64)¹
  * Windows 10 / 11 (x64)
 
- ¹ Apple Silicon builds first shipped in 2.31.0 and have not yet been tested on real Apple Silicon hardware.
+There is no macOS build and no Linux arm64 build in this release: both follow once they have been tested.
 
 All builds are **unsigned** - see [Published Applications](#published-applications).
 
@@ -69,11 +79,11 @@ This fork does not provide 32bit builds.
 
 ## Portability
 
-Buttercup provides a portable **Windows** version. Look for the release asset named like `Buttercup-win-x64-2.31.0-portable.exe`, where `2.31.0` is the version and `x64` is the architecture.
+Buttercup provides a portable **Windows** version. Look for the release asset named like `Buttercup-win-x64-3.0.0-portable.exe`, where `3.0.0` is the version and `x64` is the architecture. It keeps all of its data (vault list, settings, backups, log and the app's own profile) in a **`Buttercup-data`** folder next to the `.exe`. On its first start it copies the vault list and settings from the standard locations (see [Configuration](#configuration)), so vaults you already use are still listed; the originals are left in place.
 
-Although not explicitly portable, both the Mac **zip** and Linux **AppImage** formats are more or less standalone. They still write to the standard config/log destinations, however.
+Although not explicitly portable, the Linux **AppImage** is more or less standalone. It still writes to the standard config/log destinations, however.
 
-**On its own, the Windows portable build is not fully portable:** it still keeps its configuration and vault list in the standard OS locations (see [Configuration](#configuration)); only the log file is written next to the executable. To keep everything alongside the executable, set some environment variables:
+To put the data somewhere else (for the portable build or any other), set some environment variables:
 
 | Environment Variable   | Description |
 |------------------------|-------------|
@@ -90,7 +100,7 @@ Although not explicitly portable, both the Mac **zip** and Linux **AppImage** fo
 if not exist "%~dp0Buttercup" mkdir "%~dp0Buttercup"
 set "BUTTERCUP_HOME_DIR=%~dp0Buttercup"
 set "BUTTERCUP_TEMP_DIR=%temp%"
-start "" "%~dp0Buttercup-win-x64-2.31.0-portable.exe" %*
+start "" "%~dp0Buttercup-win-x64-3.0.0-portable.exe" %*
 ```
 
 ## Configuration
@@ -139,7 +149,7 @@ Logs are written for all app sessions, to `buttercup-desktop.log` in:
  * Mac: `~/Library/Logs/Buttercup-nodejs`
  * Windows: `%LOCALAPPDATA%\Buttercup-nodejs\Log`
 
-_Note that logs for portable Windows applications will be written to the same directory that the executable resides in._
+_The portable Windows app writes its log to `Buttercup-data\log`, next to the executable._
 
 ## Published Applications
 
@@ -148,18 +158,15 @@ You can view the current releases on the [releases page](https://github.com/butt
 | Platform | Assets |
 |----------|--------|
 | Windows (x64) | `Buttercup-win-x64-<version>-installer.exe` (installer), `Buttercup-win-x64-<version>-portable.exe` (portable), `Buttercup-win-x64-<version>.7z` (archive) |
-| macOS, Intel | `Buttercup-mac-x64-<version>.dmg` / `.zip` |
-| macOS, Apple Silicon | `Buttercup-mac-arm64-<version>.dmg` / `.zip` |
 | Linux, x64 | `Buttercup-linux-x86_64.AppImage`, `Buttercup-linux-amd64.deb` (Debian/Ubuntu) |
 
 **These builds are not code-signed**, so your OS will warn you the first time you run them:
 
  * **Windows** SmartScreen: choose _More info_, then _Run anyway_.
- * **macOS** Gatekeeper: right-click the app and choose _Open_ (or run `xattr -cr /Applications/Buttercup.app` once).
 
 ### Linux
 
-We provide an **AppImage** build for Linux, because it supports auto-updating, a crucial feature (we feel) for a security application. There is also a **`.deb`** package for Debian, Ubuntu and derivatives, installed with `sudo apt install ./Buttercup-linux-amd64.deb`. The `.deb` does **not** update itself: to update, download the new release's `.deb` and install it over the old one. Other package formats (rpm, Snap) are not provided at this time.
+We provide an **AppImage** build for Linux, and a **`.deb`** package for Debian, Ubuntu and derivatives, installed with `sudo apt install ./Buttercup-linux-amd64.deb`. Neither updates itself (no build of this fork does, as releases aren't code-signed): to update, download the new release from the releases page and replace the AppImage, or install the new `.deb` over the old one. Other package formats (rpm, Snap) are not provided at this time.
 
 The `.deb` installs its own menu entry and URL-scheme handler. The AppImage registers its own `.desktop` entry and URL-scheme handler when run, so no extra tooling is required. Installing [**AppImageLauncher**](https://github.com/TheAssassin/AppImageLauncher#readme) is still a good way to integrate AppImages into your desktop (menu entries, icons, updates) if you'd like that.
 
@@ -199,14 +206,14 @@ The e2e tests launch the real app in an isolated data directory. See [`e2e/READM
 
 ### Dependency security
 
-`npm audit` reports **0 vulnerabilities** (checked 2026-10-02). The importer now comes from the CodeKunde fork, which fixed the `csv-parse` and `xml2js` findings. Other transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
+The production `npm audit` (`npm audit --omit=dev`, checked 2026-11-24) lists two findings, neither reached by the app: `zod` (fixed only in zod 4; the browser access API caps request bodies at 100 KB) and `i18next` (fixed only in i18next 26; the affected code merges translations added while the app runs, which it never does). Both upgrades are planned. The importer comes from the CodeKunde fork, which fixed the `csv-parse` and `xml2js` findings. Other transitive packages that upstream never patched are pinned in the `overrides` block of `package.json` — check there first if an `npm update` reintroduces a finding.
 
 ## Building & Releasing
 
 Two GitHub Actions workflows live in `.github/workflows/`:
 
  * **`test.yml`** runs on every push and on pull requests to `master`: a build plus the unit tests and prettier check on Ubuntu, macOS and Windows, and an informational Playwright end-to-end run.
- * **`build.yml`** runs on pushes to `master`, on `v*` tags, and on demand: it builds **unsigned** installers on Windows, macOS and Linux. On a `v*` tag it also **drafts a GitHub release** with all of the artifacts (including the `latest*.yml` auto-update metadata) attached.
+ * **`build.yml`** runs on pushes to `master`, on `v*` tags, and on demand: it builds **unsigned** installers on Windows and Linux (no macOS build until macOS releases are tested again). On a `v*` tag it also **drafts a GitHub release** with all of the artifacts (including the `latest*.yml` auto-update metadata) attached.
 
 ### Local, unsigned builds
 
@@ -223,7 +230,7 @@ Each platform's installers must be built on that platform (macOS builds in parti
 ### Publishing a release
 
  1. Bump `version` in `package.json` (and the two version fields in `package-lock.json`), run `npm run set-version` (it writes the version into `source/main/library/build.ts`), and add the release to `CHANGELOG.md`.
- 2. Merge that to `master`, then tag it `v<version>` and push the tag (`git tag v2.31.0 && git push origin v2.31.0`).
+ 2. Merge that to `master`, then tag it `v<version>` and push the tag (`git tag -a v3.0.0 -m "..." && git push origin refs/tags/v3.0.0`).
  3. The `Build` workflow builds everything and drafts the release. Review the draft and publish it by hand.
 
 `build.publish` in `package.json` targets `buttercup-fork/buttercup-desktop`, which is also where the in-app update check looks for new versions. Releases aren't code-signed (D-017), so the app only tells the user a new version exists and opens the releases page; it doesn't download or install anything itself.
