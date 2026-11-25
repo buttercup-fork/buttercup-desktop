@@ -15,6 +15,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Fixed
 
 - The tray menu said "2 unlocked vault": the plural strings were in the format of an old version of the translation library, which newer versions ignore. Every language that has the string now has each plural form it needs (Polish and Romanian have more than two), so none of them falls back to English for some numbers.
+- Windows showed the original project's company as the publisher: **Apps & features** listed Buttercup 3.0.0 by "Vault Garden", and the installer and app files carried "Vault Garden" as company and copyright. They now say CodeKunde, which maintains this fork; installing this version updates the entry in **Apps & features**. The Linux package's maintainer is spelled CodeKunde.
 
 ### Security
 

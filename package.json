@@ -54,7 +54,10 @@
     "vault",
     "security"
   ],
-  "author": "Vault Garden",
+  "author": {
+    "name": "CodeKunde",
+    "email": "buttercup@codekunde.net"
+  },
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/buttercup-fork/buttercup-desktop/issues"
@@ -72,7 +75,7 @@
     "appId": "net.codekunde.buttercup",
     "asar": true,
     "productName": "Buttercup",
-    "copyright": "Copyright © Vault Garden",
+    "copyright": "Copyright © CodeKunde",
     "files": [
       "build/**/*",
       "resources/**/*",
@@ -100,7 +103,7 @@
         }
       ],
       "category": "Utility",
-      "maintainer": "Codekunde <buttercup@codekunde.net>",
+      "maintainer": "CodeKunde <buttercup@codekunde.net>",
       "synopsis": "Free and Open Source Password Vault",
       "artifactName": "${productName}-${os}-${arch}.${ext}",
       "mimeTypes": [
