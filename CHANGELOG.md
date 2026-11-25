@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Release history up to and including **2.28.1** predates this file and lives in the [git tags](https://github.com/buttercup-fork/buttercup-desktop/tags) and the original project's GitHub Releases.
 
+## [Unreleased]
+
+### Changed
+
+- A new **About** dialog: the version and who maintains this fork, whether you have the latest version (or that a newer one is out, the last check failed, or update checks are off), the core version and the platform. Links open the website, the release notes, the issue tracker and the security policy, so a vulnerability can be reported privately instead of in a public issue. **Copy details** copies the version, core, Electron, Chromium and Node.js versions and the platform as plain text for a bug report.
+
 ## [3.0.0] - 2026-11-24
 
 ### Added
@@ -228,7 +234,8 @@ First release of the CodeKunde fork. A modernization pass over the archived upst
 - CI actions bumped to Node 24 runtime (`actions/checkout@v5`, `actions/setup-node@v5`, `actions/{upload,download}-artifact@v7`); CI Node is 22. `engines` bumped to `node >=20`, `npm >=9`.
 - This `CHANGELOG.md`.
 
-[Unreleased]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.31.0...HEAD
+[Unreleased]: https://github.com/buttercup-fork/buttercup-desktop/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/buttercup-fork/buttercup-desktop/releases/tag/v3.0.0
 [2.31.0]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.30.1...v2.31.0
 [2.30.1]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.30.0...v2.30.1
 [2.30.0]: https://github.com/buttercup-fork/buttercup-desktop/compare/v2.29.0...v2.30.0

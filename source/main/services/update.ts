@@ -12,7 +12,7 @@ import { isUpdateFeedUnavailable } from "../library/updateErrors";
 import { getConfigValue } from "./config";
 import { openExternalSafely } from "./navigation";
 import { t } from "../../shared/i18n/trans";
-import { UpdateProgressInfo } from "../types";
+import { UpdateProgressInfo, UpdateStatus } from "../types";
 
 // Where to get the installer by hand when the update can't install itself
 const RELEASES_URL = "https://github.com/buttercup-fork/buttercup-desktop/releases/latest";
@@ -33,11 +33,21 @@ let __eventListenersAttached = false,
     __updateErrored: boolean = false,
     __updateFeedWarned: boolean = false,
     __updateMuted: boolean = false,
-    __updatesDisabled: boolean = false;
+    __updatesDisabled: boolean = false,
+    // The result of the last check, for the About dialog (B-810)
+    __updateStatus: UpdateStatus = { state: "not-checked" };
+
+// Only a result that arrives during a check counts: the updater reports install
+// errors through the same "error" event
+function finishCheck(status: UpdateStatus) {
+    if (__updateStatus.state !== "checking") return;
+    __updateStatus = status;
+}
 
 function attachEventListeners(updater = autoUpdater) {
     updater.on("error", (err: Error) => {
         __updateErrored = true;
+        finishCheck({ state: "failed", checkedAt: Date.now() });
         if (err?.message === "net::ERR_INTERNET_DISCONNECTED") {
             logInfo("Updates: Update failed due to no internet connection");
             return;
@@ -60,6 +70,8 @@ function attachEventListeners(updater = autoUpdater) {
     });
     updater.on("update-available", (updateInfo: UpdateInfo) => {
         logInfo(`Updates: Update available: ${updateInfo.version} (${updateInfo.releaseDate})`);
+        // About shows a newer version even when its notification was muted
+        finishCheck({ state: "available", version: updateInfo.version, checkedAt: Date.now() });
         if (__updateMuted) {
             logInfo("Updates: Updates muted: will not notify");
             return;
@@ -71,6 +83,7 @@ function attachEventListeners(updater = autoUpdater) {
     });
     updater.on("update-not-available", () => {
         logInfo("Updates: No update available");
+        finishCheck({ state: "up-to-date", checkedAt: Date.now() });
     });
     updater.on("update-downloaded", (updateInfo: UpdateInfo) => {
         logInfo(`Updates: Updated build downloaded: ${updateInfo.version}`);
@@ -118,9 +131,11 @@ async function checkForUpdateInternal() {
         }
     }
     logInfo("Checking for updates");
+    __updateStatus = { state: "checking" };
     try {
         await autoUpdater.checkForUpdates();
     } catch (err) {
+        finishCheck({ state: "failed", checkedAt: Date.now() });
         // Already handled by the "error" listener
         if (isUpdateFeedUnavailable(err)) return;
         logErr(`Updates: Update check failed: ${err.message}`);
@@ -135,6 +150,11 @@ export function disableUpdates(): void {
 
 export function getCurrentUpdate(): UpdateInfo {
     return !__updateMuted && __currentUpdate && !__updatesDisabled ? __currentUpdate : null;
+}
+
+export function getUpdateStatus(): UpdateStatus {
+    if (__updatesDisabled) return { state: "off" };
+    return { ...__updateStatus };
 }
 
 export function getReadyUpdate(): UpdateInfo {
