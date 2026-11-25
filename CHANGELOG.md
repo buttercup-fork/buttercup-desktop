@@ -12,6 +12,14 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 - A new **About** dialog: the version and who maintains this fork, whether you have the latest version (or that a newer one is out, the last check failed, or update checks are off), the core version and the platform. Links open the website, the release notes, the issue tracker and the security policy, so a vulnerability can be reported privately instead of in a public issue. **Copy details** copies the version, core, Electron, Chromium and Node.js versions and the platform as plain text for a bug report.
 
+### Fixed
+
+- The tray menu said "2 unlocked vault": the plural strings were in the format of an old version of the translation library, which newer versions ignore. Every language that has the string now has each plural form it needs (Polish and Romanian have more than two), so none of them falls back to English for some numbers.
+
+### Security
+
+- Updated `i18next` to 26.7.2 (was 23.16.8; GHSA-6jcc-5g8w-32mx, moderate). The affected code merged translations added while the app runs, which the app never does, so 3.0.0 was not exposed; the update clears the `npm audit` finding.
+
 ## [3.0.0] - 2026-11-24
 
 ### Added
