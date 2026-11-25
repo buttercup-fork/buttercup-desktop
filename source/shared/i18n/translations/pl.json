@@ -71,8 +71,10 @@
         "quit": "Wyjdź",
         "search": "Szukaj",
         "unlock-vault": "Odblokuj",
-        "unlocked-vaults": "{{count}} odblokowane archiwum",
-        "unlocked-vaults_plural": "{{count}} odblokowane archiwa",
+        "unlocked-vaults_one": "{{count}} odblokowane archiwum",
+        "unlocked-vaults_few": "{{count}} odblokowane archiwa",
+        "unlocked-vaults_many": "{{count}} odblokowanych archiwów",
+        "unlocked-vaults_other": "{{count}} odblokowane archiwa",
         "vault": "Archiwum"
     },
     "dialog": {
