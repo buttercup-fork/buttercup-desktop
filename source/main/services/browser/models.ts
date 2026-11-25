@@ -37,7 +37,7 @@ export const EntriesSearchQuerySchema = z.discriminatedUnion("type", [
     }),
     z.object({
         type: z.literal(EntriesSearchType.URL),
-        url: z.string().url()
+        url: z.url()
     })
 ]);
 
@@ -50,7 +50,7 @@ export const SaveExistingEntryParamSchema = z
     .strict();
 
 export const SaveExistingEntryPayloadSchema = z.object({
-    properties: z.record(z.string())
+    properties: z.record(z.string(), z.string())
 });
 
 export const SaveNewEntryParamSchema = z
@@ -61,8 +61,8 @@ export const SaveNewEntryParamSchema = z
     .strict();
 
 export const SaveNewEntryPayloadSchema = z.object({
-    properties: z.record(z.string()),
-    type: z.nativeEnum(EntryType)
+    properties: z.record(z.string(), z.string()),
+    type: z.enum(EntryType)
 });
 
 export const VaultUnlockParamSchema = z

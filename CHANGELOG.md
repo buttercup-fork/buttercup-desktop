@@ -21,6 +21,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 ### Security
 
 - Updated `i18next` to 26.7.2 (was 23.16.8; GHSA-6jcc-5g8w-32mx, moderate). The affected code merged translations added while the app runs, which the app never does, so 3.0.0 was not exposed; the update clears the `npm audit` finding.
+- Updated `zod` to 4.6.7 (was 3.25.76; GHSA-mrhx-c7xc-m3w5, high: memory exhaustion while validating oversized size-limited lists). Zod checks the requests the browser extension sends to Buttercup. They have no size-limited lists, request bodies are capped at 100 kB, and the one list is accepted only from a paired extension, so 3.0.0 was not exposed; the update clears the last `npm audit` finding for the app (production dependencies now report none). The requests accepted and refused are unchanged.
 
 ## [3.0.0] - 2026-11-24
 
