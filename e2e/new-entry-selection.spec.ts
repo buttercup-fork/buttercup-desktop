@@ -63,4 +63,34 @@ test.describe("new entry selection", () => {
         await window.getByRole("button", { name: "Edit" }).click();
         await expect(window.getByPlaceholder("Title")).toHaveValue("Mail");
     });
+
+    // B-811: Login and Website differed only in the URL field; Login has it now
+    test("offers no Website type, and a new Login has a URL field", async () => {
+        const { window } = launched;
+        // Leave the edit of the previous test
+        await window.getByRole("button", { name: "Cancel" }).click();
+        await expect(window.getByRole("button", { name: "Edit" })).toBeVisible();
+        const newEntry = window.getByRole("button", { name: "New Entry" });
+        await window
+            .locator(".bp4-button-group")
+            .filter({ has: newEntry })
+            .getByRole("button")
+            .last()
+            .click();
+        const types = window.getByRole("menuitem");
+        await expect(types).toHaveCount(4);
+        expect(await types.allInnerTexts()).toEqual([
+            expect.stringContaining("Login"),
+            "Credit/Bank Card",
+            "Note",
+            "SSH Key"
+        ]);
+        await window.keyboard.press("Escape");
+        await newEntry.click();
+        await window.getByPlaceholder("Title").fill("Shop");
+        await window.getByPlaceholder("URL", { exact: true }).fill("https://shop.example.com/login");
+        await window.getByRole("button", { name: "Save" }).click();
+        await expect(window.getByRole("button", { name: "Edit" })).toBeVisible();
+        await expect(window.getByText("https://shop.example.com/login")).toBeVisible();
+    });
 });

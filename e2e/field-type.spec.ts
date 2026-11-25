@@ -52,7 +52,12 @@ test.describe("field type changes", () => {
         await expect(
             window.getByRole("menuitem", { name: `Change Type: ${type}` }).locator(".bp4-icon-small-tick")
         ).toHaveCount(1);
+        // Escape reaches the menu only once it has taken focus from the cog button
+        await expect
+            .poll(() => window.evaluate(() => !!document.activeElement?.closest(".bp4-overlay")))
+            .toBe(true);
         await window.keyboard.press("Escape");
+        await expect(window.locator(".bp4-popover")).toHaveCount(0);
         await window.getByRole("button", { name: "Cancel" }).click();
     }
 

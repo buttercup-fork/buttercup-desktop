@@ -10,6 +10,7 @@ Release history up to and including **2.28.1** predates this file and lives in t
 
 ### Changed
 
+- A **Login** has a **URL** field (optional), and **Website** is gone from the **New Entry** menu: the two types differed only in that field. Give a Login its site's address and the browser extension offers it on that site. Existing Website entries open as before, show as a Login and keep their stored type, so other apps and older versions read them unchanged. A Login that already has a custom field named URL shows it as its URL field, without a second, empty one.
 - A new **About** dialog: the version and who maintains this fork, whether you have the latest version (or that a newer one is out, the last check failed, or update checks are off), the core version and the platform. Links open the website, the release notes, the issue tracker and the security policy, so a vulnerability can be reported privately instead of in a public issue. **Copy details** copies the version, core, Electron, Chromium and Node.js versions and the platform as plain text for a bug report.
 
 ### Fixed

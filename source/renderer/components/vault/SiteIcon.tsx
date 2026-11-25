@@ -3,7 +3,6 @@ import { ipcRenderer } from "../../library/ipcRenderer";
 import styled from "styled-components";
 import { DEFAULT_ENTRY_TYPE, EntryType } from "buttercup";
 import ICON_LOGIN from "../../../../resources/images/login.png";
-import ICON_WEBSITE from "../../../../resources/images/website.png";
 import ICON_NOTE from "../../../../resources/images/note.png";
 import ICON_SSH from "../../../../resources/images/ssh.png";
 import ICON_CREDITCARD from "../../../../resources/images/credit-card.png";
@@ -11,7 +10,8 @@ import { isIconDomain } from "./utils/domain";
 
 const ICON_TYPES = {
     [EntryType.Login]: ICON_LOGIN,
-    [EntryType.Website]: ICON_WEBSITE,
+    // A stored Website entry shows as a Login (B-811)
+    [EntryType.Website]: ICON_LOGIN,
     [EntryType.SSHKey]: ICON_SSH,
     [EntryType.Note]: ICON_NOTE,
     [EntryType.CreditCard]: ICON_CREDITCARD
